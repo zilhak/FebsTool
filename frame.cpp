@@ -5,17 +5,48 @@
 wxBEGIN_EVENT_TABLE(Frame, wxFrame)
 wxEND_EVENT_TABLE()
 
-wxString _current_name;
-wxDir * dir;
-
 Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
 {
-    initOpen();
+    initialize();
 }
 
 Frame::~Frame()
 {
     /*EMPTY*/
+}
+
+void Frame::initialize()
+{
+    wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
+
+    initializeStyle();
+    initializeToolBar(v_sizer);
+    initializeImageViewer(v_sizer);
+
+    SetSizer(v_sizer);
+
+    Refresh();
+}
+
+void Frame::initializeStyle()
+{
+    SetMinSize(wxSize(400, 300));
+}
+
+void Frame::initializeToolBar(wxBoxSizer * sizer)
+{
+    _tool_bar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100, 40));
+//    _tool_bar->SetBackgroundColour(wxColour(0x00FF00));
+
+    sizer->Add(_tool_bar, 0, wxEXPAND);
+}
+
+void Frame::initializeImageViewer(wxBoxSizer * sizer)
+{
+    _Image_viewer = new wxPanel(this, wxID_ANY);
+    _Image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
+
+    sizer->Add(_Image_viewer, 1, wxEXPAND);
 }
 
 bool calculateRate(int image_width, int image_height)
@@ -42,7 +73,7 @@ bool calculateRate(int image_width, int image_height)
     return true;
 }
 
-void Frame::initOpen()
+void Frame::onOpenImage()
 {
     wxFileDialog * find = new wxFileDialog(this,
                                            _("Open jpg file"),
@@ -52,22 +83,18 @@ void Frame::initOpen()
     if (find->ShowModal() == wxID_CANCEL) {
         return;
     }
-    dir = new wxDir(find->GetDirectory());
 
-    wxString filename;
-    dir->GetFirst(&filename);
-    if (filename.substr(0,1) == ".") {
-        dir->GetNext(&filename);
+    _dir = new wxDir(find->GetDirectory());
+    _dir->GetFirst(&_current_file, "*.jpg");
+    while (_dir->GetNext(&_current_file)) {
+        std::cout << _current_file << std::endl;
     }
-    _current_name = filename;
-    wxString path = dir->GetName()+"/"+filename;
 
-    while (dir->GetNext(&_current_name)) {
-        std::cout << _current_name << std::endl;
-    }
+    wxString _current_path = _dir->GetName()+"/"+_current_file;
+
 }
 
-bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int image_height, int image_width, int diff)
+bool Frame::saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int image_height, int image_width, int diff)
 {
     tinyxml2::XMLDocument document;
     tinyxml2::XMLDeclaration * dec = document.NewDeclaration();

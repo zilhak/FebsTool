@@ -7,12 +7,34 @@ class Frame : public wxFrame
 public:
     wxDECLARE_EVENT_TABLE();
 
+private:
+    wxDir * _dir;
+    wxString _current_file;
+    wxString _current_path;
+
+private:
+    wxPanel * _tool_bar;
+    wxPanel * _Image_viewer;
+
 public:
     Frame(const wxString & title);
     ~Frame();
 
 private:
-    void initOpen();
+    void initialize();
+    void initializeStyle();
+    void initializeToolBar(wxBoxSizer * sizer);
+    void initializeImageViewer(wxBoxSizer * sizer);
+
+private: // menu event.
+    void onOpenImage();
+    void onExplore();
+
+private: // input event.
+    void onMouseEvent(wxMouseEvent & event);
+    void onKeyboardEvent(wxKeyEvent & event);
+
+private:
+    bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int image_height, int image_width, int diff);
 };
 
-bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int height, int width, int diff);
