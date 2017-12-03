@@ -1,6 +1,7 @@
 #include <wx/wx.h>
 #include <wx/dir.h>
 #include "data/tinyxml2.h"
+#include "ui/ImagePanel.hpp"
 
 class Frame : public wxFrame
 {

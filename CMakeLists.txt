@@ -15,6 +15,6 @@ ELSE(wxWidgets_FOUND)
     message("wxWidgets not found!!!!!!!!!")
 ENDIF(wxWidgets_FOUND)
 
-add_executable(ImageSearcher main.cpp ui/frame.cpp data/tinyxml2.cpp)
+add_executable(ImageSearcher main.cpp ui/frame.cpp data/tinyxml2.cpp ui/ImagePanel.cpp ui/ImagePanel.hpp)
 target_link_libraries(ImageSearcher ${wxWidgets_LIBRARIES})
 
