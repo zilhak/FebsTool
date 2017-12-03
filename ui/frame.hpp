@@ -1,6 +1,5 @@
 #include <wx/wx.h>
 #include <wx/dir.h>
-#include "data/tinyxml2.h"
 #include "ui/ImagePanel.hpp"
 
 class Frame : public wxFrame
@@ -21,7 +20,7 @@ private:
 
 private:
     wxPanel * _tool_bar;
-    wxPanel * _Image_viewer;
+    ImagePanel * _image_viewer;
 
 private:
     wxButton * _open_button;
@@ -46,6 +45,7 @@ private: // input event.
     void onKeyboardEvent(wxKeyEvent & event);
 
 private:
-    bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int image_height, int image_width, int diff);
+    void prevFile();
+    void nextFile();
 };
 

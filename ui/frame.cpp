@@ -4,6 +4,8 @@
 
 wxBEGIN_EVENT_TABLE(Frame, wxFrame)
     EVT_BUTTON(ID::BUTTON_OPEN, Frame::onOpenButton)
+    EVT_CHAR_HOOK(Frame::onKeyboardEvent)
+    EVT_MOUSE_EVENTS(Frame::onMouseEvent)
 wxEND_EVENT_TABLE()
 
 Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
@@ -32,6 +34,8 @@ void Frame::initialize()
 void Frame::initializeStyle()
 {
     SetMinSize(wxSize(400, 300));
+    SetSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
+                   wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 }
 
 void Frame::initializeToolBar(wxBoxSizer * sizer)
@@ -51,10 +55,10 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
 
 void Frame::initializeImageViewer(wxBoxSizer * sizer)
 {
-    _Image_viewer = new wxPanel(this, wxID_ANY);
-    _Image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
+    _image_viewer = new ImagePanel(this, wxID_ANY);
+    _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
 
-    sizer->Add(_Image_viewer, 1, wxEXPAND);
+    sizer->Add(_image_viewer, 1, wxEXPAND);
 }
 
 bool calculateRate(int image_width, int image_height)
@@ -93,80 +97,68 @@ void Frame::onOpenButton(wxCommandEvent & event)
     }
 
     _dir = new wxDir(find->GetDirectory());
-    _dir->GetFirst(&_current_file, "*.jpg");
-    while (_dir->GetNext(&_current_file)) {
-        std::cout << _current_file << std::endl;
+    _dir->GetFirst(&_current_file);
+
+    do {
+        if (_current_file == find->GetFilename()){
+            break;
+        }
+    } while (_dir->GetNext(&_current_file));
+
+    if (_current_file != find->GetFilename()){
+        std::cout << "Cannot Found file!!!" << std::endl;
+        return;
     }
 
-    wxString _current_path = _dir->GetName()+"/"+_current_file;
-
+    _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
 }
 
-bool Frame::saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int image_height, int image_width, int diff)
+void Frame::onKeyboardEvent(wxKeyEvent &event)
 {
-    tinyxml2::XMLDocument document;
-    tinyxml2::XMLDeclaration * dec = document.NewDeclaration();
-    tinyxml2::XMLNode * root = document.NewElement("annotation");
-    tinyxml2::XMLElement * filename = document.NewElement("filename");
-    tinyxml2::XMLElement * folder = document.NewElement("folder");
-    tinyxml2::XMLElement * object = document.NewElement("object");
-    tinyxml2::XMLElement * name = document.NewElement("name");
-    tinyxml2::XMLElement * bndbox = document.NewElement("bndbox");
-    tinyxml2::XMLElement * xmax = document.NewElement("xmax");
-    tinyxml2::XMLElement * xmin = document.NewElement("xmin");
-    tinyxml2::XMLElement * ymax = document.NewElement("ymax");
-    tinyxml2::XMLElement * ymin = document.NewElement("ymin");
-    tinyxml2::XMLElement * difficult = document.NewElement("difficult");
-    tinyxml2::XMLElement * size = document.NewElement("size");
-    tinyxml2::XMLElement * depth = document.NewElement("depth");
-    tinyxml2::XMLElement * height = document.NewElement("height");
-    tinyxml2::XMLElement * width = document.NewElement("width");
-    tinyxml2::XMLElement * source = document.NewElement("source");
-    tinyxml2::XMLElement * annotation = document.NewElement("annotation");
-    tinyxml2::XMLElement * database = document.NewElement("database");
-    tinyxml2::XMLElement * image = document.NewElement("image");
-
-    document.InsertFirstChild(root);
-    root->LinkEndChild(filename);
-    root->LinkEndChild(folder);
-    root->LinkEndChild(object);
-    root->LinkEndChild(size);
-    root->LinkEndChild(source);
-
-    object->LinkEndChild(name);
-    object->LinkEndChild(bndbox);
-    object->LinkEndChild(difficult);
-
-    size->LinkEndChild(depth);
-    size->LinkEndChild(height);
-    size->LinkEndChild(width);
-
-    source->LinkEndChild(annotation);
-    source->LinkEndChild(database);
-    source->LinkEndChild(image);
-
-    bndbox->LinkEndChild(xmin);
-    bndbox->LinkEndChild(ymin);
-    bndbox->LinkEndChild(xmax);
-    bndbox->LinkEndChild(ymax);
-
-    filename->LinkEndChild(document.NewText(file_name.c_str()));
-    folder->LinkEndChild(document.NewText("${FOLDER}"));
-    name->LinkEndChild(document.NewText("car"));
-    xmax->SetText(x2);
-    xmin->SetText(x1);
-    ymax->SetText(y2);
-    ymin->SetText(y1);
-    difficult->SetText(diff);
-    depth->LinkEndChild(document.NewText("3"));
-    height->SetText(image_height);
-    width->SetText(image_width);
-    annotation->LinkEndChild(document.NewText("Bogonet"));
-    database->LinkEndChild(document.NewText("The bogonet image database"));
-    image->LinkEndChild(document.NewText("SaveZone"));
-
-    document.SaveFile((filepath + "/" + file_name.substr(0, file_name.length() - 4) + ".xml").c_str());
-    document.Clear();
-    return true;
+    std::cout << event.GetKeyCode() << std::endl;
+    if (_image_viewer->isReady()) {
+        if (event.GetKeyCode() == 69) { // 'e'
+            nextFile();
+        } else if (event.GetKeyCode() == 81) { //'q'
+            prevFile();
+        }
+    }
 }
 
+void Frame::onMouseEvent(wxMouseEvent &event)
+{
+
+}
+
+void Frame::prevFile()
+{
+    wxString search;
+    wxString prevFile;
+    _dir->GetFirst(&search);
+
+    prevFile = search;
+    do {
+        if (search.substr(_current_file.length()-4, 4) == ".jpg" ||
+            search.substr(_current_file.length()-5, 5) == ".jpeg") {
+            if (search == _current_file) {
+                _current_file = prevFile;
+                _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+            } else {
+                prevFile = search;
+            }
+        }
+    } while (_dir->GetNext(&search));
+}
+
+void Frame::nextFile()
+{
+    _image_viewer->save();
+    while (_dir->GetNext(&_current_file)) {
+        if (_current_file.substr(_current_file.length()-4, 4) == ".jpg" ||
+            _current_file.substr(_current_file.length()-5, 5) == ".jpeg") {
+            _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+            return;
+        }
+    }
+    std::cout << "File Search End." << std::endl;
+}
