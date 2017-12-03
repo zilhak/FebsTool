@@ -1,11 +1,17 @@
 #include <wx/wx.h>
 #include <wx/dir.h>
-#include "tinyxml2.h"
+#include "data/tinyxml2.h"
 
 class Frame : public wxFrame
 {
 public:
     wxDECLARE_EVENT_TABLE();
+
+public:
+    enum ID {
+        BUTTON_OPEN,
+        BUTTON_CLOSE
+    };
 
 private:
     wxDir * _dir;
@@ -15,6 +21,10 @@ private:
 private:
     wxPanel * _tool_bar;
     wxPanel * _Image_viewer;
+
+private:
+    wxButton * _open_button;
+    wxButton * _close_button;
 
 public:
     Frame(const wxString & title);
@@ -27,7 +37,7 @@ private:
     void initializeImageViewer(wxBoxSizer * sizer);
 
 private: // menu event.
-    void onOpenImage();
+    void onOpenButton(wxCommandEvent & event);
     void onExplore();
 
 private: // input event.

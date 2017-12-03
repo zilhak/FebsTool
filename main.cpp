@@ -1,5 +1,5 @@
 #include "main.h"
-#include "frame.hpp"
+#include "ui/frame.hpp"
 
 IMPLEMENT_APP(MyApp)
 

@@ -1,6 +1,11 @@
 /cmake-build-debug
-/cmake
+/cmake-build-release
+/cmake*
 temp.txt
 Makefile
 /.idea
 .DS_Store
+/build
+*.gitignore
+*CMakeLists.txt
+*main.h

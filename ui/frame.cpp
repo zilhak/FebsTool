@@ -3,6 +3,7 @@
 #include <iostream>
 
 wxBEGIN_EVENT_TABLE(Frame, wxFrame)
+    EVT_BUTTON(ID::BUTTON_OPEN, Frame::onOpenButton)
 wxEND_EVENT_TABLE()
 
 Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
@@ -36,7 +37,14 @@ void Frame::initializeStyle()
 void Frame::initializeToolBar(wxBoxSizer * sizer)
 {
     _tool_bar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100, 40));
-//    _tool_bar->SetBackgroundColour(wxColour(0x00FF00));
+    wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
+    _open_button = new wxButton(_tool_bar, BUTTON_OPEN, wxT("Open"));
+    _close_button = new wxButton(_tool_bar, BUTTON_CLOSE, wxT("Close"));
+
+    h_sizer->Add(_open_button, 0, wxALIGN_CENTER_VERTICAL);
+    h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL);
+
+    _tool_bar->SetSizer(h_sizer);
 
     sizer->Add(_tool_bar, 0, wxEXPAND);
 }
@@ -73,13 +81,13 @@ bool calculateRate(int image_width, int image_height)
     return true;
 }
 
-void Frame::onOpenImage()
+void Frame::onOpenButton(wxCommandEvent & event)
 {
     wxFileDialog * find = new wxFileDialog(this,
                                            _("Open jpg file"),
                                            "",
                                            "",
-                                           "JPG files (*.jpg)|*.jpg");
+                                           "JPG files (*.jpg;*.jpeg)| *.jpg;*.jpeg");
     if (find->ShowModal() == wxID_CANCEL) {
         return;
     }
@@ -161,3 +169,4 @@ bool Frame::saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std
     document.Clear();
     return true;
 }
+
