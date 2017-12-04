@@ -18,6 +18,8 @@ private:
     wxBitmap _background_bitmap;
     int _image_width;
     int _image_height;
+    int _bitmap_width;
+    int _bitmap_height;
     wxString _image_filepath;
     wxString _image_filename;
     int _image_x = 15;

@@ -10,13 +10,14 @@ public:
 public:
     enum ID {
         BUTTON_OPEN,
-        BUTTON_CLOSE
+        BUTTON_CLOSE,
+        COMBO_SCALE
     };
 
 private:
     wxDir * _dir;
     wxString _current_file;
-    wxString _current_path;
+    wxString _temp_file;
 
 private:
     wxPanel * _tool_bar;
@@ -25,6 +26,10 @@ private:
 private:
     wxButton * _open_button;
     wxButton * _close_button;
+    wxComboBox * _scale_combobox;
+
+private:
+    bool _use_prev = false;
 
 public:
     Frame(const wxString & title);
@@ -37,6 +42,7 @@ private:
     void initializeImageViewer(wxBoxSizer * sizer);
 
 private: // menu event.
+    void onScaleComboBox(wxCommandEvent & event);
     void onOpenButton(wxCommandEvent & event);
     void onExplore();
 

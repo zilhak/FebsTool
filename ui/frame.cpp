@@ -6,6 +6,7 @@ wxBEGIN_EVENT_TABLE(Frame, wxFrame)
     EVT_BUTTON(ID::BUTTON_OPEN, Frame::onOpenButton)
     EVT_CHAR_HOOK(Frame::onKeyboardEvent)
     EVT_MOUSE_EVENTS(Frame::onMouseEvent)
+    EVT_COMBOBOX(ID::COMBO_SCALE, Frame::onScaleComboBox)
 wxEND_EVENT_TABLE()
 
 Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
@@ -44,8 +45,14 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     _open_button = new wxButton(_tool_bar, BUTTON_OPEN, wxT("Open"));
     _close_button = new wxButton(_tool_bar, BUTTON_CLOSE, wxT("Close"));
 
+    _scale_combobox = new wxComboBox(_tool_bar, COMBO_SCALE);
+    for (int i = 10; i < 400; i += 10) {
+        _scale_combobox->Append(wxString::Format("%d", i));
+    }
+
     h_sizer->Add(_open_button, 0, wxALIGN_CENTER_VERTICAL);
     h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL);
+    h_sizer->Add(_scale_combobox, 0, wxALIGN_CENTER_VERTICAL);
 
     _tool_bar->SetSizer(h_sizer);
 
@@ -130,20 +137,28 @@ void Frame::onMouseEvent(wxMouseEvent &event)
 
 }
 
+void Frame::onScaleComboBox(wxCommandEvent &event)
+{
+    _image_viewer->changeScale(static_cast<double>(wxAtoi(_scale_combobox->GetValue())) / (double)100);
+}
+
 void Frame::prevFile()
 {
     wxString search;
     wxString prevFile;
     _dir->GetFirst(&search);
 
-    prevFile = search;
+    prevFile = _current_file;
     do {
-        std::cout << search << std::endl;
-        if (search.substr(_current_file.length()-4, 4) == ".jpg" ||
-            search.substr(_current_file.length()-5, 5) == ".jpeg") {
+        if (search.substr(search.length()-4, 4) == ".jpg" ||
+            search.substr(search.length()-5, 5) == ".jpeg") {
             if (search == _current_file) {
+                _temp_file = _current_file;
                 _current_file = prevFile;
+
+                std::cout << _current_file << std::endl;
                 _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+                _use_prev = true;
                 return;
             } else {
                 prevFile = search;
@@ -155,6 +170,12 @@ void Frame::prevFile()
 void Frame::nextFile()
 {
     _image_viewer->save();
+    if (_use_prev) {
+        _current_file = _temp_file;
+        _image_viewer->setBackgroundImage(_dir->GetName(), _temp_file);
+        _use_prev = false;
+        return;
+    }
     while (_dir->GetNext(&_current_file)) {
         if (_current_file.substr(_current_file.length()-4, 4) == ".jpg" ||
             _current_file.substr(_current_file.length()-5, 5) == ".jpeg") {
