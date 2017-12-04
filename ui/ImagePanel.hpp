@@ -15,7 +15,7 @@ public:
     };
 
 private:
-    wxBitmap _background_bitmap = wxBitmap();
+    wxBitmap _background_bitmap;
     int _image_width;
     int _image_height;
     wxString _image_filepath;

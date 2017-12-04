@@ -8,6 +8,7 @@ wxEND_EVENT_TABLE()
 ImagePanel::ImagePanel(wxWindow *parent, wxWindowID id) : wxPanel(parent, id)
 {
     /* EMPTY */
+    ::wxInitAllImageHandlers();
 }
 
 ImagePanel::~ImagePanel()
@@ -19,7 +20,10 @@ void ImagePanel::setBackgroundImage(wxString filepath, wxString filename)
 {
     _image_filepath = filepath;
     _image_filename = filename;
-    _background_bitmap = wxBitmap(filepath + "/" + filename);
+
+    wxString path = wxString::Format("%s/%s",filepath, filename);
+    wxImage image(path, wxBITMAP_TYPE_JPEG);
+    _background_bitmap = wxBitmap(image);
 
     _image_height = _background_bitmap.GetHeight();
     _image_width = _background_bitmap.GetWidth();

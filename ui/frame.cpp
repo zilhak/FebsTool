@@ -21,7 +21,6 @@ Frame::~Frame()
 void Frame::initialize()
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
-
     initializeStyle();
     initializeToolBar(v_sizer);
     initializeImageViewer(v_sizer);
@@ -91,7 +90,7 @@ void Frame::onOpenButton(wxCommandEvent & event)
                                            _("Open jpg file"),
                                            "",
                                            "",
-                                           "JPG files (*.jpg;*.jpeg)| *.jpg;*.jpeg");
+                                           "JPG files (*.jpg;*.jpeg)|*.jpg;*.jpeg");
     if (find->ShowModal() == wxID_CANCEL) {
         return;
     }
@@ -123,6 +122,7 @@ void Frame::onKeyboardEvent(wxKeyEvent &event)
             prevFile();
         }
     }
+    SetTitle(_current_file);
 }
 
 void Frame::onMouseEvent(wxMouseEvent &event)
@@ -138,11 +138,13 @@ void Frame::prevFile()
 
     prevFile = search;
     do {
+        std::cout << search << std::endl;
         if (search.substr(_current_file.length()-4, 4) == ".jpg" ||
             search.substr(_current_file.length()-5, 5) == ".jpeg") {
             if (search == _current_file) {
                 _current_file = prevFile;
                 _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+                return;
             } else {
                 prevFile = search;
             }
