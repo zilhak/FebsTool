@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include <wx/dir.h>
+#include <wx/listctrl.h>
 #include "ui/ImagePanel.hpp"
 
 class Frame : public wxFrame
@@ -21,6 +22,7 @@ private:
 
 private:
     wxPanel * _tool_bar;
+    wxListCtrl * _list_ctrl;
     ImagePanel * _image_viewer;
 
 private:

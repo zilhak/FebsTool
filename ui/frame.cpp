@@ -50,9 +50,9 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
         _scale_combobox->Append(wxString::Format("%d", i));
     }
 
-    h_sizer->Add(_open_button, 0, wxALIGN_CENTER_VERTICAL);
-    h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL);
-    h_sizer->Add(_scale_combobox, 0, wxALIGN_CENTER_VERTICAL);
+    h_sizer->Add(_open_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
+    h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 15);
+    h_sizer->Add(_scale_combobox, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 20);
 
     _tool_bar->SetSizer(h_sizer);
 
@@ -61,10 +61,18 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
 
 void Frame::initializeImageViewer(wxBoxSizer * sizer)
 {
+    wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
+
+    _list_ctrl = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+    _list_ctrl->SetBackgroundColour(wxColour(0xCCCCCC));
+
     _image_viewer = new ImagePanel(this, wxID_ANY);
     _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
 
-    sizer->Add(_image_viewer, 1, wxEXPAND);
+    h_sizer->Add(_list_ctrl, 0, wxEXPAND);
+    h_sizer->Add(_image_viewer, 1, wxEXPAND);
+
+    sizer->Add(h_sizer, 1, wxEXPAND);
 }
 
 bool calculateRate(int image_width, int image_height)
@@ -101,6 +109,13 @@ void Frame::onOpenButton(wxCommandEvent & event)
     if (find->ShowModal() == wxID_CANCEL) {
         return;
     }
+
+    _dir = new wxDir(find->GetDirectory());
+    _dir->GetFirst(&_current_file);
+
+    do {
+        _list_ctrl->
+    } while (_dir->GetNext(&_current_file));
 
     _dir = new wxDir(find->GetDirectory());
     _dir->GetFirst(&_current_file);
