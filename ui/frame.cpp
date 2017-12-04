@@ -63,13 +63,13 @@ void Frame::initializeImageViewer(wxBoxSizer * sizer)
 {
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
 
-    _list_ctrl = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-    _list_ctrl->SetBackgroundColour(wxColour(0xCCCCCC));
+    _file_list = new FileExplorer(this);
+    _file_list->SetBackgroundColour(wxColour(0xCCCCCC));
 
     _image_viewer = new ImagePanel(this, wxID_ANY);
     _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
 
-    h_sizer->Add(_list_ctrl, 0, wxEXPAND);
+    h_sizer->Add(_file_list, 0, wxEXPAND);
     h_sizer->Add(_image_viewer, 1, wxEXPAND);
 
     sizer->Add(h_sizer, 1, wxEXPAND);
@@ -101,6 +101,8 @@ bool calculateRate(int image_width, int image_height)
 
 void Frame::onOpenButton(wxCommandEvent & event)
 {
+    _file_list->ClearAll();
+
     wxFileDialog * find = new wxFileDialog(this,
                                            _("Open jpg file"),
                                            "",
@@ -112,9 +114,15 @@ void Frame::onOpenButton(wxCommandEvent & event)
 
     _dir = new wxDir(find->GetDirectory());
     _dir->GetFirst(&_current_file);
-
+    long index;
     do {
-        _list_ctrl->
+        if (_current_file.substr(_current_file.length()-4, 4) == ".jpg" ||
+            _current_file.substr(_current_file.length()-5, 5) == ".jpeg") {
+            index = _file_list->InsertItem(0, _current_file);
+            _file_list->SetItem(index, 1, ("X"));
+        } else if (_current_file.substr(_current_file.length()-4, 4) == ".xml"){
+            _file_list->SetItem(index, 1, ("O"));
+        }
     } while (_dir->GetNext(&_current_file));
 
     _dir = new wxDir(find->GetDirectory());

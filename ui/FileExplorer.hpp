@@ -7,7 +7,7 @@
 class FileExplorer : public wxListCtrl{
 
 public:
-    FileExplorer();
+    FileExplorer(wxWindow * parent);
     ~FileExplorer();
 
 private:

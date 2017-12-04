@@ -2,6 +2,7 @@
 #include <wx/dir.h>
 #include <wx/listctrl.h>
 #include "ui/ImagePanel.hpp"
+#include "ui/FileExplorer.hpp"
 
 class Frame : public wxFrame
 {
@@ -22,7 +23,7 @@ private:
 
 private:
     wxPanel * _tool_bar;
-    wxListCtrl * _list_ctrl;
+    FileExplorer * _file_list;
     ImagePanel * _image_viewer;
 
 private:

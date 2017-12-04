@@ -4,7 +4,11 @@
 
 #include "FileExplorer.hpp"
 
-FileExplorer::FileExplorer() : wxListCtrl(NULL)
+FileExplorer::FileExplorer(wxWindow * parent) : wxListCtrl(parent,
+                                                           wxID_ANY,
+                                                           wxDefaultPosition,
+                                                           wxSize(250, 100),
+                                                           wxLC_REPORT)
 {
     initialize();
 }
@@ -17,7 +21,8 @@ FileExplorer::~FileExplorer()
 void FileExplorer::initialize()
 {
     SetBackgroundColour(wxColour(0xCCCCCC));
-    AppendColumn(wxT("Name"));
-    AppendColumn(wxT("check"));
-    AppendColumn(wxT(""));
+    InsertColumn(0, _("FileName"));
+    SetColumnWidth(0, 200);
+    InsertColumn(1, _("Check"));
+    SetColumnWidth(1, 50);
 }

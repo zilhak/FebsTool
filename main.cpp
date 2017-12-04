@@ -7,9 +7,6 @@ IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
 {
-    wxInitAllImageHandlers();
-    wxImage::AddHandler(new wxJPEGHandler());
-    wxBitmap::AddHandler(new wxBitmapHandler());
     Frame *frame = new Frame(wxT("Program"));
     frame->Show(true);
 
