@@ -7,6 +7,7 @@ wxBEGIN_EVENT_TABLE(Frame, wxFrame)
     EVT_CHAR_HOOK(Frame::onKeyboardEvent)
     EVT_MOUSE_EVENTS(Frame::onMouseEvent)
     EVT_COMBOBOX(ID::COMBO_SCALE, Frame::onScaleComboBox)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, Frame::onListDoubleClick)
 wxEND_EVENT_TABLE()
 
 Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
@@ -23,6 +24,7 @@ void Frame::initialize()
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
     initializeStyle();
+    initializeSetting();
     initializeToolBar(v_sizer);
     initializeImageViewer(v_sizer);
 
@@ -38,6 +40,13 @@ void Frame::initializeStyle()
                    wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 }
 
+void Frame::initializeSetting()
+{
+    _image_extension.insert(wxT("jpg"));
+    _image_extension.insert(wxT("jpeg"));
+    _image_extension.insert(wxT("png"));
+}
+
 void Frame::initializeToolBar(wxBoxSizer * sizer)
 {
     _tool_bar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100, 40));
@@ -46,7 +55,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     _close_button = new wxButton(_tool_bar, BUTTON_CLOSE, wxT("Close"));
 
     _scale_combobox = new wxComboBox(_tool_bar, COMBO_SCALE);
-    for (int i = 10; i < 400; i += 10) {
+    for (int i = 10; i <= 600; i += 10) {
         _scale_combobox->Append(wxString::Format("%d", i));
     }
 
@@ -99,10 +108,17 @@ bool calculateRate(int image_width, int image_height)
     return true;
 }
 
+bool Frame::fileExtCheck(wxString const extension)
+{
+    if (_image_extension.find(extension) != _image_extension.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void Frame::onOpenButton(wxCommandEvent & event)
 {
-    _file_list->ClearAll();
-
     wxFileDialog * find = new wxFileDialog(this,
                                            _("Open jpg file"),
                                            "",
@@ -112,19 +128,7 @@ void Frame::onOpenButton(wxCommandEvent & event)
         return;
     }
 
-    _dir = new wxDir(find->GetDirectory());
-    _dir->GetFirst(&_current_file);
-    long index;
-    do {
-        if (_current_file.substr(_current_file.length()-4, 4) == ".jpg" ||
-            _current_file.substr(_current_file.length()-5, 5) == ".jpeg") {
-            index = _file_list->InsertItem(0, _current_file);
-            _file_list->SetItem(index, 1, ("X"));
-        } else if (_current_file.substr(_current_file.length()-4, 4) == ".xml"){
-            _file_list->SetItem(index, 1, ("O"));
-        }
-    } while (_dir->GetNext(&_current_file));
-
+    addToListCtrl(find->GetDirectory());
     _dir = new wxDir(find->GetDirectory());
     _dir->GetFirst(&_current_file);
 
@@ -136,10 +140,39 @@ void Frame::onOpenButton(wxCommandEvent & event)
 
     if (_current_file != find->GetFilename()){
         std::cout << "Cannot Found file!!!" << std::endl;
+        std::cout << "Tip: if path name have korean, this error occur." << std::endl;
         return;
     }
 
+    _file_list->highlightItem(_current_file);
     _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+}
+
+void Frame::addToListCtrl(wxString const directory)
+{
+    _file_list->DeleteAllItems();
+    _dir = new wxDir(directory);
+    _dir->GetFirst(&_current_file);
+    wxFileName file(directory + "/" + _current_file);
+
+    long index = 0;
+    do {
+        file.Assign(directory + "/" + _current_file);
+        if (fileExtCheck(file.GetExt())) {
+            _file_list->InsertItem(index, _current_file);
+            if (wxFileExists(directory + "/" + file.GetName() + ".xml")) {
+                _file_list->SetItem(index, 1, ("O"));
+            } else {
+                _file_list->SetItem(index, 1, ("X"));
+            }
+            index++;
+        }
+    } while (_dir->GetNext(&_current_file));
+}
+
+void Frame::onListDoubleClick(wxListEvent & event)
+{
+    std::cout << event.GetIndex() << std::endl;
 }
 
 void Frame::onKeyboardEvent(wxKeyEvent &event)
@@ -147,9 +180,21 @@ void Frame::onKeyboardEvent(wxKeyEvent &event)
     std::cout << event.GetKeyCode() << std::endl;
     if (_image_viewer->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
+            _file_list->xmlCheck(_current_file);
+            _image_viewer->save();
             nextFile();
         } else if (event.GetKeyCode() == 81) { //'q'
             prevFile();
+        } else if (event.GetKeyCode() == 87) { //'w'
+
+        } else if (event.GetKeyCode() == 83) { //'s'
+
+        } else if (event.GetKeyCode() == 65) { //'a'
+
+        } else if (event.GetKeyCode() == 68) { //'d'
+
+        } else if (event.GetKeyCode() == 82) { //'r'
+            nextFile();
         }
     }
     SetTitle(_current_file);
@@ -162,7 +207,10 @@ void Frame::onMouseEvent(wxMouseEvent &event)
 
 void Frame::onScaleComboBox(wxCommandEvent &event)
 {
-    _image_viewer->changeScale(static_cast<double>(wxAtoi(_scale_combobox->GetValue())) / (double)100);
+    if (_image_viewer->isReady()) {
+        _image_viewer->changeScale(static_cast<double>(wxAtoi(_scale_combobox->GetValue())) / (double) 100);
+        _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+    }
 }
 
 void Frame::prevFile()
@@ -179,7 +227,7 @@ void Frame::prevFile()
                 _temp_file = _current_file;
                 _current_file = prevFile;
 
-                std::cout << _current_file << std::endl;
+                _file_list->highlightItem(_current_file);
                 _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
                 _use_prev = true;
                 return;
@@ -192,9 +240,9 @@ void Frame::prevFile()
 
 void Frame::nextFile()
 {
-    _image_viewer->save();
     if (_use_prev) {
         _current_file = _temp_file;
+        _file_list->highlightItem(_current_file);
         _image_viewer->setBackgroundImage(_dir->GetName(), _temp_file);
         _use_prev = false;
         return;
@@ -202,9 +250,11 @@ void Frame::nextFile()
     while (_dir->GetNext(&_current_file)) {
         if (_current_file.substr(_current_file.length()-4, 4) == ".jpg" ||
             _current_file.substr(_current_file.length()-5, 5) == ".jpeg") {
+            _file_list->highlightItem(_current_file);
             _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
             return;
         }
     }
+
     std::cout << "File Search End." << std::endl;
 }

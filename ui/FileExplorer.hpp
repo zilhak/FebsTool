@@ -6,6 +6,9 @@
 
 class FileExplorer : public wxListCtrl{
 
+private:
+    long _highlighted_item = -1;
+
 public:
     FileExplorer(wxWindow * parent);
     ~FileExplorer();
@@ -13,6 +16,9 @@ public:
 private:
     void initialize();
 
+public:
+    void xmlCheck(wxString filename);
+    void highlightItem(wxString filename);
 };
 
 

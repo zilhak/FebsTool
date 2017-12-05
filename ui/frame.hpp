@@ -1,8 +1,12 @@
 #include <wx/wx.h>
 #include <wx/dir.h>
 #include <wx/listctrl.h>
+#include <wx/filename.h>
+
 #include "ui/ImagePanel.hpp"
 #include "ui/FileExplorer.hpp"
+
+#include <set>
 
 class Frame : public wxFrame
 {
@@ -20,6 +24,7 @@ private:
     wxDir * _dir;
     wxString _current_file;
     wxString _temp_file;
+    std::set<wxString> _image_extension;
 
 private:
     wxPanel * _tool_bar;
@@ -41,12 +46,20 @@ public:
 private:
     void initialize();
     void initializeStyle();
+    void initializeSetting();
     void initializeToolBar(wxBoxSizer * sizer);
     void initializeImageViewer(wxBoxSizer * sizer);
+
+private:
+    void addToListCtrl(wxString const directory);
+
+private:
+    bool fileExtCheck(wxString const extension);
 
 private: // menu event.
     void onScaleComboBox(wxCommandEvent & event);
     void onOpenButton(wxCommandEvent & event);
+    void onListDoubleClick(wxListEvent & event);
     void onExplore();
 
 private: // input event.

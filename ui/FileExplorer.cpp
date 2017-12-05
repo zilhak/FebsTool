@@ -22,7 +22,20 @@ void FileExplorer::initialize()
 {
     SetBackgroundColour(wxColour(0xCCCCCC));
     InsertColumn(0, _("FileName"));
-    SetColumnWidth(0, 200);
+    SetColumnWidth(0, 190);
     InsertColumn(1, _("Check"));
-    SetColumnWidth(1, 50);
+    SetColumnWidth(1, 60);
+}
+
+void FileExplorer::xmlCheck(wxString filename)
+{
+    SetItem(FindItem(0, filename), 1, "O");
+}
+
+void FileExplorer::highlightItem(wxString filename)
+{
+    SetItemTextColour(_highlighted_item, *wxBLACK);
+
+    _highlighted_item = FindItem(0, filename);
+    SetItemTextColour(_highlighted_item, wxColour(0x99FF99));
 }

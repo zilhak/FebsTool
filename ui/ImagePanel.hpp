@@ -46,6 +46,12 @@ public:
     void setBackgroundImage(wxString filepath, wxString filename);
 
 public:
+    void firstPointUp();
+    void firstPointDown();
+    void firstPointLeft();
+    void firstPointRight();
+
+public:
     bool isReady() {return _is_ready;};
 
 private:
