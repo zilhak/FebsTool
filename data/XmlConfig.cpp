@@ -1,11 +1,35 @@
 
+#include <iostream>
 #include "XmlConfig.hpp"
 
+cyRect loadFromXml (wxString image_file_not_ext)
+{
+    cyRect result;
+    tinyxml2::XMLDocument document;
+    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());
+    if (err != tinyxml2::XML_NO_ERROR) {
+        return result;
+    }
+    tinyxml2::XMLNode * root = document.FirstChildElement("annotation");
+    tinyxml2::XMLElement * object = root->FirstChildElement("object");
+    tinyxml2::XMLElement * bndbox = object->FirstChildElement("bndbox");
 
-bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::string file_name, int image_height, int image_width, int diff)
+    tinyxml2::XMLElement * xmin = bndbox->FirstChildElement("xmin");
+    tinyxml2::XMLElement * xmax = bndbox->FirstChildElement("xmax");
+    tinyxml2::XMLElement * ymin = bndbox->FirstChildElement("ymin");
+    tinyxml2::XMLElement * ymax = bndbox->FirstChildElement("ymax");
+
+    result.x1 = std::stoi(xmin->GetText());
+    result.y1 = std::stoi(xmax->GetText());
+    result.x2 = std::stoi(ymin->GetText());
+    result.y2 = std::stoi(ymax->GetText());
+
+    return result;
+}
+
+bool saveToXml (cyRect check, wxFileName file, int image_height, int image_width, int diff)
 {
     tinyxml2::XMLDocument document;
-    tinyxml2::XMLDeclaration * dec = document.NewDeclaration();
     tinyxml2::XMLNode * root = document.NewElement("annotation");
     tinyxml2::XMLElement * filename = document.NewElement("filename");
     tinyxml2::XMLElement * folder = document.NewElement("folder");
@@ -50,13 +74,13 @@ bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::strin
     bndbox->LinkEndChild(xmax);
     bndbox->LinkEndChild(ymax);
 
-    filename->LinkEndChild(document.NewText(file_name.c_str()));
+    filename->LinkEndChild(document.NewText(file.GetFullName().c_str()));
     folder->LinkEndChild(document.NewText("${FOLDER}"));
     name->LinkEndChild(document.NewText("car"));
-    xmax->SetText(x2);
-    xmin->SetText(x1);
-    ymax->SetText(y2);
-    ymin->SetText(y1);
+    xmax->SetText(check.x2);
+    xmin->SetText(check.x1);
+    ymax->SetText(check.y2);
+    ymin->SetText(check.y1);
     difficult->SetText(diff);
     depth->LinkEndChild(document.NewText("3"));
     height->SetText(image_height);
@@ -65,7 +89,7 @@ bool saveToXml (int x1, int y1, int x2, int y2, std::string filepath, std::strin
     database->LinkEndChild(document.NewText("The bogonet image database"));
     image->LinkEndChild(document.NewText("SaveZone"));
 
-    document.SaveFile((filepath + "/" + file_name.substr(0, file_name.length() - 4) + ".xml").c_str());
+    document.SaveFile((file.GetPath(true) + file.GetName() + ".xml").c_str());
     document.Clear();
     return true;
 }

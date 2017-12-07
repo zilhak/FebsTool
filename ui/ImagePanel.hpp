@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include "data/XmlConfig.hpp"
+#include <wx/filename.h>
 
 #ifndef IMAGESEARCHER_UI_IMAGEPANEL_HPP
 #define IMAGESEARCHER_UI_IMAGEPANEL_HPP
@@ -16,22 +17,20 @@ public:
 
 private:
     wxBitmap _background_bitmap;
+    wxFileName _image_file;
     int _image_width;
     int _image_height;
-    int _bitmap_width;
-    int _bitmap_height;
-    wxString _image_filepath;
-    wxString _image_filename;
+    int _bitmap_width; // arranged width
+    int _bitmap_height; // arranged hieght
     int _image_x = 15;
     int _image_y = 15;
 
 private:
     int _mouse_x;
     int _mouse_y;
-    int _x1 = -1;
-    int _y1;
-    int _x2;
-    int _y2;
+    cyRect _check;
+    cyRect _temp_rect;
+    bool _xml_exists = false;
     double _scale_setting = 1;
     STATUS mode = STATUS::IDLE;
     bool _is_ready = false;
@@ -43,6 +42,7 @@ public:
 public:
     void changeScale(double scale);
     void save();
+    void load();
     void setBackgroundImage(wxString filepath, wxString filename);
 
 public:

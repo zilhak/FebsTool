@@ -18,16 +18,10 @@ ImagePanel::~ImagePanel()
 
 void ImagePanel::setBackgroundImage(wxString filepath, wxString filename)
 {
-    _x1 = -1;
-    _y1 = -1;
-    _x2 = -1;
-    _y2 = -1;
+    _image_file.Assign(wxString::Format("%s/%s",filepath, filename));
+    load();
 
-    _image_filepath = filepath;
-    _image_filename = filename;
-
-    wxString path = wxString::Format("%s/%s",filepath, filename);
-    wxImage image(path, wxBITMAP_TYPE_JPEG);
+    wxImage image(_image_file.GetFullPath(), wxBITMAP_TYPE_JPEG);
     _image_height = image.GetHeight();
     _image_width = image.GetWidth();
     image.Rescale(static_cast<int>(static_cast<double>(image.GetWidth()) * _scale_setting),
@@ -40,16 +34,21 @@ void ImagePanel::setBackgroundImage(wxString filepath, wxString filename)
     Refresh();
 }
 
+void ImagePanel::load()
+{
+    _temp_rect = loadFromXml(_image_file.GetPath(true) + _image_file.GetName());
+}
+
 void ImagePanel::save()
 {
     if (_background_bitmap.IsOk() && mode == STATUS::IDLE) {
-        saveToXml(static_cast<int>(static_cast<double>(_x1 - _image_x) / _scale_setting),
-                  static_cast<int>(static_cast<double>(_y1 - _image_y) / _scale_setting),
-                  static_cast<int>(static_cast<double>(_x2 - _image_x) / _scale_setting),
-                  static_cast<int>(static_cast<double>(_y2 - _image_y) / _scale_setting),
-                  std::string(_image_filepath.c_str()),
-                  std::string(_image_filename.c_str()),
-                  _image_height, _image_width, 1);
+        cyRect check (
+                static_cast<int>(static_cast<double>(_check.x1 - _image_x) / _scale_setting),
+                static_cast<int>(static_cast<double>(_check.y1 - _image_y) / _scale_setting),
+                static_cast<int>(static_cast<double>(_check.x2 - _image_x) / _scale_setting),
+                static_cast<int>(static_cast<double>(_check.y2 - _image_y) / _scale_setting)
+        );
+        saveToXml(check, _image_file, _image_height, _image_width, 1);
     }
 }
 
@@ -81,10 +80,32 @@ void ImagePanel::onPaint(wxPaintEvent & event)
                     _mouse_x,
                     _image_y + _bitmap_height);
     }
-    if (_x1 != -1) {
+
+    if (_check.x1 != _check.x2) {
+        _temp_rect = _check;
+        if (_check.x1 > _check.x2) {
+            _temp_rect.x1 = _check.x2;
+            _temp_rect.x2 = _check.x1;
+        }
+        if (_check.y1 > _check.y2) {
+            _temp_rect.y1 = _check.y2;
+            _temp_rect.y2 = _check.y1;
+        }
         dc.SetPen(*wxCYAN_PEN);
-        dc.DrawRectangle(_x1, _y1, _x2 - _x1, _y2 - _y1);
-        dc.DrawRectangle(_x1 - 1, _y1 - 1, _x2 - _x1 + 2, _y2 - _y1 + 2);
+        dc.DrawRectangle(_temp_rect.x1, _temp_rect.y1,
+                         _temp_rect.x2 - _temp_rect.x1, _temp_rect.y2 - _temp_rect.y1);
+        dc.DrawRectangle(_temp_rect.x1 - 1, _temp_rect.y1 - 1,
+                         _temp_rect.x2 - _temp_rect.x1 + 2, _temp_rect.y2 - _temp_rect.y1 + 2);
+    } else if (wxFileExists(_image_file.GetPath(true) + _image_file.GetName() + ".xml")) {
+        dc.SetPen(*wxYELLOW_PEN);
+        int x = static_cast<int>(static_cast<double>(_temp_rect.x1 + _image_x) * _scale_setting);
+        int y = static_cast<int>(static_cast<double>(_temp_rect.y1 + _image_y) * _scale_setting);
+        int width = static_cast<int>(static_cast<double>(_temp_rect.x2 - _temp_rect.x1) * _scale_setting);
+        int height = static_cast<int>(static_cast<double>(_temp_rect.y2 + _temp_rect.y1) * _scale_setting);
+
+        dc.DrawRectangle(x, y, width, height);
+        dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
+        std::cout << "x:" << x << " y:" << y << " width:" << width << " height:" << height << std::endl;
     }
 }
 
@@ -96,35 +117,23 @@ void ImagePanel::onMouse(wxMouseEvent & event)
     }
 
     if (event.LeftDown() && mode == STATUS::IDLE) {
-        _x1 = event.GetX();
-        _x2 = event.GetX();
-        _y1 = event.GetY();
-        _y2 = event.GetY();
+        _check.x1 = event.GetX();
+        _check.x2 = event.GetX();
+        _check.y1 = event.GetY();
+        _check.y2 = event.GetY();
         mode = STATUS::MOUSE_DOWN;
     } else if (event.LeftIsDown() && mode == STATUS::MOUSE_DOWN) {
-        _x2 = event.GetX();
-        _y2 = event.GetY();
+        _check.x2 = event.GetX();
+        _check.y2 = event.GetY();
     } else if (event.LeftUp() && mode == STATUS::MOUSE_DOWN) {
-        int tmp = 0;
-        if (_x2 < _x1) {
-            tmp = _x1;
-            _x1 = _x2;
-            _x2 = tmp;
-        }
-        if (_y2 < _y1) {
-            tmp = _y1;
-            _y1 = _y2;
-            _y2 = tmp;
-        }
         mode = STATUS::IDLE;
         _mouse_x = event.GetX();
         _mouse_y = event.GetY();
     }
-    locationAdjust(_x1, _y1);
-    locationAdjust(_x2, _y2);
+    locationAdjust(_check.x1, _check.y1);
+    locationAdjust(_check.x2, _check.y2);
     locationAdjust(_mouse_x, _mouse_y);
     Refresh();
-    event.Skip(false);
 }
 
 void ImagePanel::locationAdjust(int & x, int & y)
