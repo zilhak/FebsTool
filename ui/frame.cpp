@@ -6,7 +6,10 @@ wxBEGIN_EVENT_TABLE(Frame, wxFrame)
     EVT_BUTTON(ID::BUTTON_OPEN, Frame::onOpenButton)
     EVT_CHAR_HOOK(Frame::onKeyboardEvent)
     EVT_MOUSE_EVENTS(Frame::onMouseEvent)
+    EVT_COMBOBOX(ID::COMBO_SIZE, Frame::onSizeComboBox)
+    EVT_COMBOBOX(ID::COMBO_TYPE, Frame::onTypeComboBox)
     EVT_COMBOBOX(ID::COMBO_SCALE, Frame::onScaleComboBox)
+    EVT_COMBOBOX(ID::COMBO_DIFFICULT, Frame::onDifficultComboBox)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY, Frame::onListDoubleClick)
 wxEND_EVENT_TABLE()
 
@@ -23,11 +26,16 @@ Frame::~Frame()
 void Frame::initialize()
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
+
     initializeStyle();
     initializeSetting();
     initializeToolBar(v_sizer);
-    initializeImageViewer(v_sizer);
 
+    initializeLeftMenu(h_sizer);
+    initializeImageViewer(h_sizer);
+
+    v_sizer->Add(h_sizer, 1, wxEXPAND);
     SetSizer(v_sizer);
 
     Refresh();
@@ -51,37 +59,86 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
 {
     _tool_bar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100, 40));
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
-    _open_button = new wxButton(_tool_bar, BUTTON_OPEN, wxT("Open"));
-    _close_button = new wxButton(_tool_bar, BUTTON_CLOSE, wxT("Close"));
+    _open_button = new wxButton(_tool_bar, ID::BUTTON_OPEN, wxT("Open"));
+    _close_button = new wxButton(_tool_bar, ID::BUTTON_XML, wxT("XML view"));
 
-    _scale_combobox = new wxComboBox(_tool_bar, COMBO_SCALE);
+    _size_combobox = new wxComboBox(_tool_bar, ID::COMBO_SIZE, wxT("100"));
+    _size_combobox->SetEditable(false);
     for (int i = 10; i <= 600; i += 10) {
-        _scale_combobox->Append(wxString::Format("%d", i));
+        _size_combobox->Append(wxString::Format("%d", i));
     }
 
+    _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
+    _type_combobox->SetEditable(false);
+    _type_combobox->Append(wxT("car"));
+    _type_combobox->Append(wxT("truck"));
+    _type_combobox->Append(wxT("bus"));
+
+    _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
+    _scale_combobox->SetEditable(false);
+    _scale_combobox->Append(wxT("1"));
+    _scale_combobox->Append(wxT("2"));
+    _scale_combobox->Append(wxT("3"));
+
+    _difficult_combobox = new wxComboBox(_tool_bar, ID::COMBO_DIFFICULT, wxT("1"));
+    _difficult_combobox->Append(wxT("0"));
+    _difficult_combobox->Append(wxT("1"));
+    _difficult_combobox->Append(wxT("2"));
+
     h_sizer->Add(_open_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
-    h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 15);
-    h_sizer->Add(_scale_combobox, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 20);
+    h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 15);
+    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Size:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
+    h_sizer->Add(_size_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
+    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Type:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
+    h_sizer->Add(_type_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
+    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Scale:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
+    h_sizer->Add(_scale_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
+    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Difficult:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
+    h_sizer->Add(_difficult_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
 
     _tool_bar->SetSizer(h_sizer);
 
     sizer->Add(_tool_bar, 0, wxEXPAND);
 }
 
+void Frame::initializeLeftMenu(wxBoxSizer *h_sizer)
+{
+    wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
+
+    _file_list_viewer = new FileExplorer(this);
+    _file_list_viewer->SetBackgroundColour(wxColour(0xCCCCCC));
+
+    _image_info_box = new wxPanel(this, wxID_ANY);
+    _image_info_box->SetBackgroundColour(0xBBBBBB);
+    wxGridSizer * panel_sizer = new wxGridSizer(2, 3, 5);
+    _image_info_box->SetSizer(panel_sizer);
+
+    _info_image_name = new wxStaticText(_image_info_box, wxID_ANY, "");
+    _info_image_size = new wxStaticText(_image_info_box, wxID_ANY, "");
+    _info_mouse_x = new wxStaticText(_image_info_box, wxID_ANY, "");
+    _info_mouse_y = new wxStaticText(_image_info_box, wxID_ANY, "");
+
+    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "ImageName :"));
+    panel_sizer->Add(_info_image_name);
+    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "ImageSize :"));
+    panel_sizer->Add(_info_image_size);
+    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "MouseX :"));
+    panel_sizer->Add(_info_mouse_x);
+    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "MouseY :"));
+    panel_sizer->Add(_info_mouse_y);
+
+    v_sizer->Add(_image_info_box, 1, wxEXPAND);
+    v_sizer->Add(_file_list_viewer, 5, wxEXPAND);
+
+    h_sizer->Add(v_sizer, 0, wxEXPAND);
+}
+
 void Frame::initializeImageViewer(wxBoxSizer * sizer)
 {
-    wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
-
-    _file_list = new FileExplorer(this);
-    _file_list->SetBackgroundColour(wxColour(0xCCCCCC));
-
     _image_viewer = new ImagePanel(this, wxID_ANY);
     _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
 
-    h_sizer->Add(_file_list, 0, wxEXPAND);
-    h_sizer->Add(_image_viewer, 1, wxEXPAND);
-
-    sizer->Add(h_sizer, 1, wxEXPAND);
+    sizer->Add(_image_viewer, 1, wxEXPAND);
 }
 
 bool calculateRate(int image_width, int image_height)
@@ -119,68 +176,68 @@ bool Frame::fileExtCheck(wxString const extension)
 
 void Frame::onOpenButton(wxCommandEvent & event)
 {
-    wxFileDialog * find = new wxFileDialog(this,
-                                           _("Open jpg file"),
-                                           "",
-                                           "",
-                                           "JPG files (*.jpg;*.jpeg)|*.jpg;*.jpeg");
-    if (find->ShowModal() == wxID_CANCEL) {
-        return;
-    }
+     wxFileDialog * find = new wxFileDialog(this,
+                                            _("Open jpg file"),
+                                            "",
+                                            "",
+                                            "JPG files (*.jpg;*.jpeg)|*.jpg;*.jpeg");
+     if (find->ShowModal() == wxID_CANCEL) {
+         return;
+     }
 
-    addToListCtrl(find->GetDirectory());
-    _dir = new wxDir(find->GetDirectory());
-    _dir->GetFirst(&_current_file);
+     makeFileList(find->GetDirectory());
 
-    do {
-        if (_current_file == find->GetFilename()){
-            break;
+    for (auto file : _file_list) {
+        if (file == find->GetFilename()) {
+            showImage(file);
+            return;
         }
-    } while (_dir->GetNext(&_current_file));
-
-    if (_current_file != find->GetFilename()){
-        std::cout << "Cannot Found file!!!" << std::endl;
-        std::cout << "Tip: if path name have korean, this error occur." << std::endl;
-        return;
     }
-
-    _file_list->highlightItem(_current_file);
-    _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+    std::cout << "Cannot Found file!!!" << std::endl;
+    std::cout << "Tip: if path name have korean, this error occur." << std::endl;
 }
 
-void Frame::addToListCtrl(wxString const directory)
+void Frame::makeFileList(wxString const directory)
 {
-    _file_list->DeleteAllItems();
+    _file_list_viewer->DeleteAllItems();
+    _file_list.empty();
+
     _dir = new wxDir(directory);
+
     _dir->GetFirst(&_current_file);
     wxFileName file(directory + "/" + _current_file);
 
-    long index = 0;
     do {
         file.Assign(directory + "/" + _current_file);
         if (fileExtCheck(file.GetExt())) {
-            _file_list->InsertItem(index, _current_file);
-            if (wxFileExists(directory + "/" + file.GetName() + ".xml")) {
-                _file_list->SetItem(index, 1, ("O"));
-            } else {
-                _file_list->SetItem(index, 1, ("X"));
-            }
-            index++;
+            _file_list.push_back(_current_file);
         }
-    } while (_dir->GetNext(&_current_file));
+    } while (_dir->GetNext((&_current_file)));
+
+    std::sort(_file_list.begin(), _file_list.end());
+
+    for (int index = 0; index < _file_list.size(); index++) {
+        file.Assign(directory + "/" + _file_list.at(index));
+       _file_list_viewer->InsertItem(index, _file_list.at(index));
+       if (wxFileExists(directory + "/" + file.GetName() + ".xml")) {
+           _file_list_viewer->SetItem(index, 1, ("O"));
+       } else {
+           _file_list_viewer->SetItem(index, 1, ("X"));
+       }
+    }
 }
 
 void Frame::onListDoubleClick(wxListEvent & event)
 {
-    std::cout << event.GetIndex() << std::endl;
+    showImage(event.GetLabel());
 }
 
-void Frame::onKeyboardEvent(wxKeyEvent &event)
+void Frame::onKeyboardEvent(wxKeyEvent & event)
 {
     std::cout << event.GetKeyCode() << std::endl;
     if (_image_viewer->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
-            _file_list->xmlCheck(_current_file);
+            _file_list_viewer->xmlCheck(_current_file);
             _image_viewer->save();
             nextFile();
         } else if (event.GetKeyCode() == 81) { //'q'
@@ -195,66 +252,80 @@ void Frame::onKeyboardEvent(wxKeyEvent &event)
 
         } else if (event.GetKeyCode() == 82) { //'r'
             nextFile();
+        } else if (event.GetKeyCode() == 49) { //'1'
+            _type_combobox->SetValue(wxT("car"));
+        } else if (event.GetKeyCode() == 50) { //'2'
+            _type_combobox->SetValue(wxT("truck"));
+        } else if (event.GetKeyCode() == 51) { //'3'
+            _type_combobox->SetValue(wxT("bus"));
         }
     }
     SetTitle(_current_file);
 }
 
-void Frame::onMouseEvent(wxMouseEvent &event)
+void Frame::onMouseEvent(wxMouseEvent & event)
 {
+    int x = static_cast<int>(static_cast<double>(event.GetX() - 15) * 100.0 / wxAtof(_size_combobox->GetValue()));
+    int y = static_cast<int>(static_cast<double>(event.GetY() - 15) * 100.0 / wxAtof(_size_combobox->GetValue()));
 
+    _info_mouse_x->SetLabel(wxString::Format("%d", x));
+    _info_mouse_y->SetLabel(wxString::Format("%d", y));
+}
+
+void Frame::onSizeComboBox(wxCommandEvent &event)
+{
+    if (_image_viewer->isReady()) {
+        _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())) / (double) 100);
+        _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+    }
+}
+
+void Frame::onTypeComboBox(wxCommandEvent &event)
+{
+    if (_image_viewer->isReady()) {
+        _image_viewer->setType(_type_combobox->GetValue());
+    }
 }
 
 void Frame::onScaleComboBox(wxCommandEvent &event)
 {
     if (_image_viewer->isReady()) {
-        _image_viewer->changeScale(static_cast<double>(wxAtoi(_scale_combobox->GetValue())) / (double) 100);
-        _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+        _image_viewer->setDepth(wxAtoi(_scale_combobox->GetValue()));
+    }
+}
+
+void Frame::onDifficultComboBox(wxCommandEvent &event)
+{
+    if (_image_viewer->isReady()) {
+        _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
     }
 }
 
 void Frame::prevFile()
 {
-    wxString search;
-    wxString prevFile;
-    _dir->GetFirst(&search);
-
-    prevFile = _current_file;
-    do {
-        if (search.substr(search.length()-4, 4) == ".jpg" ||
-            search.substr(search.length()-5, 5) == ".jpeg") {
-            if (search == _current_file) {
-                _temp_file = _current_file;
-                _current_file = prevFile;
-
-                _file_list->highlightItem(_current_file);
-                _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
-                _use_prev = true;
-                return;
-            } else {
-                prevFile = search;
-            }
-        }
-    } while (_dir->GetNext(&search));
+    if (_image_index > 0) {
+        _image_index--;
+        showImage(_file_list.at(_image_index));
+    }
 }
 
 void Frame::nextFile()
 {
-    if (_use_prev) {
-        _current_file = _temp_file;
-        _file_list->highlightItem(_current_file);
-        _image_viewer->setBackgroundImage(_dir->GetName(), _temp_file);
-        _use_prev = false;
-        return;
+    if (_image_index < _file_list.size() - 1) {
+        _image_index++;
+        showImage(_file_list.at(_image_index));
     }
-    while (_dir->GetNext(&_current_file)) {
-        if (_current_file.substr(_current_file.length()-4, 4) == ".jpg" ||
-            _current_file.substr(_current_file.length()-5, 5) == ".jpeg") {
-            _file_list->highlightItem(_current_file);
-            _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
-            return;
-        }
-    }
+}
 
-    std::cout << "File Search End." << std::endl;
+void Frame::showImage(wxString const & file_name)
+{
+    SetTitle(file_name);
+
+    _image_index = _file_list_viewer->highlightItem(file_name);
+    _current_file = file_name;
+    _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+
+    _info_image_name->SetLabel(wxString::Format("%s", _current_file));
+
+    _info_image_size->SetLabel(wxString::Format("%d x %d", _image_viewer->getImageWidth(), _image_viewer->getImageHeight()));
 }

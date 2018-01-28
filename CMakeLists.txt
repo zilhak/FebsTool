@@ -4,8 +4,6 @@ cmake_minimum_required(VERSION 2.8)
 aux_source_directory(. SRC_LIST)
 
 include_directories(${CMAKE_SOURCE_DIR})
-#add_subdirectory(libIz)
-#target_link_libraries(ImageSearcher libImageSearcher)
 
 set(SRCS main.cpp frame.cpp tinyxml2.cpp)
 find_package(wxWidgets COMPONENTS core base REQUIRED)

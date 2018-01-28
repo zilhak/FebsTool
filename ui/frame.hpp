@@ -16,28 +16,39 @@ public:
 public:
     enum ID {
         BUTTON_OPEN,
-        BUTTON_CLOSE,
-        COMBO_SCALE
+        BUTTON_XML,
+        COMBO_SIZE,
+        COMBO_TYPE,
+        COMBO_SCALE,
+        COMBO_DIFFICULT
     };
 
 private:
     wxDir * _dir;
     wxString _current_file;
-    wxString _temp_file;
     std::set<wxString> _image_extension;
+    std::vector<wxString> _file_list;
+    long _image_index;
 
 private:
     wxPanel * _tool_bar;
-    FileExplorer * _file_list;
+    FileExplorer * _file_list_viewer;
+    wxPanel * _image_info_box;
     ImagePanel * _image_viewer;
+
+private:
+    wxStaticText * _info_image_name;
+    wxStaticText * _info_image_size;
+    wxStaticText * _info_mouse_x;
+    wxStaticText * _info_mouse_y;
 
 private:
     wxButton * _open_button;
     wxButton * _close_button;
+    wxComboBox * _size_combobox;
+    wxComboBox * _type_combobox;
     wxComboBox * _scale_combobox;
-
-private:
-    bool _use_prev = false;
+    wxComboBox * _difficult_combobox;
 
 public:
     Frame(const wxString & title);
@@ -48,16 +59,23 @@ private:
     void initializeStyle();
     void initializeSetting();
     void initializeToolBar(wxBoxSizer * sizer);
-    void initializeImageViewer(wxBoxSizer * sizer);
+    void initializeLeftMenu(wxBoxSizer * h_sizer);
+    void initializeImageViewer(wxBoxSizer * h_sizer);
 
 private:
-    void addToListCtrl(wxString const directory);
+    void makeFileList(wxString const directory);
+
+private:
+    void showImage(wxString const & file_name);
 
 private:
     bool fileExtCheck(wxString const extension);
 
 private: // menu event.
-    void onScaleComboBox(wxCommandEvent & event);
+    void onSizeComboBox(wxCommandEvent &event);
+    void onTypeComboBox(wxCommandEvent &event);
+    void onScaleComboBox(wxCommandEvent &event);
+    void onDifficultComboBox(wxCommandEvent &event);
     void onOpenButton(wxCommandEvent & event);
     void onListDoubleClick(wxListEvent & event);
     void onExplore();

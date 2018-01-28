@@ -18,7 +18,7 @@ private:
 
 public:
     void xmlCheck(wxString filename);
-    void highlightItem(wxString filename);
+    long highlightItem(wxString filename);
 };
 
 

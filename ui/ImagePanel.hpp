@@ -24,6 +24,9 @@ private:
     int _bitmap_height; // arranged hieght
     int _image_x = 15;
     int _image_y = 15;
+    wxString _image_type = "car";
+    int _image_depth = 3;
+    int _image_diff = 1;
 
 private:
     int _mouse_x;
@@ -33,6 +36,7 @@ private:
     bool _xml_exists = false;
     double _scale_setting = 1;
     STATUS mode = STATUS::IDLE;
+    bool _click = false;
     bool _is_ready = false;
 
 public:
@@ -40,12 +44,17 @@ public:
     virtual ~ImagePanel();
 
 public:
-    void changeScale(double scale);
+    void setSize(double scale) {_scale_setting = scale;}
+    void setType(wxString type) {_image_type = type;}
+    void setDepth(int depth) {_image_depth = depth;}
+    void setDiff(int diff) {_image_diff = diff;}
     void save();
     void load();
     void setBackgroundImage(wxString filepath, wxString filename);
 
 public:
+    int getImageWidth() const {return _image_width;}
+    int getImageHeight() const {return _image_height;}
     void firstPointUp();
     void firstPointDown();
     void firstPointLeft();

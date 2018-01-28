@@ -20,14 +20,44 @@ cyRect loadFromXml (wxString image_file_not_ext)
     tinyxml2::XMLElement * ymax = bndbox->FirstChildElement("ymax");
 
     result.x1 = std::stoi(xmin->GetText());
-    result.y1 = std::stoi(xmax->GetText());
-    result.x2 = std::stoi(ymin->GetText());
+    result.x2 = std::stoi(xmax->GetText());
+    result.y1 = std::stoi(ymin->GetText());
     result.y2 = std::stoi(ymax->GetText());
 
     return result;
 }
 
-bool saveToXml (cyRect check, wxFileName file, int image_height, int image_width, int diff)
+ImageInfo loadXmlInfo (wxString image_file_not_ext)
+{
+    ImageInfo result(0, 0, wxT(""));
+
+    tinyxml2::XMLDocument document;
+    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());
+    if (err != tinyxml2::XML_NO_ERROR) {
+        return result;
+    }
+
+    tinyxml2::XMLNode * root = document.FirstChildElement("annotation");
+
+    tinyxml2::XMLElement * object = root->FirstChildElement("object");
+    tinyxml2::XMLElement * name = object->FirstChildElement("name");
+    tinyxml2::XMLElement * diff = object->FirstChildElement("difficult");
+
+    tinyxml2::XMLElement * size = root->FirstChildElement("size");
+    tinyxml2::XMLElement * depth = size->FirstChildElement("depth");
+    tinyxml2::XMLElement * height = size->FirstChildElement("height");
+    tinyxml2::XMLElement * width = size->FirstChildElement("height");
+
+    result.type = name->GetText();
+    result.image_width = std::stoi(width->GetText());
+    result.image_height = std::stoi(height->GetText());
+    result.depth = std::stoi(depth->GetText());
+    result.diff = std::stoi(diff->GetText());
+
+    return result;
+}
+
+bool saveToXml (cyRect check, wxFileName file, ImageInfo info)
 {
     tinyxml2::XMLDocument document;
     tinyxml2::XMLNode * root = document.NewElement("annotation");
@@ -76,15 +106,15 @@ bool saveToXml (cyRect check, wxFileName file, int image_height, int image_width
 
     filename->LinkEndChild(document.NewText(file.GetFullName().c_str()));
     folder->LinkEndChild(document.NewText("${FOLDER}"));
-    name->LinkEndChild(document.NewText("car"));
+    name->LinkEndChild(document.NewText(info.type.c_str()));
     xmax->SetText(check.x2);
     xmin->SetText(check.x1);
     ymax->SetText(check.y2);
     ymin->SetText(check.y1);
-    difficult->SetText(diff);
-    depth->LinkEndChild(document.NewText("3"));
-    height->SetText(image_height);
-    width->SetText(image_width);
+    difficult->SetText(info.diff);
+    depth->SetText(info.depth);
+    height->SetText(info.image_height);
+    width->SetText(info.image_width);
     annotation->LinkEndChild(document.NewText("Bogonet"));
     database->LinkEndChild(document.NewText("The bogonet image database"));
     image->LinkEndChild(document.NewText("SaveZone"));

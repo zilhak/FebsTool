@@ -32,10 +32,12 @@ void FileExplorer::xmlCheck(wxString filename)
     SetItem(FindItem(0, filename), 1, "O");
 }
 
-void FileExplorer::highlightItem(wxString filename)
+long FileExplorer::highlightItem(wxString filename)
 {
     SetItemTextColour(_highlighted_item, *wxBLACK);
 
     _highlighted_item = FindItem(0, filename);
     SetItemTextColour(_highlighted_item, wxColour(0x99FF99));
+
+    return _highlighted_item;
 }
