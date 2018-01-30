@@ -73,6 +73,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     _type_combobox->Append(wxT("car"));
     _type_combobox->Append(wxT("truck"));
     _type_combobox->Append(wxT("bus"));
+    _type_combobox->Append(wxT("person"));
 
     _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
     _scale_combobox->SetEditable(false);
