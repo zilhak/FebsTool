@@ -123,7 +123,6 @@ void ImagePanel::onPaint(wxPaintEvent & event)
 
         dc.DrawRectangle(x, y, width, height);
         dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
-        std::cout << "x:" << x << " y:" << y << " width:" << width << " height:" << height << std::endl;
     }
 }
 

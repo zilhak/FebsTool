@@ -13,6 +13,8 @@ wxBEGIN_EVENT_TABLE(Frame, wxFrame)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY, Frame::onListDoubleClick)
 wxEND_EVENT_TABLE()
 
+constexpr static char const * const TRASHBIN_NAME = "TrashCan";
+
 Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
 {
     initialize();
@@ -185,9 +187,7 @@ void Frame::onOpenButton(wxCommandEvent & event)
      if (find->ShowModal() == wxID_CANCEL) {
          return;
      }
-
      makeFileList(find->GetDirectory());
-
     for (auto file : _file_list) {
         if (file == find->GetFilename()) {
             showImage(file);
@@ -201,7 +201,7 @@ void Frame::onOpenButton(wxCommandEvent & event)
 void Frame::makeFileList(wxString const directory)
 {
     _file_list_viewer->DeleteAllItems();
-    _file_list.empty();
+    _file_list.clear();
 
     _dir = new wxDir(directory);
 
@@ -259,6 +259,27 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
             _type_combobox->SetValue(wxT("truck"));
         } else if (event.GetKeyCode() == 51) { //'3'
             _type_combobox->SetValue(wxT("bus"));
+        } else if (event.GetKeyCode() == 127) { //'delete'
+            wxFileName file(_dir->GetName() + "/" + _current_file);
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
+
+            if (!wxDirExists(trashbin_path)) {
+                wxMkdir(trashbin_path);
+            }
+            wxString duplicate_number = "";
+            int number = 0;
+            while (!wxRenameFile(file.GetFullPath(),
+                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
+                                 false)) {
+                number++;
+                duplicate_number = wxString::Format("(%d)", number);
+            }
+            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
+                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
+                        trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
+            }
+            makeFileList(file.GetPath());
+            refresh();
         }
     }
     SetTitle(_current_file);
@@ -275,31 +296,25 @@ void Frame::onMouseEvent(wxMouseEvent & event)
 
 void Frame::onSizeComboBox(wxCommandEvent &event)
 {
+    _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())) / (double) 100);
     if (_image_viewer->isReady()) {
-        _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())) / (double) 100);
         _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
     }
 }
 
 void Frame::onTypeComboBox(wxCommandEvent &event)
 {
-    if (_image_viewer->isReady()) {
-        _image_viewer->setType(_type_combobox->GetValue());
-    }
+    _image_viewer->setType(_type_combobox->GetValue());
 }
 
 void Frame::onScaleComboBox(wxCommandEvent &event)
 {
-    if (_image_viewer->isReady()) {
-        _image_viewer->setDepth(wxAtoi(_scale_combobox->GetValue()));
-    }
+    _image_viewer->setDepth(wxAtoi(_scale_combobox->GetValue()));
 }
 
 void Frame::onDifficultComboBox(wxCommandEvent &event)
 {
-    if (_image_viewer->isReady()) {
-        _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
-    }
+    _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
 }
 
 void Frame::prevFile()
@@ -314,6 +329,15 @@ void Frame::nextFile()
 {
     if (_image_index < _file_list.size() - 1) {
         _image_index++;
+        showImage(_file_list.at(_image_index));
+    }
+}
+
+void Frame::refresh()
+{
+    if (_image_index < _file_list.size()) {
+        showImage(_file_list.at(_image_index));
+    } else if (--_image_index < _file_list.size()){
         showImage(_file_list.at(_image_index));
     }
 }

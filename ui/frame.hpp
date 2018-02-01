@@ -87,5 +87,8 @@ private: // input event.
 private:
     void prevFile();
     void nextFile();
+
+private:
+    void refresh();
 };
 
