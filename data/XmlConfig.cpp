@@ -36,6 +36,9 @@ ImageInfo loadXmlInfo (wxString image_file_not_ext)
     if (err != tinyxml2::XML_NO_ERROR) {
         return result;
     }
+    char * c;
+    tinyxml2::StrPair * pair;
+    std::cout << document.ParseDeep(c, pair) << std::endl;
 
     tinyxml2::XMLNode * root = document.FirstChildElement("annotation");
 

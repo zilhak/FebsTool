@@ -190,7 +190,8 @@ void Frame::onOpenButton(wxCommandEvent & event)
      makeFileList(find->GetDirectory());
     for (auto file : _file_list) {
         if (file == find->GetFilename()) {
-            showImage(file);
+            loadXmlInfo(find->GetDirectory() + file));
+            showImage(file.substr(0, file.length() - 3));
             return;
         }
     }

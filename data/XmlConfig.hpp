@@ -38,6 +38,7 @@ struct ImageInfo {
 
 // ex) file "/usr/home/bogonets/example.jpg" -> loadFromXml("/usr/home/bogonets/example");
 cyRect loadFromXml(wxString file_path_and_name_not_ext);
+ImageInfo loadXmlInfo (wxString image_file_not_ext);
 
 bool saveToXml (cyRect check,
                 wxFileName file,
