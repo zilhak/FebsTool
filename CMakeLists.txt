@@ -5,7 +5,7 @@ aux_source_directory(. SRC_LIST)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-set(SRCS main.cpp frame.cpp tinyxml2.cpp)
+set(SRCS main.cpp tinyxml2.cpp)
 find_package(wxWidgets COMPONENTS core base REQUIRED)
 IF(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
