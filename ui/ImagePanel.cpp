@@ -75,6 +75,41 @@ void ImagePanel::save()
     }
 }
 
+void ImagePanel::saveCropImage()
+{
+
+    wxRect sub_rect;
+    if (_background_bitmap.IsOk() && mode == STATUS::IDLE) {
+        int x1;
+        int y1;
+        int x2;
+        int y2;
+
+        if (_check.x1 > _check.x2) {
+            x1 = static_cast<int>(static_cast<double>(_check.x2 - _image_x) / _scale_setting);
+            x2 = static_cast<int>(static_cast<double>(_check.x1 - _image_x) / _scale_setting);
+        } else {
+            x1 = static_cast<int>(static_cast<double>(_check.x1 - _image_x) / _scale_setting);
+            x2 = static_cast<int>(static_cast<double>(_check.x2 - _image_x) / _scale_setting);
+        }
+
+        if (_check.y1 > _check.y2) {
+            y1 = static_cast<int>(static_cast<double>(_check.y2 - _image_y) / _scale_setting);
+            y2 = static_cast<int>(static_cast<double>(_check.y1 - _image_y) / _scale_setting);
+        } else {
+            y1 = static_cast<int>(static_cast<double>(_check.y1 - _image_y) / _scale_setting);
+            y2 = static_cast<int>(static_cast<double>(_check.y2 - _image_y) / _scale_setting);
+        }
+
+        sub_rect = wxRect(x1, y1, x2 - x1, y2 - y1);
+    }
+
+    wxImage image = _background_bitmap.ConvertToImage();
+    wxImage sub_image = image.GetSubImage(sub_rect);
+
+    sub_image.SaveFile(_image_file.GetPath(true) + "crop_" + _image_file.GetFullName());
+}
+
 void ImagePanel::onPaint(wxPaintEvent & event)
 {
     if (!_background_bitmap.IsOk()) {

@@ -51,6 +51,7 @@ public:
     void save();
     void load();
     void setBackgroundImage(wxString filepath, wxString filename);
+    void saveCropImage();
 
 public:
     int getImageWidth() const {return _image_width;}

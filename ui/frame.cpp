@@ -190,8 +190,8 @@ void Frame::onOpenButton(wxCommandEvent & event)
      makeFileList(find->GetDirectory());
     for (auto file : _file_list) {
         if (file == find->GetFilename()) {
-            loadXmlInfo(find->GetDirectory() + file));
-            showImage(file.substr(0, file.length() - 3));
+            loadXmlInfo(find->GetDirectory() + file);
+            showImage(file);
             return;
         }
     }
@@ -253,6 +253,9 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 68) { //'d'
 
         } else if (event.GetKeyCode() == 82) { //'r'
+            nextFile();
+        } else if (event.GetKeyCode() == 13) { //'enter'
+            _image_viewer->saveCropImage();
             nextFile();
         } else if (event.GetKeyCode() == 49) { //'1'
             _type_combobox->SetValue(wxT("car"));
