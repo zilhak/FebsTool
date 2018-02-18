@@ -13,9 +13,9 @@ ConfigData LoadConfig()
 
 }
 
-std::vector<cyRect> loadFromXml(wxString image_file_not_ext)
+std::vector<BoundingBox> loadFromXml(wxString image_file_not_ext)
 {
-    std::vector<cyRect> result;
+    std::vector<BoundingBox> result;
     Document document;
     tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());
     if (err != tinyxml2::XML_NO_ERROR) {
@@ -29,7 +29,7 @@ std::vector<cyRect> loadFromXml(wxString image_file_not_ext)
     return result;
 }
 
-cyRect loadObject(Element * object)
+BoundingBox loadObject(Element * object)
 {
     Element * name = object->FirstChildElement("name");
     Element * bndbox = object->FirstChildElement("bndbox");
@@ -40,7 +40,7 @@ cyRect loadObject(Element * object)
     Element * ymin = bndbox->FirstChildElement("ymin");
     Element * ymax = bndbox->FirstChildElement("ymax");
 
-    return cyRect(name->GetText(),
+    return BoundingBox(name->GetText(),
                   std::stoi(xmin->GetText()),
                   std::stoi(ymin->GetText()),
                   std::stoi(xmax->GetText()),
@@ -79,7 +79,7 @@ ImageInfo loadXmlInfo(wxString image_file_not_ext)
     return result;
 }
 
-Element * insertObject(Document * doc, cyRect rect)
+Element * insertObject(Document * doc, BoundingBox rect)
 {
     Element * object = doc->NewElement("object");
     Element * name = doc->NewElement("name");
@@ -109,7 +109,7 @@ Element * insertObject(Document * doc, cyRect rect)
     return object;
 }
 
-bool saveToXml (std::vector<cyRect> check_list, wxFileName file, ImageInfo info)
+bool saveToXml (std::vector<BoundingBox> check_list, wxFileName file, ImageInfo info)
 {
     Document document;
     Node * root = document.NewElement("annotation");

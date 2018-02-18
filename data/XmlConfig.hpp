@@ -6,7 +6,13 @@
 #ifndef IMAGESEARCHER_XMLCONFIG_H
 #define IMAGESEARCHER_XMLCONFIG_H
 
-struct cyRect {
+struct TargetObject
+{
+
+};
+
+struct BoundingBox : TargetObject
+{
     wxString type;
     int difficult = -1;
 
@@ -15,10 +21,15 @@ struct cyRect {
     int x2 = -1;
     int y2 = -1;
 
-    cyRect() { /* EMPTY */ }
-    cyRect(wxString type, int x1, int y1, int x2, int y2, int difficult) :
+    BoundingBox() { /* EMPTY */ }
+    BoundingBox(wxString type, int x1, int y1, int x2, int y2, int difficult) :
             type(type), x1(x1), y1(y1), x2(x2), y2(y2), difficult(difficult)
     { /* EMPTY */ }
+};
+
+struct Segmentation : TargetObject
+{
+
 };
 
 struct ImageInfo {
@@ -46,12 +57,12 @@ bool SaveConfig(ConfigData data);
 ConfigData LoadConfig();
 
 // ex) file "/usr/home/bogonets/example.jpg" -> loadFromXml("/usr/home/bogonets/example");
-std::vector<cyRect> loadFromXml(wxString file_path_and_name_not_ext);
-cyRect loadObject(Element * root);
+std::vector<BoundingBox> loadFromXml(wxString file_path_and_name_not_ext);
+BoundingBox loadObject(Element * root);
 ImageInfo loadXmlInfo (wxString image_file_not_ext);
 
-Element * insertObject(Document * doc, cyRect check);
-bool saveToXml (std::vector<cyRect> check_list,
+Element * insertObject(Document * doc, BoundingBox check);
+bool saveToXml (std::vector<BoundingBox> check_list,
                 wxFileName file,
                 ImageInfo info);
 

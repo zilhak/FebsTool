@@ -39,9 +39,9 @@ private:
     bool _is_ready = false;
 
 private:
-    std::vector<cyRect> _rect_vector;
-    cyRect _check;
-    cyRect _temp_rect;
+    std::vector<BoundingBox> _rect_vector;
+    BoundingBox _check;
+    BoundingBox _temp_rect;
     int _current_object_index = -1;
 
 public:

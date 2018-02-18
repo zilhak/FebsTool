@@ -19,7 +19,7 @@ ImagePanel::~ImagePanel()
 void ImagePanel::setBackgroundImage(wxString filepath, wxString filename)
 {
     _click = false;
-    _check = cyRect();
+    _check = BoundingBox();
     _image_file.Assign(wxString::Format("%s/%s",filepath, filename));
     load();
 
@@ -79,7 +79,7 @@ void ImagePanel::save()
         if (_current_object_index != _rect_vector.size()) {
             _rect_vector.erase(_rect_vector.begin() + _current_object_index);
         }
-        cyRect check (_image_type, x1, y1, x2, y2, _image_diff);
+        BoundingBox check (_image_type, x1, y1, x2, y2, _image_diff);
         _rect_vector.push_back(check);
         _current_object_index = static_cast<int>(_rect_vector.size());
 
@@ -134,7 +134,7 @@ void ImagePanel::onPaint(wxPaintEvent & event)
 
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     int i = 0;
-    for (cyRect const & rect: _rect_vector) {
+    for (BoundingBox const & rect: _rect_vector) {
         if (i == _current_object_index) {
             if (_click) {
                 i++;
