@@ -346,7 +346,9 @@ void Frame::prevFile()
     if (_image_index > 0) {
         _image_index--;
         showImage(_file_list.at(_image_index));
-        _file_list_viewer->ScrollLines(-1);
+        if (_file_list_viewer->getHighlightedItemIndex() < _file_list_viewer->GetItemCount() - 5) {
+            _file_list_viewer->ScrollLines(-1);
+        }
     }
 }
 
@@ -355,7 +357,9 @@ void Frame::nextFile()
     if (_image_index < _file_list.size() - 1) {
         _image_index++;
         showImage(_file_list.at(_image_index));
-        _file_list_viewer->ScrollLines(1);
+        if (_file_list_viewer->getHighlightedItemIndex() > 5) {
+            _file_list_viewer->ScrollLines(1);
+        }
     }
 }
 

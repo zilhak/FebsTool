@@ -43,3 +43,8 @@ long FileExplorer::highlightItem(wxString filename)
 
     return _highlighted_item;
 }
+
+long FileExplorer::getHighlightedItemIndex()
+{
+    return _highlighted_item;
+}

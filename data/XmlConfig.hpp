@@ -34,9 +34,16 @@ struct ImageInfo {
     { /* EMPTY */ }
 };
 
+struct ConfigData {
+
+};
+
 using Document = tinyxml2::XMLDocument;
 using Node = tinyxml2::XMLNode;
 using Element = tinyxml2::XMLElement;
+
+bool SaveConfig(ConfigData data);
+ConfigData LoadConfig();
 
 // ex) file "/usr/home/bogonets/example.jpg" -> loadFromXml("/usr/home/bogonets/example");
 std::vector<cyRect> loadFromXml(wxString file_path_and_name_not_ext);

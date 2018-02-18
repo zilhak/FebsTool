@@ -3,6 +3,16 @@
 #include <vector>
 #include "XmlConfig.hpp"
 
+bool SaveConfig(ConfigData data)
+{
+
+}
+
+ConfigData LoadConfig()
+{
+
+}
+
 std::vector<cyRect> loadFromXml(wxString image_file_not_ext)
 {
     std::vector<cyRect> result;
