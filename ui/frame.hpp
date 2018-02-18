@@ -23,7 +23,9 @@ public:
         COMBO_SIZE,
         COMBO_TYPE,
         COMBO_SCALE,
-        COMBO_DIFFICULT
+        COMBO_DIFFICULT,
+        IMAGE_VIEWER,
+        FILE_EXPLORER
     };
 
 private:

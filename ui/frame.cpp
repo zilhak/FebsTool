@@ -112,7 +112,7 @@ void Frame::initializeLeftMenu(wxBoxSizer *h_sizer)
     _file_list_viewer = new FileExplorer(this);
     _file_list_viewer->SetBackgroundColour(wxColour(0xCCCCCC));
 
-    _image_info_box = new wxPanel(this, wxID_ANY);
+    _image_info_box = new wxPanel(this, ID::FILE_EXPLORER);
     _image_info_box->SetBackgroundColour(0xBBBBBB);
     wxGridSizer * panel_sizer = new wxGridSizer(2, 3, 5);
     _image_info_box->SetSizer(panel_sizer);
@@ -139,7 +139,7 @@ void Frame::initializeLeftMenu(wxBoxSizer *h_sizer)
 
 void Frame::initializeImageViewer(wxBoxSizer * sizer)
 {
-    _image_viewer = new ImagePanel(this, wxID_ANY);
+    _image_viewer = new ImagePanel(this, ID::IMAGE_VIEWER);
     _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
 
     sizer->Add(_image_viewer, 1, wxEXPAND);
@@ -298,17 +298,19 @@ void Frame::onMouseEvent(wxMouseEvent & event)
     _info_mouse_x->SetLabel(wxString::Format("%d", x));
     _info_mouse_y->SetLabel(wxString::Format("%d", y));
 
-    if (event.GetWheelRotation() < 0) {
-        if (_size_combobox->GetSelection() > 1) {
-            _size_combobox->Select(_size_combobox->GetSelection() - 1);
-            wxCommandEvent evt;
-            onSizeComboBox(evt);
-        }
-    } else if (event.GetWheelRotation() > 0) {
-        if (_size_combobox->GetSelection() < _size_combobox->GetCount() - 1) {
-            _size_combobox->Select(_size_combobox->GetSelection() + 1);
-            wxCommandEvent evt;
-            onSizeComboBox(evt);
+    if (event.GetId() == ID::IMAGE_VIEWER) {
+        if (event.GetWheelRotation() < 0) {
+            if (_size_combobox->GetSelection() > 1) {
+                _size_combobox->Select(_size_combobox->GetSelection() - 1);
+                wxCommandEvent evt;
+                onSizeComboBox(evt);
+            }
+        } else if (event.GetWheelRotation() > 0) {
+            if (_size_combobox->GetSelection() < _size_combobox->GetCount() - 1) {
+                _size_combobox->Select(_size_combobox->GetSelection() + 1);
+                wxCommandEvent evt;
+                onSizeComboBox(evt);
+            }
         }
     }
 }
@@ -341,6 +343,7 @@ void Frame::prevFile()
     if (_image_index > 0) {
         _image_index--;
         showImage(_file_list.at(_image_index));
+        _file_list_viewer->ScrollLines(-1);
     }
 }
 
@@ -349,6 +352,7 @@ void Frame::nextFile()
     if (_image_index < _file_list.size() - 1) {
         _image_index++;
         showImage(_file_list.at(_image_index));
+        _file_list_viewer->ScrollLines(1);
     }
 }
 
