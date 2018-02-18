@@ -132,6 +132,10 @@ void ImagePanel::onPaint(wxPaintEvent & event)
     int i = 0;
     for (cyRect const & rect: _rect_vector) {
         if (i == _current_object_index) {
+            if (_click) {
+                i++;
+                continue;
+            }
             dc.SetPen(*wxCYAN_PEN);
         } else {
             dc.SetPen(*wxYELLOW_PEN);
@@ -232,13 +236,17 @@ void ImagePanel::previousObject()
     } else {
         _current_object_index = static_cast<int>(_rect_vector.size());
     }
+    _click = false;
+    Refresh();
 }
 
 void ImagePanel::nextObject()
 {
-    if (_current_object_index <= _rect_vector.size()) {
+    if (_current_object_index < _rect_vector.size()) {
         _current_object_index++;
     } else {
         _current_object_index = 0;
     }
+    _click = false;
+    Refresh();
 }

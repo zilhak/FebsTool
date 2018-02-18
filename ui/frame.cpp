@@ -284,6 +284,8 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
+        } else if (event.GetKeyCode() == WXK_TAB) {
+            _image_viewer->nextObject();
         }
     }
     SetTitle(_current_file);
