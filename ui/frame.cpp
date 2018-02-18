@@ -254,6 +254,8 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
 
         } else if (event.GetKeyCode() == 82) { //'r'
             nextFile();
+        } else if (event.GetKeyCode() == 84) { //'t
+            _image_viewer->deleteObject();
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_viewer->saveCropImage();
             nextFile();

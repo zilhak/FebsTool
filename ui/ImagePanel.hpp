@@ -63,6 +63,7 @@ public:
     int getImageHeight() const {return _image_height;}
 
 public:
+    void deleteObject();
     void previousObject();
     void nextObject();
     void firstPointUp();

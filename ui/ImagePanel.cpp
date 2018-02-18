@@ -56,6 +56,10 @@ void ImagePanel::save()
         int x2;
         int y2;
 
+        if (!_click) {
+            return;
+        }
+
         if (_check.x1 > _check.x2) {
             x1 = static_cast<int>(static_cast<double>(_check.x2 - _image_x) / _scale_setting);
             x2 = static_cast<int>(static_cast<double>(_check.x1 - _image_x) / _scale_setting);
@@ -226,6 +230,16 @@ void ImagePanel::locationAdjust(int & x, int & y)
         y = _image_y;
     } else if (y > _image_y + _bitmap_height) {
         y = _image_y + _bitmap_height;
+    }
+}
+
+void ImagePanel::deleteObject()
+{
+    if(_rect_vector.size() > _current_object_index) {
+        _rect_vector.erase(_rect_vector.begin() + _current_object_index);
+        _current_object_index = static_cast<int>(_rect_vector.size());
+        _click = false;
+        Refresh();
     }
 }
 
