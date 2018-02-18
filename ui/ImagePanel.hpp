@@ -1,6 +1,7 @@
 #include <wx/wx.h>
 #include "data/XmlConfig.hpp"
 #include <wx/filename.h>
+#include <vector>
 
 #ifndef IMAGESEARCHER_UI_IMAGEPANEL_HPP
 #define IMAGESEARCHER_UI_IMAGEPANEL_HPP
@@ -31,13 +32,17 @@ private:
 private:
     int _mouse_x;
     int _mouse_y;
-    cyRect _check;
-    cyRect _temp_rect;
     bool _xml_exists = false;
     double _scale_setting = 1;
     STATUS mode = STATUS::IDLE;
     bool _click = false;
     bool _is_ready = false;
+
+private:
+    std::vector<cyRect> _rect_vector;
+    cyRect _check;
+    cyRect _temp_rect;
+    int _current_object_index = -1;
 
 public:
     ImagePanel(wxWindow * parent, wxWindowID id);
@@ -56,6 +61,10 @@ public:
 public:
     int getImageWidth() const {return _image_width;}
     int getImageHeight() const {return _image_height;}
+
+public:
+    void previousObject();
+    void nextObject();
     void firstPointUp();
     void firstPointDown();
     void firstPointLeft();

@@ -38,10 +38,12 @@ void ImagePanel::setBackgroundImage(wxString filepath, wxString filename)
 
 void ImagePanel::load()
 {
-    _temp_rect = loadFromXml(_image_file.GetPath(true) + _image_file.GetName());
-    if (_temp_rect.x1 == -1) {
+    _rect_vector = loadFromXml(_image_file.GetPath(true) + _image_file.GetName());
+    if (_rect_vector.size() < 1) {
+        _current_object_index = 0;
         _xml_exists = false;
     } else {
+        _current_object_index = static_cast<int>(_rect_vector.size());
         _xml_exists = true;
     }
 }
@@ -70,8 +72,15 @@ void ImagePanel::save()
             y2 = static_cast<int>(static_cast<double>(_check.y2 - _image_y) / _scale_setting);
         }
 
-        cyRect check (x1, y1, x2, y2);
-        saveToXml(check, _image_file, ImageInfo(_image_height, _image_width, _image_type, _image_depth, _image_diff));
+        if (_current_object_index != _rect_vector.size()) {
+            _rect_vector.erase(_rect_vector.begin() + _current_object_index);
+        }
+        cyRect check (_image_type, x1, y1, x2, y2, _image_diff);
+        _rect_vector.push_back(check);
+        _current_object_index = static_cast<int>(_rect_vector.size());
+
+        saveToXml(_rect_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
+        _click = false;
     }
 }
 
@@ -120,6 +129,25 @@ void ImagePanel::onPaint(wxPaintEvent & event)
     dc.DrawBitmap(_background_bitmap , _image_x, _image_y);
 
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    int i = 0;
+    for (cyRect const & rect: _rect_vector) {
+        if (i == _current_object_index) {
+            dc.SetPen(*wxCYAN_PEN);
+        } else {
+            dc.SetPen(*wxYELLOW_PEN);
+        }
+
+        int x = _image_x + static_cast<int>(static_cast<double>(rect.x1) * _scale_setting);
+        int y = _image_y + static_cast<int>(static_cast<double>(rect.y1) * _scale_setting);
+        int width = static_cast<int>(static_cast<double>(rect.x2 - rect.x1) * _scale_setting);
+        int height = static_cast<int>(static_cast<double>(rect.y2 - rect.y1) * _scale_setting);
+
+        dc.DrawText(rect.type, x + 1, y + 1);
+        dc.DrawRectangle(x, y, width, height);
+        dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
+        i++;
+    }
+
     dc.SetPen(*wxRED_PEN);
     if (mode == STATUS::IDLE && _image_y < _mouse_y && _mouse_y < _image_y + _bitmap_height) {
         dc.DrawLine(_image_x,
@@ -149,16 +177,8 @@ void ImagePanel::onPaint(wxPaintEvent & event)
                          _temp_rect.x2 - _temp_rect.x1, _temp_rect.y2 - _temp_rect.y1);
         dc.DrawRectangle(_temp_rect.x1 - 1, _temp_rect.y1 - 1,
                          _temp_rect.x2 - _temp_rect.x1 + 2, _temp_rect.y2 - _temp_rect.y1 + 2);
-    } else if (_xml_exists) {
-        dc.SetPen(*wxYELLOW_PEN);
-        int x = _image_x + static_cast<int>(static_cast<double>(_temp_rect.x1) * _scale_setting);
-        int y = _image_y + static_cast<int>(static_cast<double>(_temp_rect.y1) * _scale_setting);
-        int width = static_cast<int>(static_cast<double>(_temp_rect.x2 - _temp_rect.x1) * _scale_setting);
-        int height = static_cast<int>(static_cast<double>(_temp_rect.y2 - _temp_rect.y1) * _scale_setting);
-
-        dc.DrawRectangle(x, y, width, height);
-        dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
     }
+
 }
 
 void ImagePanel::onMouse(wxMouseEvent & event)
@@ -202,5 +222,23 @@ void ImagePanel::locationAdjust(int & x, int & y)
         y = _image_y;
     } else if (y > _image_y + _bitmap_height) {
         y = _image_y + _bitmap_height;
+    }
+}
+
+void ImagePanel::previousObject()
+{
+    if (_current_object_index > 0) {
+        _current_object_index--;
+    } else {
+        _current_object_index = static_cast<int>(_rect_vector.size());
+    }
+}
+
+void ImagePanel::nextObject()
+{
+    if (_current_object_index <= _rect_vector.size()) {
+        _current_object_index++;
+    } else {
+        _current_object_index = 0;
     }
 }

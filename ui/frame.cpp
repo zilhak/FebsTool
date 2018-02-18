@@ -191,7 +191,7 @@ void Frame::onOpenButton(wxCommandEvent & event)
      makeFileList(find->GetDirectory());
     for (auto file : _file_list) {
         if (file == find->GetFilename()) {
-            loadXmlInfo(find->GetDirectory() + file);
+            //loadXmlInfo(find->GetDirectory() + file);
             showImage(file);
             return;
         }
@@ -242,7 +242,6 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
         if (event.GetKeyCode() == 69) { // 'e'
             _file_list_viewer->xmlCheck(_current_file);
             _image_viewer->save();
-            nextFile();
         } else if (event.GetKeyCode() == 81) { //'q'
             prevFile();
         } else if (event.GetKeyCode() == 87) { //'w'
