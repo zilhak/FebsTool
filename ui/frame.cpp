@@ -69,6 +69,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     for (int i = 10; i <= 600; i += 10) {
         _size_combobox->Append(wxString::Format("%d", i));
     }
+    _size_combobox->Select(9);
 
     _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
     _type_combobox->SetEditable(false);
@@ -296,6 +297,20 @@ void Frame::onMouseEvent(wxMouseEvent & event)
 
     _info_mouse_x->SetLabel(wxString::Format("%d", x));
     _info_mouse_y->SetLabel(wxString::Format("%d", y));
+
+    if (event.GetWheelRotation() < 0) {
+        if (_size_combobox->GetSelection() > 1) {
+            _size_combobox->Select(_size_combobox->GetSelection() - 1);
+            wxCommandEvent evt;
+            onSizeComboBox(evt);
+        }
+    } else if (event.GetWheelRotation() > 0) {
+        if (_size_combobox->GetSelection() < _size_combobox->GetCount() - 1) {
+            _size_combobox->Select(_size_combobox->GetSelection() + 1);
+            wxCommandEvent evt;
+            onSizeComboBox(evt);
+        }
+    }
 }
 
 void Frame::onSizeComboBox(wxCommandEvent &event)

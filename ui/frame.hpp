@@ -7,6 +7,9 @@
 #include "ui/FileExplorer.hpp"
 
 #include <set>
+#include <vector>
+#include <algorithm>
+
 
 class Frame : public wxFrame
 {
