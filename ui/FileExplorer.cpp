@@ -34,7 +34,9 @@ void FileExplorer::xmlCheck(wxString filename)
 
 long FileExplorer::highlightItem(wxString filename)
 {
-    SetItemTextColour(_highlighted_item, *wxBLACK);
+    if (_highlighted_item != -1) {
+        SetItemTextColour(_highlighted_item, *wxBLACK);
+    }
 
     _highlighted_item = FindItem(0, filename);
     SetItemTextColour(_highlighted_item, wxColour(0x99FF99));
