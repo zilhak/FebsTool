@@ -75,6 +75,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     _type_combobox->SetEditable(false);
     _type_combobox->Append(wxT("fire"));
     _type_combobox->Append(wxT("smoke"));
+    _type_combobox->Append(wxT("explosion"));
     _type_combobox->Select(0);
 
     _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
@@ -239,9 +240,10 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
     std::cout << event.GetKeyCode() << std::endl;
     if (_image_viewer->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
-            _file_list_viewer->xmlCheck(_current_file);
             _image_viewer->setType(_type_combobox->GetValue());
-            _image_viewer->save();
+            if (_image_viewer->save()) {
+                _file_list_viewer->xmlCheck(_current_file);
+            }
         } else if (event.GetKeyCode() == 81) { //'q'
             prevFile();
         } else if (event.GetKeyCode() == 87) { //'w'
@@ -264,7 +266,7 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 50) { //'2'
             _type_combobox->SetValue(wxT("smoke"));
         } else if (event.GetKeyCode() == 51) { //'3'
-            //_type_combobox->SetValue(wxT("bus"));
+            _type_combobox->SetValue(wxT("explosion"));
         } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;

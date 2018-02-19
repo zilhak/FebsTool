@@ -53,7 +53,7 @@ public:
     void setType(wxString type) {_image_type = type;}
     void setDepth(int depth) {_image_depth = depth;}
     void setDiff(int diff) {_image_diff = diff;}
-    void save();
+    bool save();
     void load();
     void setBackgroundImage(wxString filepath, wxString filename);
     void saveCropImage();

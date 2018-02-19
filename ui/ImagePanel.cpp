@@ -48,7 +48,7 @@ void ImagePanel::load()
     }
 }
 
-void ImagePanel::save()
+bool ImagePanel::save()
 {
     if (_background_bitmap.IsOk() && mode == STATUS::IDLE) {
         int x1;
@@ -57,7 +57,7 @@ void ImagePanel::save()
         int y2;
 
         if (!_click) {
-            return;
+            return false;
         }
 
         if (_check.x1 > _check.x2) {
@@ -86,6 +86,10 @@ void ImagePanel::save()
         saveToXml(_rect_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
         _click = false;
         Refresh();
+
+        return true;
+    } else {
+        return false;
     }
 }
 
