@@ -141,8 +141,10 @@ void ImagePanel::onPaint(wxPaintEvent & event)
                 continue;
             }
             dc.SetPen(*wxCYAN_PEN);
+            dc.SetTextForeground(*wxCYAN);
         } else {
             dc.SetPen(*wxYELLOW_PEN);
+            dc.SetTextForeground(*wxYELLOW);
         }
 
         int x = _image_x + static_cast<int>(static_cast<double>(rect.x1) * _scale_setting);
