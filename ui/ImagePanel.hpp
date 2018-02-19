@@ -27,7 +27,7 @@ private:
     int _image_y = 15;
     wxString _image_type = "car";
     int _image_depth = 3;
-    int _image_diff = 1;
+    int _image_diff = 0;
 
 private:
     int _mouse_x;

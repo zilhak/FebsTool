@@ -73,10 +73,8 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
 
     _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
     _type_combobox->SetEditable(false);
-    _type_combobox->Append(wxT("car"));
-    _type_combobox->Append(wxT("truck"));
-    _type_combobox->Append(wxT("bus"));
-    _type_combobox->Append(wxT("person"));
+    _type_combobox->Append(wxT("fire"));
+    _type_combobox->Append(wxT("smoke"));
 
     _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
     _scale_combobox->SetEditable(false);
@@ -84,7 +82,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     _scale_combobox->Append(wxT("2"));
     _scale_combobox->Append(wxT("3"));
 
-    _difficult_combobox = new wxComboBox(_tool_bar, ID::COMBO_DIFFICULT, wxT("1"));
+    _difficult_combobox = new wxComboBox(_tool_bar, ID::COMBO_DIFFICULT, wxT("0"));
     _difficult_combobox->Append(wxT("0"));
     _difficult_combobox->Append(wxT("1"));
     _difficult_combobox->Append(wxT("2"));
@@ -241,6 +239,7 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
     if (_image_viewer->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
             _file_list_viewer->xmlCheck(_current_file);
+            _image_viewer->setType(_type_combobox->GetValue());
             _image_viewer->save();
         } else if (event.GetKeyCode() == 81) { //'q'
             prevFile();
@@ -260,11 +259,11 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
             _image_viewer->saveCropImage();
             nextFile();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _type_combobox->SetValue(wxT("car"));
+            _type_combobox->SetValue(wxT("fire"));
         } else if (event.GetKeyCode() == 50) { //'2'
-            _type_combobox->SetValue(wxT("truck"));
+            _type_combobox->SetValue(wxT("smoke"));
         } else if (event.GetKeyCode() == 51) { //'3'
-            _type_combobox->SetValue(wxT("bus"));
+            //_type_combobox->SetValue(wxT("bus"));
         } else if (event.GetKeyCode() == 127) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;

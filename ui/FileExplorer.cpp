@@ -41,6 +41,8 @@ long FileExplorer::highlightItem(wxString filename)
     _highlighted_item = FindItem(0, filename);
     SetItemTextColour(_highlighted_item, wxColour(0x99FF99));
 
+    Refresh();
+
     return _highlighted_item;
 }
 

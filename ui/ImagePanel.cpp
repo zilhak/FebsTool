@@ -242,7 +242,11 @@ void ImagePanel::deleteObject()
         _current_object_index = static_cast<int>(_rect_vector.size());
         _click = false;
         Refresh();
+    } else if (_rect_vector.size() > 0) {
+        _rect_vector.pop_back();
+        _current_object_index = static_cast<int>(_rect_vector.size());
     }
+    Refresh();
 }
 
 void ImagePanel::previousObject()
