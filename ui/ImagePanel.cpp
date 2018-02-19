@@ -152,7 +152,7 @@ void ImagePanel::onPaint(wxPaintEvent & event)
         int width = static_cast<int>(static_cast<double>(rect.x2 - rect.x1) * _scale_setting);
         int height = static_cast<int>(static_cast<double>(rect.y2 - rect.y1) * _scale_setting);
 
-        dc.DrawText(rect.type, x + 1, y + 1);
+        dc.DrawText(wxString(rect.type + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
         dc.DrawRectangle(x, y, width, height);
         dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
         i++;
