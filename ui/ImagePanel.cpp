@@ -85,6 +85,7 @@ void ImagePanel::save()
 
         saveToXml(_rect_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
         _click = false;
+        Refresh();
     }
 }
 
