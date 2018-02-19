@@ -5,12 +5,12 @@
 
 bool SaveConfig(ConfigData data)
 {
-
+    return true;
 }
 
 ConfigData LoadConfig()
 {
-
+    return ConfigData();
 }
 
 std::vector<BoundingBox> loadFromXml(wxString image_file_not_ext)
