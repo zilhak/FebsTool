@@ -75,6 +75,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     _type_combobox->SetEditable(false);
     _type_combobox->Append(wxT("fire"));
     _type_combobox->Append(wxT("smoke"));
+    _type_combobox->Select(0);
 
     _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
     _scale_combobox->SetEditable(false);
@@ -264,7 +265,7 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
             _type_combobox->SetValue(wxT("smoke"));
         } else if (event.GetKeyCode() == 51) { //'3'
             //_type_combobox->SetValue(wxT("bus"));
-        } else if (event.GetKeyCode() == 127) { //'delete'
+        } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
 
@@ -282,6 +283,48 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
             if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
                 wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
                         trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
+            }
+            makeFileList(file.GetPath());
+            refresh();
+        } else if (event.GetKeyCode() == WXK_PAGEUP) { //'pageup'
+            wxFileName file(_dir->GetName() + "/" + _current_file);
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp1";
+
+            if (!wxDirExists(trashbin_path)) {
+                wxMkdir(trashbin_path);
+            }
+            wxString duplicate_number = "";
+            int number = 0;
+            while (!wxRenameFile(file.GetFullPath(),
+                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
+                                 false)) {
+                number++;
+                duplicate_number = wxString::Format("(%d)", number);
+            }
+            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
+                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
+                             trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
+            }
+            makeFileList(file.GetPath());
+            refresh();
+        } else if (event.GetKeyCode() == WXK_PAGEDOWN) { //'delete'
+            wxFileName file(_dir->GetName() + "/" + _current_file);
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp2";
+
+            if (!wxDirExists(trashbin_path)) {
+                wxMkdir(trashbin_path);
+            }
+            wxString duplicate_number = "";
+            int number = 0;
+            while (!wxRenameFile(file.GetFullPath(),
+                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
+                                 false)) {
+                number++;
+                duplicate_number = wxString::Format("(%d)", number);
+            }
+            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
+                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
+                             trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
             }
             makeFileList(file.GetPath());
             refresh();
