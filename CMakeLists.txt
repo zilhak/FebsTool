@@ -13,6 +13,6 @@ ELSE(wxWidgets_FOUND)
     message("wxWidgets not found!!!!!!!!!")
 ENDIF(wxWidgets_FOUND)
 
-add_executable(ImageSearcher main.cpp ui/frame.cpp data/tinyxml2.cpp ui/ImagePanel.cpp ui/ImagePanel.hpp data/XmlConfig.cpp data/XmlConfig.hpp ui/FileExplorer.cpp ui/FileExplorer.hpp) 
+add_executable(ImageSearcher main.cpp FebsToolApp.hpp FebsToolApp.cpp ui/SelectDialog.hpp ui/SelectDialog.cpp)
 target_link_libraries(ImageSearcher ${wxWidgets_LIBRARIES})
 
