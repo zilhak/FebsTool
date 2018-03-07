@@ -1,13 +1,13 @@
-#include "main.h"
-#include "ui/frame.hpp"
 #include <wx/wx.h>
+#include "FebsToolApp.hpp"
 
-IMPLEMENT_APP(MyApp)
+#define __GXX_ABI_VERSION 1002
 
-bool MyApp::OnInit()
+wxIMPLEMENT_WX_THEME_SUPPORT;
+IMPLEMENT_APP_NO_MAIN(FebsToolApp)
+
+int main(int argc, char ** argv)
 {
-    Frame *frame = new Frame(wxT("Program"));
-    frame->Show(true);
-
-    return true;
+    wxDISABLE_DEBUG_SUPPORT();
+    return wxEntry(argc, argv);
 }
