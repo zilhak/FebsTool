@@ -2,7 +2,7 @@
 // Created by bogonets on 2017. 12. 4..
 //
 
-#include "FileExplorer.hpp"
+#include <ui/component/FileExplorer.hpp>
 
 FileExplorer::FileExplorer(wxWindow * parent) : wxListCtrl(parent,
                                                            wxID_ANY,

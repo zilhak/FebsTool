@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <vector>
-#include "XmlConfig.hpp"
+#include <data/XmlConfig.hpp>
 
 bool SaveConfig(ConfigData data)
 {

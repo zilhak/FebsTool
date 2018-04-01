@@ -2,7 +2,7 @@
 // Created by zilhak on 18. 3. 7.
 //
 
-#include "SelectDialog.hpp"
+#include <ui/SelectDialog.hpp>
 
 BEGIN_EVENT_TABLE(SelectDialog, wxDialog)
     EVT_BUTTON(wxID_ANY, SelectDialog::onDialogButton)
@@ -38,6 +38,7 @@ void SelectDialog::initialize()
 void SelectDialog::onDialogButton(wxCommandEvent & event)
 {
     _selected_button = event.GetId();
+    EndModal(wxID_OK);
 }
 
 int SelectDialog::getSelectedID()

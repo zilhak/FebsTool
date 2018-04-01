@@ -3,15 +3,15 @@
 #include <wx/listctrl.h>
 #include <wx/filename.h>
 
-#include "ui/ImagePanel.hpp"
-#include "ui/FileExplorer.hpp"
+#include <ui/component/ImagePanel.hpp>
+#include <ui/component/FileExplorer.hpp>
 
 #include <set>
 #include <vector>
 #include <algorithm>
 
 
-class Frame : public wxFrame
+class DetectionFrame : public wxDialog
 {
 public:
     wxDECLARE_EVENT_TABLE();
@@ -56,8 +56,8 @@ private:
     wxComboBox * _difficult_combobox;
 
 public:
-    Frame(const wxString & title);
-    ~Frame();
+    DetectionFrame(const wxString & title);
+    ~DetectionFrame();
 
 private:
     void initialize();

@@ -1,31 +1,31 @@
 
-#include "frame.hpp"
+#include <ui/detection/DetectionFrame.hpp>
 #include <iostream>
 
-wxBEGIN_EVENT_TABLE(Frame, wxFrame)
-    EVT_BUTTON(ID::BUTTON_OPEN, Frame::onOpenButton)
-    EVT_CHAR_HOOK(Frame::onKeyboardEvent)
-    EVT_MOUSE_EVENTS(Frame::onMouseEvent)
-    EVT_COMBOBOX(ID::COMBO_SIZE, Frame::onSizeComboBox)
-    EVT_COMBOBOX(ID::COMBO_TYPE, Frame::onTypeComboBox)
-    EVT_COMBOBOX(ID::COMBO_SCALE, Frame::onScaleComboBox)
-    EVT_COMBOBOX(ID::COMBO_DIFFICULT, Frame::onDifficultComboBox)
-    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, Frame::onListDoubleClick)
+wxBEGIN_EVENT_TABLE(DetectionFrame, wxDialog)
+    EVT_BUTTON(ID::BUTTON_OPEN, DetectionFrame::onOpenButton)
+    EVT_CHAR_HOOK(DetectionFrame::onKeyboardEvent)
+    EVT_MOUSE_EVENTS(DetectionFrame::onMouseEvent)
+    EVT_COMBOBOX(ID::COMBO_SIZE, DetectionFrame::onSizeComboBox)
+    EVT_COMBOBOX(ID::COMBO_TYPE, DetectionFrame::onTypeComboBox)
+    EVT_COMBOBOX(ID::COMBO_SCALE, DetectionFrame::onScaleComboBox)
+    EVT_COMBOBOX(ID::COMBO_DIFFICULT, DetectionFrame::onDifficultComboBox)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, DetectionFrame::onListDoubleClick)
 wxEND_EVENT_TABLE()
 
 constexpr static char const * const TRASHBIN_NAME = "TrashCan";
 
-Frame::Frame(const wxString & title) : wxFrame(NULL, wxID_ANY, title)
+DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title)
 {
     initialize();
 }
 
-Frame::~Frame()
+DetectionFrame::~DetectionFrame()
 {
     /*EMPTY*/
 }
 
-void Frame::initialize()
+void DetectionFrame::initialize()
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -43,21 +43,21 @@ void Frame::initialize()
     Refresh();
 }
 
-void Frame::initializeStyle()
+void DetectionFrame::initializeStyle()
 {
     SetMinSize(wxSize(400, 300));
     SetSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
                    wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 }
 
-void Frame::initializeSetting()
+void DetectionFrame::initializeSetting()
 {
     _image_extension.insert(wxT("jpg"));
     _image_extension.insert(wxT("jpeg"));
     _image_extension.insert(wxT("png"));
 }
 
-void Frame::initializeToolBar(wxBoxSizer * sizer)
+void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
 {
     _tool_bar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100, 40));
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -105,7 +105,7 @@ void Frame::initializeToolBar(wxBoxSizer * sizer)
     sizer->Add(_tool_bar, 0, wxEXPAND);
 }
 
-void Frame::initializeLeftMenu(wxBoxSizer *h_sizer)
+void DetectionFrame::initializeLeftMenu(wxBoxSizer *h_sizer)
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -137,7 +137,7 @@ void Frame::initializeLeftMenu(wxBoxSizer *h_sizer)
     h_sizer->Add(v_sizer, 0, wxEXPAND);
 }
 
-void Frame::initializeImageViewer(wxBoxSizer * sizer)
+void DetectionFrame::initializeImageViewer(wxBoxSizer * sizer)
 {
     _image_viewer = new ImagePanel(this, ID::IMAGE_VIEWER);
     _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
@@ -169,7 +169,7 @@ bool calculateRate(int image_width, int image_height)
     return true;
 }
 
-bool Frame::fileExtCheck(wxString const extension)
+bool DetectionFrame::fileExtCheck(wxString const extension)
 {
     if (_image_extension.find(extension) != _image_extension.end()) {
         return true;
@@ -178,7 +178,7 @@ bool Frame::fileExtCheck(wxString const extension)
     }
 }
 
-void Frame::onOpenButton(wxCommandEvent & event)
+void DetectionFrame::onOpenButton(wxCommandEvent & event)
 {
      wxFileDialog * find = new wxFileDialog(this,
                                             _("Open jpg file"),
@@ -200,7 +200,7 @@ void Frame::onOpenButton(wxCommandEvent & event)
     std::cout << "Tip: if path name have korean, this error occur." << std::endl;
 }
 
-void Frame::makeFileList(wxString const directory)
+void DetectionFrame::makeFileList(wxString const directory)
 {
     _file_list_viewer->DeleteAllItems();
     _file_list.clear();
@@ -230,12 +230,12 @@ void Frame::makeFileList(wxString const directory)
     }
 }
 
-void Frame::onListDoubleClick(wxListEvent & event)
+void DetectionFrame::onListDoubleClick(wxListEvent & event)
 {
     showImage(event.GetLabel());
 }
 
-void Frame::onKeyboardEvent(wxKeyEvent & event)
+void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 {
     std::cout << event.GetKeyCode() << std::endl;
     if (_image_viewer->isReady()) {
@@ -337,7 +337,7 @@ void Frame::onKeyboardEvent(wxKeyEvent & event)
     SetTitle(_current_file);
 }
 
-void Frame::onMouseEvent(wxMouseEvent & event)
+void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 {
     int x = static_cast<int>(static_cast<double>(event.GetX() - 15) * 100.0 / wxAtof(_size_combobox->GetValue()));
     int y = static_cast<int>(static_cast<double>(event.GetY() - 15) * 100.0 / wxAtof(_size_combobox->GetValue()));
@@ -362,7 +362,7 @@ void Frame::onMouseEvent(wxMouseEvent & event)
     }
 }
 
-void Frame::onSizeComboBox(wxCommandEvent &event)
+void DetectionFrame::onSizeComboBox(wxCommandEvent &event)
 {
     _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())) / (double) 100);
     if (_image_viewer->isReady()) {
@@ -370,22 +370,22 @@ void Frame::onSizeComboBox(wxCommandEvent &event)
     }
 }
 
-void Frame::onTypeComboBox(wxCommandEvent &event)
+void DetectionFrame::onTypeComboBox(wxCommandEvent &event)
 {
     _image_viewer->setType(_type_combobox->GetValue());
 }
 
-void Frame::onScaleComboBox(wxCommandEvent &event)
+void DetectionFrame::onScaleComboBox(wxCommandEvent &event)
 {
     _image_viewer->setDepth(wxAtoi(_scale_combobox->GetValue()));
 }
 
-void Frame::onDifficultComboBox(wxCommandEvent &event)
+void DetectionFrame::onDifficultComboBox(wxCommandEvent &event)
 {
     _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
 }
 
-void Frame::prevFile()
+void DetectionFrame::prevFile()
 {
     if (_image_index > 0) {
         _image_index--;
@@ -396,7 +396,7 @@ void Frame::prevFile()
     }
 }
 
-void Frame::nextFile()
+void DetectionFrame::nextFile()
 {
     if (_image_index < _file_list.size() - 1) {
         _image_index++;
@@ -407,7 +407,7 @@ void Frame::nextFile()
     }
 }
 
-void Frame::refresh()
+void DetectionFrame::refresh()
 {
     if (_image_index < _file_list.size()) {
         showImage(_file_list.at(_image_index));
@@ -416,7 +416,7 @@ void Frame::refresh()
     }
 }
 
-void Frame::showImage(wxString const & file_name)
+void DetectionFrame::showImage(wxString const & file_name)
 {
     SetTitle(file_name);
 

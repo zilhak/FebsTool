@@ -1,5 +1,5 @@
 #include <wx/wx.h>
-#include "data/XmlConfig.hpp"
+#include <data/XmlConfig.hpp>
 #include <wx/filename.h>
 #include <vector>
 

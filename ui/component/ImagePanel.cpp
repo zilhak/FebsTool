@@ -1,4 +1,4 @@
-#include "ImagePanel.hpp"
+#include <ui/component/ImagePanel.hpp>
 
 wxBEGIN_EVENT_TABLE(ImagePanel, wxPanel)
     EVT_PAINT(ImagePanel::onPaint)
@@ -8,7 +8,6 @@ wxEND_EVENT_TABLE()
 ImagePanel::ImagePanel(wxWindow *parent, wxWindowID id) : wxPanel(parent, id)
 {
     /* EMPTY */
-    ::wxInitAllImageHandlers();
 }
 
 ImagePanel::~ImagePanel()
