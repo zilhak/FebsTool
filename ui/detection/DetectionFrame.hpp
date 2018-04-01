@@ -56,7 +56,7 @@ private:
     wxComboBox * _difficult_combobox;
 
 public:
-    DetectionFrame(const wxString & title);
+    DetectionFrame(wxString const & title);
     ~DetectionFrame();
 
 private:

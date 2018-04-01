@@ -1,7 +1,9 @@
 #include <string>
+#include <wx/wx.h>
 #include <wx/filename.h>
-#include "data/tinyxml2.h"
+#include <data/tinyxml2.h>
 #include <vector>
+#include <map>
 
 #ifndef IMAGESEARCHER_XMLCONFIG_H
 #define IMAGESEARCHER_XMLCONFIG_H
@@ -45,8 +47,18 @@ struct ImageInfo {
     { /* EMPTY */ }
 };
 
-struct ConfigData {
+enum class Action {
 
+};
+
+struct ConfigData {
+    std::vector<wxString> class_list;
+    std::map<int, Action> key_map;
+    long box_colour_normal = -1;
+    long box_colour_selected = -1;
+
+    wxSize minimum_size = wxSize(-1, -1);
+    wxSize maximum_size = wxSize(-1, -1);
 };
 
 using Document = tinyxml2::XMLDocument;

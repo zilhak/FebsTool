@@ -5,6 +5,7 @@
 #include <FebsToolApp.hpp>
 #include <ui/SelectDialog.hpp>
 #include <ui/detection/DetectionFrame.hpp>
+#include <ui/segmentation/SegmentationFrame.hpp>
 
 FebsToolApp::FebsToolApp() : wxApp()
 {
@@ -18,7 +19,6 @@ FebsToolApp::~FebsToolApp()
 
 bool FebsToolApp::OnInit()
 {
-    std::cout << "start" << std::endl;
     bool running = true;
     wxInitAllImageHandlers();
 //    wxPNGHandler *png_handler = new wxPNGHandler();
@@ -39,6 +39,7 @@ bool FebsToolApp::OnInit()
                 opened_dialog = new DetectionFrame("Detection");
                 break;
             case SelectDialog::ButtonID::SEGMENTATION:
+                opened_dialog = new SegmentationFrame("Segmentation");
                 break;
             case SelectDialog::ButtonID::FILE_MANAGER:
                 break;

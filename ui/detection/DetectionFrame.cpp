@@ -180,15 +180,19 @@ bool DetectionFrame::fileExtCheck(wxString const extension)
 
 void DetectionFrame::onOpenButton(wxCommandEvent & event)
 {
-     wxFileDialog * find = new wxFileDialog(this,
-                                            _("Open jpg file"),
-                                            "",
-                                            "",
-                                            "JPG files (*.jpg;*.jpeg)|*.jpg;*.jpeg");
-     if (find->ShowModal() == wxID_CANCEL) {
-         return;
-     }
-     makeFileList(find->GetDirectory());
+    wxFileDialog * find = new wxFileDialog(this,
+                                           _("Open jpg file"),
+                                           "",
+                                           "",
+                                           "JPG files (*.jpg;*.jpeg)|*.jpg;*.jpeg");
+    if (find->ShowModal() == wxID_CANCEL) {
+        return;
+    }
+
+    wxString temp = wxString::FromUTF8(find->GetFilename());
+    std::cout << temp << std::endl;
+
+    makeFileList(find->GetDirectory());
     for (auto file : _file_list) {
         if (file == find->GetFilename()) {
             //loadXmlInfo(find->GetDirectory() + file);
