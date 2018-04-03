@@ -1,13 +1,30 @@
-//
-// Created by bogonets on 2018. 4. 3..
-//
-
 #ifndef FEPSTOOL_DETECTIONTOOLBAR_HPP
 #define FEPSTOOL_DETECTIONTOOLBAR_HPP
 
+#include <wx/wx.h>
 
-class DetectionToolBar
+class DetectionToolBar : public wxPanel
 {
+private:
+    wxComboBox * _type_box;
+    wxComboBox * _diff_box;
+
+public:
+    DetectionToolBar();
+    ~DetectionToolBar();
+
+private:
+    void initialize();
+    void initializeComponent();
+    void initializeDefaultData();
+
+public:
+    wxString getType();
+    wxString getDifficult();
+
+public:
+    void setType(wxString type);
+    void setDifficult(int difficult);
 };
 
 
