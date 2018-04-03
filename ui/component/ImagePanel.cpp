@@ -94,7 +94,6 @@ bool ImagePanel::save()
 
 void ImagePanel::saveCropImage()
 {
-
     wxRect sub_rect;
     if (_background_bitmap.IsOk() && mode == STATUS::IDLE) {
         int x1;
@@ -122,9 +121,7 @@ void ImagePanel::saveCropImage()
     }
 
     wxImage image = _background_bitmap.ConvertToImage();
-    wxImage sub_image = image.GetSubImage(sub_rect);
-
-    sub_image.SaveFile(_image_file.GetPath(true) + "crop_" + _image_file.GetFullName());
+    image.GetSubImage(sub_rect).SaveFile(_image_file.GetPath(true) + "crop_" + _image_file.GetFullName());
 }
 
 void ImagePanel::onPaint(wxPaintEvent & event)

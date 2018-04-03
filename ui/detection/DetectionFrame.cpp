@@ -15,7 +15,7 @@ wxEND_EVENT_TABLE()
 
 constexpr static char const * const TRASHBIN_NAME = "TrashCan";
 
-DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title)
+DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 {
     initialize();
 }
@@ -45,7 +45,7 @@ void DetectionFrame::initialize()
 
 void DetectionFrame::initializeStyle()
 {
-    SetMinSize(wxSize(400, 300));
+    SetMinSize(wxSize(800, 600));
     SetSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
                    wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 }
@@ -73,7 +73,7 @@ void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
 
     _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
     _type_combobox->SetEditable(false);
-    _type_combobox->Append(wxT("fire"));
+    _type_combobox->Append(wxT("mouse"));
     _type_combobox->Append(wxT("smoke"));
     _type_combobox->Append(wxT("explosion"));
     _type_combobox->Select(0);
@@ -225,7 +225,7 @@ void DetectionFrame::makeFileList(wxString const directory)
 
     for (int index = 0; index < _file_list.size(); index++) {
         file.Assign(directory + "/" + _file_list.at(index));
-       _file_list_viewer->InsertItem(index, _file_list.at(index));
+       _file_list_viewer->InsertItem(index, wxString::FromUTF8(_file_list.at(index)));
        if (wxFileExists(directory + "/" + file.GetName() + ".xml")) {
            _file_list_viewer->SetItem(index, 1, ("O"));
        } else {
@@ -266,7 +266,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             _image_viewer->saveCropImage();
             nextFile();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _type_combobox->SetValue(wxT("fire"));
+            _type_combobox->SetValue(wxT("mouse"));
         } else if (event.GetKeyCode() == 50) { //'2'
             _type_combobox->SetValue(wxT("smoke"));
         } else if (event.GetKeyCode() == 51) { //'3'
