@@ -52,12 +52,12 @@ void DetectionToolBar::initializeDefaultData()
 
 wxString DetectionToolBar::getType()
 {
-    return wxString();
+    return _type_box->GetValue();
 }
 
 wxString DetectionToolBar::getDifficult()
 {
-    return wxString();
+    return _diff_box->GetValue();
 }
 
 void DetectionToolBar::setType(wxString type)

@@ -3,8 +3,61 @@
 #include <vector>
 #include <data/XmlConfig.hpp>
 
+constexpr static const char const * CONFIG_ROOT            = "config";
+constexpr static const char const * CONFIG_OPTION             = "option";
+constexpr static const char const * CONFIG_TYPES                  = "types";
+constexpr static const char const * CONFIG_DEFAULT_TYPE               = "default_type";
+constexpr static const char const * CONFIG_TYPE                      = "type";
+constexpr static const char const * CONFIG_VIEW_LIMIT      = "limit";
+constexpr static const char const * CONFIG_MAX_SIZE        = "max_size";
+constexpr static const char const * CONFIG_MIN_SIZE        = "min_size";
+constexpr static const char const * CONFIG_MAX_VIEW_WIDTH  = "max_view_width";
+constexpr static const char const * CONFIG_MAX_VIEW_HEIGHT = "max_view_height";
+constexpr static const char const * CONFIG_MIN_VIEW_WIDTH  = "min_view_width";
+constexpr static const char const * CONFIG_MIN_VIEW_HEIGHT = "min_view_height";
+
+namespace config {
+
 bool SaveConfig(ConfigData data)
 {
+    Document document;
+    Node * root = document.NewElement(CONFIG_ROOT);
+    Element * option = document.NewElement(CONFIG_OPTION);
+    Element * types = document.NewElement(CONFIG_TYPES);
+    Element * default_type = document.NewElement(CONFIG_DEFAULT_TYPE);
+    Element * type = document.NewElement(CONFIG_TYPE);
+    Element * view_limit = document.NewElement(CONFIG_VIEW_LIMIT);
+    Element * max_view_width = document.NewElement(CONFIG_MAX_VIEW_WIDTH);
+    Element * max_view_height = document.NewElement(CONFIG_MAX_VIEW_HEIGHT);
+    Element * min_view_width = document.NewElement(CONFIG_MIN_VIEW_WIDTH);
+    Element * min_view_height = document.NewElement(CONFIG_MIN_VIEW_HEIGHT);
+
+    document.InsertFirstChild(root);
+
+    root->LinkEndChild(option);
+
+    option->LinkEndChild(types);
+    option->LinkEndChild(view_limit);
+
+    types->LinkEndChild(default_type);
+    for (auto const & name : data.class_list) {
+        Element * type = document.NewElement(CONFIG_TYPE);
+        type->SetText(name.c_str());
+        types->LinkEndChild(type);
+    }
+
+    view_limit->LinkEndChild(min_view_width);
+    view_limit->LinkEndChild(min_view_height);
+    view_limit->LinkEndChild(max_view_width);
+    view_limit->LinkEndChild(max_view_height);
+
+    max_view_width->SetText(data.maximum_size.GetWidth());
+    max_view_height->SetText(data.maximum_size.GetHeight());
+    min_view_width->SetText(data.minimum_size.GetWidth());
+    min_view_height->SetText(data.minimum_size.GetHeight());
+
+    document.SaveFile("feps_config.xml");
+    document.Clear();
     return true;
 }
 
@@ -12,6 +65,8 @@ ConfigData LoadConfig()
 {
     return ConfigData();
 }
+
+} // namespace config
 
 std::vector<BoundingBox> loadFromXml(wxString image_file_not_ext)
 {

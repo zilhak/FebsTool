@@ -8,6 +8,11 @@
 #ifndef IMAGESEARCHER_XMLCONFIG_H
 #define IMAGESEARCHER_XMLCONFIG_H
 
+
+using Document = tinyxml2::XMLDocument;
+using Node = tinyxml2::XMLNode;
+using Element = tinyxml2::XMLElement;
+
 struct TargetObject
 {
 
@@ -61,12 +66,12 @@ struct ConfigData {
     wxSize maximum_size = wxSize(-1, -1);
 };
 
-using Document = tinyxml2::XMLDocument;
-using Node = tinyxml2::XMLNode;
-using Element = tinyxml2::XMLElement;
+namespace config {
 
 bool SaveConfig(ConfigData data);
 ConfigData LoadConfig();
+
+}// namespace config
 
 // ex) file "/usr/home/bogonets/example.jpg" -> loadFromXml("/usr/home/bogonets/example");
 std::vector<BoundingBox> loadFromXml(wxString file_path_and_name_not_ext);
