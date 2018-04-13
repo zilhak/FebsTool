@@ -3,18 +3,18 @@
 #include <vector>
 #include <data/XmlConfig.hpp>
 
-constexpr static const char const * CONFIG_ROOT            = "config";
-constexpr static const char const * CONFIG_OPTION             = "option";
-constexpr static const char const * CONFIG_TYPES                  = "types";
-constexpr static const char const * CONFIG_DEFAULT_TYPE               = "default_type";
-constexpr static const char const * CONFIG_TYPE                      = "type";
-constexpr static const char const * CONFIG_VIEW_LIMIT      = "limit";
-constexpr static const char const * CONFIG_MAX_SIZE        = "max_size";
-constexpr static const char const * CONFIG_MIN_SIZE        = "min_size";
-constexpr static const char const * CONFIG_MAX_VIEW_WIDTH  = "max_view_width";
-constexpr static const char const * CONFIG_MAX_VIEW_HEIGHT = "max_view_height";
-constexpr static const char const * CONFIG_MIN_VIEW_WIDTH  = "min_view_width";
-constexpr static const char const * CONFIG_MIN_VIEW_HEIGHT = "min_view_height";
+constexpr static char const * const CONFIG_ROOT            = "config";
+constexpr static char const * const CONFIG_OPTION             = "option";
+constexpr static char const * const CONFIG_TYPES                  = "types";
+constexpr static char const * const CONFIG_DEFAULT_TYPE               = "default_type";
+constexpr static char const * const CONFIG_TYPE                      = "type";
+constexpr static char const * const CONFIG_VIEW_LIMIT      = "limit";
+constexpr static char const * const CONFIG_MAX_SIZE        = "max_size";
+constexpr static char const * const CONFIG_MIN_SIZE        = "min_size";
+constexpr static char const * const CONFIG_MAX_VIEW_WIDTH  = "max_view_width";
+constexpr static char const * const CONFIG_MAX_VIEW_HEIGHT = "max_view_height";
+constexpr static char const * const CONFIG_MIN_VIEW_WIDTH  = "min_view_width";
+constexpr static char const * const CONFIG_MIN_VIEW_HEIGHT = "min_view_height";
 
 namespace config {
 
@@ -42,7 +42,7 @@ bool SaveConfig(ConfigData data)
     types->LinkEndChild(default_type);
     for (auto const & name : data.class_list) {
         Element * type = document.NewElement(CONFIG_TYPE);
-        type->SetText(name.c_str());
+        type->SetText(name.ToStdString().c_str());
         types->LinkEndChild(type);
     }
 

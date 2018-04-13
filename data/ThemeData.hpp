@@ -1,0 +1,11 @@
+#ifndef FEPSTOOL_THEMEDATA_HPP
+#define FEPSTOOL_THEMEDATA_HPP
+
+
+#include <wx/wx.h>
+
+#define COLOUR_TOOLBAR wxColour(0xEEEEEE)
+#define COLOUR_FILELIST wxColour(0xCCCCCC)
+#define COLOUR_INFO wxColour(0xBBBBBB)
+
+#endif //FEPSTOOL_THEMEDATA_HPP

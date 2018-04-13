@@ -7,7 +7,7 @@ wxEND_EVENT_TABLE()
 
 ImagePanel::ImagePanel(wxWindow *parent, wxWindowID id) : wxPanel(parent, id)
 {
-    /* EMPTY */
+    SetBackgroundColour(wxColour(0xFFFFFF));
 }
 
 ImagePanel::~ImagePanel()
