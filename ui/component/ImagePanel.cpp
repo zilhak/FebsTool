@@ -121,7 +121,11 @@ void ImagePanel::saveCropImage()
     }
 
     wxImage image = _background_bitmap.ConvertToImage();
-    image.GetSubImage(sub_rect).SaveFile(_image_file.GetPath(true) + "crop_" + _image_file.GetFullName());
+    int i = 1;
+    while (wxFileExists(_image_file.GetPath(true) + "crop_" + _image_file.GetName() + wxString::Format("_%03d.", i) + _image_file.GetExt())) {
+        ++i;
+    }
+    image.GetSubImage(sub_rect).SaveFile(_image_file.GetPath(true) + "crop_" + _image_file.GetName()+ wxString::Format("_%03d.", i) + _image_file.GetExt());
 }
 
 void ImagePanel::onPaint(wxPaintEvent & event)
