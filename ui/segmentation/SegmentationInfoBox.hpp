@@ -6,10 +6,15 @@
 #define FEPSTOOL_SEGMENTATIONINFOBOX_HPP
 
 #include <wx/wx.h>
-#include <data/ThemeData.hpp>
+#include "../../data/ThemeData.hpp"
 
 class SegmentationInfoBox : public wxPanel
 {
+public:
+    enum ID {
+        ZOOM_BOX
+    };
+
 private:
     wxStaticText * _image_name;
     wxStaticText * _image_size;
@@ -18,16 +23,35 @@ private:
     wxComboBox * _size_box;
     wxComboBox * _image_scale_box;
 
+private:
+    int _min;
+    int _max;
+    int _interval;
 
 public:
     SegmentationInfoBox(wxWindow * parent, wxWindowID id);
     ~SegmentationInfoBox();
 
-public:
+private:
     void initialize();
     void initializeComponent();
     void initializeSetting();
     void initializeStyle();
+
+public:
+    void setZoomBox(int min, int max, int interval);
+    void setImageName(wxString const & name);
+    void setImageSize(wxString const & size);
+    void setMouseInfo(wxPoint const & point);
+
+public:
+    void zoomIn();
+    void zoomOut();
+    void changeZoomBox(int ratio);
+
+public:
+    int getZoom();
+    int getImageScale();
 };
 
 

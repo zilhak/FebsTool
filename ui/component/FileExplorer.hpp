@@ -6,6 +6,8 @@
 
 
 class FileExplorer : public wxListCtrl{
+public:
+    DECLARE_EVENT_TABLE();
 
 private:
     long _highlighted_item = -1;
@@ -27,13 +29,21 @@ public:
     void refreshList();
 
 public:
-    void xmlCheck(wxString filename);
+    void xmlCheck(wxString filename, bool check_mark = true);
+    void xmlCheck(bool check_mark = true);
     long highlightItem(wxString filename);
     long highlightItem(long index);
 
 public:
     wxString getHighlightedItem();
     long getHighlightedItemIndex();
+
+public:
+    bool prev();
+    bool next();
+
+public:
+    void onSelect(wxListEvent & event);
 };
 
 

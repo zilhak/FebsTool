@@ -15,7 +15,7 @@ ENDIF(wxWidgets_FOUND)
 
 set(SRC_BASE main.cpp FebsToolApp.hpp FebsToolApp.cpp ui/SelectDialog.hpp ui/SelectDialog.cpp)
 set(SRC_DETECTION ui/detection/DetectionFrame.hpp ui/detection/DetectionFrame.cpp ui/detection/DetectionInfoBox.cpp ui/detection/DetectionInfoBox.hpp ui/detection/DetectionToolBar.cpp ui/detection/DetectionToolBar.hpp)
-set(SRC_SEGMENTATION ui/segmentation/SegmentationFrame.cpp ui/segmentation/SegmentationFrame.hpp ui/segmentation/SegmentationInfoBox.cpp ui/segmentation/SegmentationInfoBox.hpp ui/segmentation/SegmentationToolBar.cpp ui/segmentation/SegmentationToolBar.hpp)
+set(SRC_SEGMENTATION ui/segmentation/SegmentationFrame.cpp ui/segmentation/SegmentationFrame.hpp ui/segmentation/SegmentationInfoBox.cpp ui/segmentation/SegmentationInfoBox.hpp ui/segmentation/SegmentationToolBar.cpp ui/segmentation/SegmentationToolBar.hpp ui/segmentation/HelpDialog.cpp ui/segmentation/HelpDialog.hpp)
 set(SRC_COMPONENTS ui/component/FileExplorer.hpp ui/component/FileExplorer.cpp ui/component/ImagePanel.hpp ui/component/ImagePanel.cpp ui/component/FileOpenPanel.cpp ui/component/FileOpenPanel.hpp)
 set(SRC_DATA data/tinyxml2.h data/tinyxml2.cpp data/XmlConfig.hpp data/XmlConfig.cpp data/ThemeData.hpp data/EventData.cpp data/EventData.hpp)
 set(SRC_SETTING ui/settings/SettingFrame.cpp ui/settings/SettingFrame.hpp ui/settings/SettingPanelManager.cpp ui/settings/SettingPanelManager.hpp)

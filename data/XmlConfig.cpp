@@ -3,11 +3,15 @@
 #include <vector>
 #include <data/XmlConfig.hpp>
 
+constexpr static char const * const CONFIG_FILE = "OC_Config.xml";
+
 constexpr static char const * const CONFIG_ROOT            = "config";
 constexpr static char const * const CONFIG_OPTION             = "option";
 constexpr static char const * const CONFIG_TYPES                  = "types";
 constexpr static char const * const CONFIG_DEFAULT_TYPE               = "default_type";
-constexpr static char const * const CONFIG_TYPE                      = "type";
+constexpr static char const * const CONFIG_TYPE                       = "type";
+constexpr static char const * const CONFIG_TYPE_NAME                      = "name";
+constexpr static char const * const CONFIG_TYPE_COLOUR                    = "colour";
 constexpr static char const * const CONFIG_VIEW_LIMIT      = "limit";
 constexpr static char const * const CONFIG_MAX_SIZE        = "max_size";
 constexpr static char const * const CONFIG_MIN_SIZE        = "min_size";
@@ -16,9 +20,14 @@ constexpr static char const * const CONFIG_MAX_VIEW_HEIGHT = "max_view_height";
 constexpr static char const * const CONFIG_MIN_VIEW_WIDTH  = "min_view_width";
 constexpr static char const * const CONFIG_MIN_VIEW_HEIGHT = "min_view_height";
 
+constexpr static char const * const CONFIG_ZOOM            = "zoom";
+constexpr static char const * const CONFIG_ZOOM_MAX        = "zoom_max";
+constexpr static char const * const CONFIG_ZOOM_MIN        = "zoom_min";
+constexpr static char const * const CONFIG_ZOOM_INTERVAL   = "zoom_interval";
+
 namespace config {
 
-bool SaveConfig(ConfigData data)
+bool saveConfig(ConfigData data)
 {
     Document document;
     Node * root = document.NewElement(CONFIG_ROOT);
@@ -31,6 +40,10 @@ bool SaveConfig(ConfigData data)
     Element * max_view_height = document.NewElement(CONFIG_MAX_VIEW_HEIGHT);
     Element * min_view_width = document.NewElement(CONFIG_MIN_VIEW_WIDTH);
     Element * min_view_height = document.NewElement(CONFIG_MIN_VIEW_HEIGHT);
+    Element * zoom = document.NewElement(CONFIG_ZOOM);
+    Element * zoom_min = document.NewElement(CONFIG_ZOOM_MIN);
+    Element * zoom_max = document.NewElement(CONFIG_ZOOM_MAX);
+    Element * zoom_interval = document.NewElement(CONFIG_ZOOM_INTERVAL);
 
     document.InsertFirstChild(root);
 
@@ -38,11 +51,20 @@ bool SaveConfig(ConfigData data)
 
     option->LinkEndChild(types);
     option->LinkEndChild(view_limit);
+    option->LinkEndChild(zoom);
 
     types->LinkEndChild(default_type);
     for (auto const & name : data.class_list) {
         Element * type = document.NewElement(CONFIG_TYPE);
-        type->SetText(name.ToStdString().c_str());
+        Element * type_name = document.NewElement(CONFIG_TYPE_NAME);
+        Element * type_colour = document.NewElement(CONFIG_TYPE_COLOUR);
+
+        type->LinkEndChild(type_name);
+        type->LinkEndChild(type_colour);
+
+        type_name->SetText(name.name.ToStdString().c_str());
+        type_colour->SetText(name.colour);
+
         types->LinkEndChild(type);
     }
 
@@ -51,28 +73,98 @@ bool SaveConfig(ConfigData data)
     view_limit->LinkEndChild(max_view_width);
     view_limit->LinkEndChild(max_view_height);
 
+    zoom->LinkEndChild(zoom_min);
+    zoom->LinkEndChild(zoom_max);
+    zoom->LinkEndChild(zoom_interval);
+
+    if (data.default_class == "NULL" && data.class_list.size() > 0) {
+        data.default_class = data.class_list[0].name;
+    }
+
+    default_type->SetText(data.default_class);
     max_view_width->SetText(data.maximum_size.GetWidth());
     max_view_height->SetText(data.maximum_size.GetHeight());
     min_view_width->SetText(data.minimum_size.GetWidth());
     min_view_height->SetText(data.minimum_size.GetHeight());
 
-    document.SaveFile("feps_config.xml");
+    zoom_min->SetText(data.zoom_min);
+    zoom_max->SetText(data.zoom_max);
+    zoom_interval->SetText(data.zoom_interval);
+
+    document.SaveFile(CONFIG_FILE);
     document.Clear();
     return true;
 }
 
-ConfigData LoadConfig()
+ConfigData loadConfig()
 {
-    return ConfigData();
+    ConfigData result;
+
+    Document document;
+    tinyxml2::XMLError err = document.LoadFile(CONFIG_FILE);
+    if (err != tinyxml2::XML_NO_ERROR) {
+        result.init = true;
+        return result;
+    }
+
+    Node * root = document.FirstChildElement(CONFIG_ROOT);
+
+    Element * option = root->FirstChildElement(CONFIG_OPTION);
+    Element * types = option->FirstChildElement(CONFIG_TYPES);
+    Element * limit = option->FirstChildElement(CONFIG_VIEW_LIMIT);
+    Element * zoom = option->FirstChildElement(CONFIG_ZOOM);
+
+    Element * default_type = types->FirstChildElement(CONFIG_DEFAULT_TYPE);
+
+    for (Element * type = types->FirstChildElement(CONFIG_TYPE); type != NULL; type = type->NextSiblingElement(CONFIG_TYPE)) {
+        Element * type_name = type->FirstChildElement(CONFIG_TYPE_NAME);
+        Element * type_colour = type->FirstChildElement(CONFIG_TYPE_COLOUR);
+
+        Name name;
+        name.name = type_name->GetText();
+        name.colour = type_colour->GetText();
+
+        result.class_list.push_back(name);
+    }
+
+    Element * min_width = limit->FirstChildElement(CONFIG_MIN_VIEW_WIDTH);
+    Element * min_height = limit->FirstChildElement(CONFIG_MIN_VIEW_HEIGHT);
+    Element * max_width = limit->FirstChildElement(CONFIG_MAX_VIEW_WIDTH);
+    Element * max_height = limit->FirstChildElement(CONFIG_MAX_VIEW_HEIGHT);
+
+    result.default_class = default_type->GetText();
+    result.minimum_size = wxSize(std::stoi(min_width->GetText()), std::stoi(min_height->GetText()));
+    result.maximum_size = wxSize(std::stoi(max_width->GetText()), std::stoi(max_height->GetText()));
+
+    Element * zoom_min = zoom->FirstChildElement(CONFIG_ZOOM_MIN);
+    Element * zoom_max = zoom->FirstChildElement(CONFIG_ZOOM_MAX);
+    Element * zoom_interval = zoom->FirstChildElement(CONFIG_ZOOM_INTERVAL);
+
+    result.zoom_min = std::stoi(zoom_min->GetText());
+    result.zoom_max = std::stoi(zoom_max->GetText());
+    result.zoom_interval = std::stoi(zoom_interval->GetText());
+
+    return result;
+}
+
+void saveNameList(std::vector<Name> list)
+{
+}
+
+std::vector<Name> loadNameList()
+{
+
+
+    return std::vector<Name>();
 }
 
 } // namespace config
 
-std::vector<BoundingBox> loadFromXml(wxString image_file_not_ext)
+std::vector<Object> loadFromXml(wxString image_file_not_ext)
 {
-    std::vector<BoundingBox> result;
+    std::vector<Object> result;
     Document document;
-    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());
+    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());;
     if (err != tinyxml2::XML_NO_ERROR) {
         return result;
     }
@@ -84,23 +176,43 @@ std::vector<BoundingBox> loadFromXml(wxString image_file_not_ext)
     return result;
 }
 
-BoundingBox loadObject(Element * object)
+Object loadObject(Element * object)
 {
-    Element * name = object->FirstChildElement("name");
+    Object result;
+
     Element * bndbox = object->FirstChildElement("bndbox");
+    if (bndbox == nullptr) {
+        Element * pose = object->FirstChildElement("pose");
+        Element * truncated = object->FirstChildElement("truncated");
+        Element * polygon = object->FirstChildElement("polygon");
+
+        for (int i = 1; ; ++i) {
+            Element * x = polygon->FirstChildElement(wxString::Format("x%d", i));
+            Element * y = polygon->FirstChildElement(wxString::Format("y%d", i));
+
+            if (x == nullptr) {
+                break;
+            }
+
+            result.point_list.push_back(wxPoint(std::stoi(x->GetText()), std::stoi(y->GetText())));
+        }
+    } else {
+        Element * xmin = bndbox->FirstChildElement("xmin");
+        Element * xmax = bndbox->FirstChildElement("xmax");
+        Element * ymin = bndbox->FirstChildElement("ymin");
+        Element * ymax = bndbox->FirstChildElement("ymax");
+
+        result.point_list.push_back(wxPoint(std::stoi(xmin->GetText()), std::stoi(ymin->GetText())));
+        result.point_list.push_back(wxPoint(std::stoi(xmax->GetText()), std::stoi(ymax->GetText())));
+    }
+
+    Element * name = object->FirstChildElement("name");
     Element * difficult = object->FirstChildElement("difficult");
 
-    Element * xmin = bndbox->FirstChildElement("xmin");
-    Element * xmax = bndbox->FirstChildElement("xmax");
-    Element * ymin = bndbox->FirstChildElement("ymin");
-    Element * ymax = bndbox->FirstChildElement("ymax");
+    result.type = name->GetText();
+    result.difficult = std::stoi(difficult->GetText());
 
-    return BoundingBox(name->GetText(),
-                  std::stoi(xmin->GetText()),
-                  std::stoi(ymin->GetText()),
-                  std::stoi(xmax->GetText()),
-                  std::stoi(ymax->GetText()),
-                  std::stoi(difficult->GetText()));
+    return result;
 }
 
 ImageInfo loadXmlInfo(wxString image_file_not_ext)
@@ -134,37 +246,68 @@ ImageInfo loadXmlInfo(wxString image_file_not_ext)
     return result;
 }
 
-Element * insertObject(Document * doc, BoundingBox rect)
+Element * insertObject(Document * doc, Object obj)
 {
     Element * object = doc->NewElement("object");
-    Element * name = doc->NewElement("name");
-    Element * bndbox = doc->NewElement("bndbox");
-    Element * xmax = doc->NewElement("xmax");
-    Element * xmin = doc->NewElement("xmin");
-    Element * ymax = doc->NewElement("ymax");
-    Element * ymin = doc->NewElement("ymin");
-    Element * difficult = doc->NewElement("difficult");
+    if (obj.point_list.size() == 2) {
+        Element * name = doc->NewElement("name");
+        Element * bndbox = doc->NewElement("bndbox");
+        Element * xmax = doc->NewElement("xmax");
+        Element * xmin = doc->NewElement("xmin");
+        Element * ymax = doc->NewElement("ymax");
+        Element * ymin = doc->NewElement("ymin");
+        Element * difficult = doc->NewElement("difficult");
 
-    object->LinkEndChild(name);
-    object->LinkEndChild(bndbox);
-    object->LinkEndChild(difficult);
+        object->LinkEndChild(name);
+        object->LinkEndChild(bndbox);
+        object->LinkEndChild(difficult);
 
-    bndbox->LinkEndChild(xmin);
-    bndbox->LinkEndChild(ymin);
-    bndbox->LinkEndChild(xmax);
-    bndbox->LinkEndChild(ymax);
+        bndbox->LinkEndChild(xmin);
+        bndbox->LinkEndChild(ymin);
+        bndbox->LinkEndChild(xmax);
+        bndbox->LinkEndChild(ymax);
 
-    name->LinkEndChild(doc->NewText(rect.type.c_str()));
-    xmax->SetText(rect.x2);
-    xmin->SetText(rect.x1);
-    ymax->SetText(rect.y2);
-    ymin->SetText(rect.y1);
-    difficult->SetText(rect.difficult);
+        name->LinkEndChild(doc->NewText(obj.type.c_str()));
+        xmax->SetText(obj.point_list[1].x);
+        xmin->SetText(obj.point_list[0].x);
+        ymax->SetText(obj.point_list[1].y);
+        ymin->SetText(obj.point_list[0].y);
+        difficult->SetText(obj.difficult);
+    } else if (obj.point_list.size() > 2) {
+        Element * name = doc->NewElement("name");
+        Element * pose = doc->NewElement("pose");
+        Element * truncated = doc->NewElement("truncated");
+        Element * difficult = doc->NewElement("difficult");
+        Element * polygon = doc->NewElement("polygon");
+
+        object->LinkEndChild(name);
+        object->LinkEndChild(pose);
+        object->LinkEndChild(truncated);
+        object->LinkEndChild(difficult);
+        object->LinkEndChild(polygon);
+
+        name->LinkEndChild(doc->NewText(obj.type.c_str()));
+        pose->LinkEndChild(doc->NewText(obj.pose.c_str()));
+        truncated->LinkEndChild(doc->NewText(obj.truncated.c_str()));
+        difficult->SetText(obj.difficult);
+        int i = 0;
+        for (auto const & point : obj.point_list) {
+            ++i;
+            Element * x = doc->NewElement(wxString::Format("x%d",i));
+            Element * y = doc->NewElement(wxString::Format("y%d",i));
+
+            polygon->LinkEndChild(x);
+            polygon->LinkEndChild(y);
+
+            x->SetText(point.x);
+            y->SetText(point.y);
+        }
+    }
 
     return object;
 }
 
-bool saveToXml (std::vector<BoundingBox> check_list, wxFileName file, ImageInfo info)
+bool saveToXml (std::vector<Object> check_list, wxFileName file, ImageInfo info)
 {
     Document document;
     Node * root = document.NewElement("annotation");
@@ -206,7 +349,8 @@ bool saveToXml (std::vector<BoundingBox> check_list, wxFileName file, ImageInfo 
     database->LinkEndChild(document.NewText("The bogonet image database"));
     image->LinkEndChild(document.NewText("SaveZone"));
 
-    document.SaveFile((file.GetPath(true) + file.GetName() + ".xml").c_str());
+    tinyxml2::XMLError a = document.SaveFile((file.GetPath() + "\\" + file.GetName() + ".xml").c_str());
+
     document.Clear();
     return true;
 }

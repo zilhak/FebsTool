@@ -3,11 +3,15 @@
 //
 
 #include <ui/component/FileExplorer.hpp>
+#include "../../data/ThemeData.hpp"
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <algorithm>
 
-constexpr static const long HILIGHTED_COLOUR = 0x99FF99;
+BEGIN_EVENT_TABLE(FileExplorer, wxListCtrl)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, FileExplorer::onSelect)
+END_EVENT_TABLE()
+
 
 FileExplorer::FileExplorer(wxWindow * parent) : wxListCtrl(parent,
                                                            wxID_ANY,
@@ -25,7 +29,7 @@ FileExplorer::~FileExplorer()
 
 void FileExplorer::initialize()
 {
-    SetBackgroundColour(wxColour(0xCCCCCC));
+    SetBackgroundColour(COLOUR_FILELIST);
     InsertColumn(0, _("FileName"));
     SetColumnWidth(0, 190);
     InsertColumn(1, _("Check"));
@@ -89,19 +93,41 @@ void FileExplorer::deleteFile(wxString file)
     }
 }
 
-void FileExplorer::xmlCheck(wxString filename)
+void FileExplorer::xmlCheck(bool check_mark)
 {
-    SetItem(FindItem(0, filename), 1, "O");
+    if (check_mark) {
+        SetItem(_highlighted_item, 1, "O");
+    } else {
+        SetItem(_highlighted_item, 1, "X");
+    }
+}
+
+void FileExplorer::xmlCheck(wxString filename, bool check_mark)
+{
+    if (check_mark) {
+        SetItem(FindItem(0, filename), 1, "O");
+    } else {
+        SetItem(FindItem(0, filename), 1, "X");
+    }
 }
 
 long FileExplorer::highlightItem(wxString filename)
 {
+    if (filename.Find(' ') != -1) {
+        wxMessageBox(wxT("Space bar exist."));
+        return -1;
+    }
+
     if (_highlighted_item != -1) {
         SetItemTextColour(_highlighted_item, *wxBLACK);
     }
 
     _highlighted_item = FindItem(0, filename);
-    SetItemTextColour(_highlighted_item, wxColour(HILIGHTED_COLOUR));
+    if (_highlighted_item == -1) {
+        return -1;
+    }
+
+    SetItemTextColour(_highlighted_item, COLOUR_FILELIST_HIGHLIGHT);
 
     Refresh();
 
@@ -110,14 +136,21 @@ long FileExplorer::highlightItem(wxString filename)
 
 long FileExplorer::highlightItem(long index)
 {
+    if (GetItemText(index).find(' ') != -1) {
+        wxMessageBox(wxT("�ҷ����� ���� : �̹��� �̸��� ����(����)�� �ֽ��ϴ�."));
+        return -1;
+    };
+
     if (_highlighted_item != -1) {
-        SetItemTextColour(_highlighted_item, *wxBLACK);
+        SetItemTextColour(_highlighted_item, wxColour(0x000001));
     }
 
     _highlighted_item = index;
-    SetItemTextColour(_highlighted_item, wxColour(HILIGHTED_COLOUR));
+    SetItemTextColour(_highlighted_item, COLOUR_FILELIST_HIGHLIGHT);
 
     Refresh();
+
+    return _highlighted_item;
 }
 
 long FileExplorer::getHighlightedItemIndex()
@@ -128,4 +161,33 @@ long FileExplorer::getHighlightedItemIndex()
 wxString FileExplorer::getHighlightedItem()
 {
     return _file_list.at(_highlighted_item);
+}
+
+bool FileExplorer::prev()
+{
+    if (_highlighted_item > 0) {
+        highlightItem(_highlighted_item - 1);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool FileExplorer::next()
+{
+    if (_highlighted_item < this->GetItemCount() - 1) {
+        highlightItem(_highlighted_item + 1);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void FileExplorer::onSelect(wxListEvent & event)
+{
+    if (highlightItem(event.GetIndex()) == -1) {
+        return;
+    }
+
+    event.Skip();
 }
