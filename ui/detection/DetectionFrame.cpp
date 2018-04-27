@@ -264,7 +264,6 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             _image_viewer->deleteObject();
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_viewer->saveCropImage();
-            nextFile();
         } else if (event.GetKeyCode() == 49) { //'1'
             _type_combobox->SetValue(wxT("mouse"));
         } else if (event.GetKeyCode() == 50) { //'2'
