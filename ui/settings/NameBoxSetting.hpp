@@ -5,13 +5,6 @@
 #include "../../data/XmlConfig.hpp"
 #include <memory>
 
-struct TypeItem 
-{
-    wxString type;
-    unsigned long colour = 0xFF00FF;
-};
-
-
 class NameBoxSetting : public wxPanel
 {
 public:

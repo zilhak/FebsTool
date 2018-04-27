@@ -135,6 +135,9 @@ public:
     wxPoint convertToActualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(wxPoint const & actual_point, bool bind_point = true);
+
+public:
+    void saveCropImage();
 };
 
 

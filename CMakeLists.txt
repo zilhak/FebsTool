@@ -20,6 +20,6 @@ set(SRC_COMPONENTS ui/component/FileExplorer.hpp ui/component/FileExplorer.cpp u
 set(SRC_DATA data/tinyxml2.h data/tinyxml2.cpp data/XmlConfig.hpp data/XmlConfig.cpp data/ThemeData.hpp data/EventData.cpp data/EventData.hpp)
 set(SRC_SETTING ui/settings/SettingFrame.cpp ui/settings/SettingFrame.hpp ui/settings/SettingPanelManager.cpp ui/settings/SettingPanelManager.hpp ui/settings/GeneralSetting.cpp ui/settings/GeneralSetting.hpp ui/settings/NameBoxSetting.cpp ui/settings/NameBoxSetting.hpp)
 
-add_executable(FepsTool ${SRC_BASE} ${SRC_COMPONENTS} ${SRC_DATA} ${SRC_DETECTION} ${SRC_SEGMENTATION})
+add_executable(FepsTool ${SRC_BASE} ${SRC_COMPONENTS} ${SRC_DATA} ${SRC_DETECTION} ${SRC_SEGMENTATION} ${SRC_SETTING})
 target_link_libraries(FepsTool ${wxWidgets_LIBRARIES})
 

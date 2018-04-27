@@ -1,4 +1,4 @@
-#include "NameBoxSetting.hpp"
+#include <ui/settings/NameBoxSetting.hpp>
 
 BEGIN_EVENT_TABLE(NameBoxSetting, wxPanel)
     EVT_BUTTON(ID::BUTTON_ADD, NameBoxSetting::onAddButton)
@@ -43,7 +43,7 @@ void NameBoxSetting::initializeComponent(wxSizer * v_sizer)
     wxBoxSizer * default_sizer = new wxBoxSizer(wxHORIZONTAL);
     _default_combo = new wxComboBox(default_panel, wxID_ANY, "NULL", wxDefaultPosition, wxSize(120, -1));
     
-    default_sizer->Add(new wxStaticText(default_panel, wxID_ANY, "기본 설정 타입 : "), 0, wxLEFT | wxTOP | wxALIGN_CENTER, 15);
+    default_sizer->Add(new wxStaticText(default_panel, wxID_ANY, "Default Name : "), 0, wxLEFT | wxTOP | wxALIGN_CENTER, 15);
     default_sizer->Add(_default_combo, 0, wxTOP | wxALIGN_CENTER, 15);
 
     default_panel->SetSizer(default_sizer);
@@ -57,7 +57,7 @@ void NameBoxSetting::initializeGrid(wxSizer * v_sizer)
     _item_grid->CreateGrid(0, 0);
     _item_grid->SetRowLabelSize(0);
 
-    std::vector<wxString> label_list = { wxT("타입"), wxT("색상"), wxT("삭제") };
+    std::vector<wxString> label_list = { wxT("Name"), wxT("Color"), wxT("Delete") };
 
     int label_size = label_list.size();
     _item_grid->AppendCols(label_size);
@@ -82,8 +82,8 @@ void NameBoxSetting::initializeButtons(wxSizer * v_sizer)
     wxBoxSizer * button_sizer = new wxBoxSizer(wxHORIZONTAL);
     
 
-    wxButton * add_button = new wxButton(button_panel, ID::BUTTON_ADD, wxT("물체 타입 추가"));
-    wxButton * default_button = new wxButton(button_panel, ID::BUTTON_DEFAULT, wxT("기본 설정으로 되돌리기"));
+    wxButton * add_button = new wxButton(button_panel, ID::BUTTON_ADD, wxT("Add Name"));
+    wxButton * default_button = new wxButton(button_panel, ID::BUTTON_DEFAULT, wxT("Reset To Default"));
 
     button_sizer->Add(add_button, 0, wxLEFT, 5);
     button_sizer->Add(default_button, 0, wxLEFT, 5);
@@ -96,7 +96,7 @@ void NameBoxSetting::initializeSetting()
 {
     if (_config->init) {
         Name init_name;
-        std::vector<wxString> name_list = {wxT("GS-A"), wxT("GS-B"), wxT("GS-S"), wxT("MB"), wxT("경량A"), wxT("경량B"), wxT("몽짜"), wxT("선반설A"), wxT("선반설B"), wxT("중량A"), wxT("중량B")};
+        std::vector<wxString> name_list = {wxT("car"), wxT("bus"), wxT("truck")};
         for (auto const & name : name_list) {
             init_name.name = name;
             init_name.colour = wxString::Format("%ul", 0x00FFFF);
@@ -108,7 +108,7 @@ void NameBoxSetting::initializeSetting()
     _default_combo->SetEditable(false);
     _default_combo->SetValue(_config->default_class);
 
-    for (auto & const item : _config->class_list) {
+    for (auto const & item : _config->class_list) {
         _default_combo->Append(item.name);
     }
 }
@@ -203,7 +203,7 @@ void NameBoxSetting::onDefaultButton(wxCommandEvent & event)
     _config->class_list.clear();
 
     Name init_name;
-    std::vector<wxString> name_list = {wxT("GS-A"), wxT("GS-B"), wxT("GS-S"), wxT("MB"), wxT("경량A"), wxT("경량B"), wxT("몽짜"), wxT("선반설A"), wxT("선반설B"), wxT("중량A"), wxT("중량B")};
+    std::vector<wxString> name_list = {wxT("car"), wxT("bus"), wxT("truck")};
     for (auto const & name : name_list) {
         init_name.name = name;
         init_name.colour = wxString::Format("%ul", 0x00FFFF);
@@ -238,7 +238,7 @@ void NameBoxSetting::onGridClick(wxGridEvent & event)
 
     if (col == GRID_COL_DELETE) {
         wxString name = _item_grid->GetCellValue(row, GRID_COL_TYPE);
-        wxMessageDialog * confirm = new wxMessageDialog(this, wxString("[") + name + wxT("] 타입을 삭제하시겠습니까?"), wxT("삭제"), wxYES_NO);
+        wxMessageDialog * confirm = new wxMessageDialog(this, wxString("[") + name + wxT("] Delete item?"), wxT("Delete"), wxYES_NO);
         if (confirm->ShowModal() == wxID_YES) {
             for (int i = 0; i < _config->class_list.size(); ++i) {
                 if (_config->class_list[i].name == name) {

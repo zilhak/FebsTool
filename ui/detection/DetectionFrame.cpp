@@ -264,7 +264,6 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             _image_viewer->deleteObject();
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_viewer->saveCropImage();
-            nextFile();
         } else if (event.GetKeyCode() == 49) { //'1'
             _type_combobox->SetValue(wxT("mouse"));
         } else if (event.GetKeyCode() == 50) { //'2'
@@ -368,9 +367,9 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 
 void DetectionFrame::onSizeComboBox(wxCommandEvent &event)
 {
-    _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())) / (double) 100);
+    _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
     if (_image_viewer->isReady()) {
-        _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+        _image_viewer->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
     }
 }
 
@@ -426,7 +425,7 @@ void DetectionFrame::showImage(wxString const & file_name)
 
     _image_index = _file_list_viewer->highlightItem(file_name);
     _current_file = file_name;
-    _image_viewer->setBackgroundImage(_dir->GetName(), _current_file);
+    _image_viewer->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
 
     _info_image_name->SetLabel(wxString::Format("%s", _current_file));
 

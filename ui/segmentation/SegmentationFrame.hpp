@@ -2,8 +2,10 @@
 
 #include <ui/segmentation/SegmentationToolBar.hpp>
 #include <ui/segmentation/SegmentationInfoBox.hpp>
+#include <ui/segmentation/HelpDialog.hpp>
 #include <ui/component/FileExplorer.hpp>
 #include <ui/component/ImagePanel.hpp>
+#include <ui/settings/SettingFrame.hpp>
 #include <data/ThemeData.hpp>
 #include <data/EventData.hpp>
 
