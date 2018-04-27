@@ -63,7 +63,7 @@ bool saveConfig(ConfigData data)
         type->LinkEndChild(type_colour);
 
         type_name->SetText(name.name.ToStdString().c_str());
-        type_colour->SetText(name.colour);
+        type_colour->SetText(name.colour.ToStdString().c_str());
 
         types->LinkEndChild(type);
     }
@@ -81,7 +81,7 @@ bool saveConfig(ConfigData data)
         data.default_class = data.class_list[0].name;
     }
 
-    default_type->SetText(data.default_class);
+    default_type->SetText(data.default_class.ToStdString().c_str());
     max_view_width->SetText(data.maximum_size.GetWidth());
     max_view_height->SetText(data.maximum_size.GetHeight());
     min_view_width->SetText(data.minimum_size.GetWidth());
@@ -187,8 +187,8 @@ Object loadObject(Element * object)
         Element * polygon = object->FirstChildElement("polygon");
 
         for (int i = 1; ; ++i) {
-            Element * x = polygon->FirstChildElement(wxString::Format("x%d", i));
-            Element * y = polygon->FirstChildElement(wxString::Format("y%d", i));
+            Element * x = polygon->FirstChildElement(wxString::Format("x%d", i).ToStdString().c_str());
+            Element * y = polygon->FirstChildElement(wxString::Format("y%d", i).ToStdString().c_str());
 
             if (x == nullptr) {
                 break;
@@ -293,8 +293,8 @@ Element * insertObject(Document * doc, Object obj)
         int i = 0;
         for (auto const & point : obj.point_list) {
             ++i;
-            Element * x = doc->NewElement(wxString::Format("x%d",i));
-            Element * y = doc->NewElement(wxString::Format("y%d",i));
+            Element * x = doc->NewElement(wxString::Format("x%d",i).ToStdString().c_str());
+            Element * y = doc->NewElement(wxString::Format("y%d",i).ToStdString().c_str());
 
             polygon->LinkEndChild(x);
             polygon->LinkEndChild(y);

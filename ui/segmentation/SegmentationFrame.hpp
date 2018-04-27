@@ -2,7 +2,6 @@
 
 #include <ui/segmentation/SegmentationToolBar.hpp>
 #include <ui/segmentation/SegmentationInfoBox.hpp>
-#include <ui/component/FileOpenPanel.hpp>
 #include <ui/component/FileExplorer.hpp>
 #include <ui/component/ImagePanel.hpp>
 #include <data/ThemeData.hpp>

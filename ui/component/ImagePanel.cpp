@@ -280,7 +280,7 @@ bool ImagePanel::deleteObject()
     Refresh();
 
     if (_obj_vector.empty()) {
-        remove(_image_file.GetPath() + "\\" + _image_file.GetName() + ".xml");
+        remove((_image_file.GetPath() + "/" + _image_file.GetName() + ".xml").c_str());
         return true;
     } else {
         return false;
