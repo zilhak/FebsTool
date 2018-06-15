@@ -46,22 +46,22 @@ private:
     void refreshDefault();
 };
 
-
-class TableRenderer : public wxGridCellStringRenderer
-{
-private:
-    wxString _col_str;
-
-public:
-    TableRenderer(wxString const & col_str);
-    virtual ~TableRenderer();
-
-public:
-    virtual void Draw(wxGrid & grid,
-                      wxGridCellAttr & attr,
-                      wxDC & dc,
-                      wxRect const & rect,
-                      int row,
-                      int col,
-                      bool isSelected) wxOVERRIDE;
-};
+//
+//class TableRenderer : public wxGridCellStringRenderer
+//{
+//private:
+//    wxString _col_str;
+//
+//public:
+//    TableRenderer(wxString const & col_str);
+//    virtual ~TableRenderer();
+//
+//public:
+//    virtual void Draw(wxGrid & grid,
+//                      wxGridCellAttr & attr,
+//                      wxDC & dc,
+//                      wxRect const & rect,
+//                      int row,
+//                      int col,
+//                      bool isSelected) wxOVERRIDE;
+//};
