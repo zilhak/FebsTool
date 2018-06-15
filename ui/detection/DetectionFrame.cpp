@@ -265,11 +265,11 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_viewer->saveCropImage();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _type_combobox->SetValue(wxT("mouse"));
+            _type_combobox->SetValue(wxT("car"));
         } else if (event.GetKeyCode() == 50) { //'2'
-            _type_combobox->SetValue(wxT("smoke"));
+            _type_combobox->SetValue(wxT("bus"));
         } else if (event.GetKeyCode() == 51) { //'3'
-            _type_combobox->SetValue(wxT("explosion"));
+            _type_combobox->SetValue(wxT("truck"));
         } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
