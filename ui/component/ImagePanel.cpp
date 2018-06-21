@@ -208,7 +208,7 @@ void ImagePanel::drawObject(wxDC & dc)
         } else {
             wxColour colour = wxColour(0x00FFFF);
             for (int j = 0; j < _name_list.size(); ++j) {
-                if (_name_list[j].name == _obj_vector[i].type) {
+                if (_name_list[j].name == _obj_vector[i].name) {
                     colour = wxColour(wxAtol(_name_list[j].colour));
                     break;
                 }
@@ -229,7 +229,7 @@ void ImagePanel::drawObject(wxDC & dc)
         if (_show_name) {
             dc.SetFont(wxFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
             wxPoint middle_point = (_obj_vector[i].point_list[0] + _obj_vector[i].point_list[_obj_vector[i].point_list.size() / 2]) / 2;
-            dc.DrawText(_obj_vector[i].type, convertToVirtualLocation(middle_point, false));
+            dc.DrawText(_obj_vector[i].name, convertToVirtualLocation(middle_point, false));
         }
     }
 }
@@ -259,7 +259,7 @@ void ImagePanel::drawTempObject(wxDC & dc)
         if (_show_name) {
             dc.SetTextForeground(COLOUR_IMAGE_PANEL_BOX_SELECTED);
             dc.SetFont(wxFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-            dc.DrawText(_new_object.type, convertToVirtualLocation(_new_object.point_list.back(), false));
+            dc.DrawText(_new_object.name, convertToVirtualLocation(_new_object.point_list.back(), false));
         }
     }
 }
@@ -677,7 +677,7 @@ void ImagePanel::saveCropImage()
 //        int width = static_cast<int>(static_cast<double>(rect.x2 - rect.x1) * _scale_setting);
 //        int height = static_cast<int>(static_cast<double>(rect.y2 - rect.y1) * _scale_setting);
 //
-//        dc.DrawText(wxString(rect.type + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
+//        dc.DrawText(wxString(rect.name + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
 //        dc.DrawRectangle(x, y, width, height);
 //        dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
 //        i++;

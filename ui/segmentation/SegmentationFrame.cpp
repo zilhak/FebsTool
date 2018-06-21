@@ -104,7 +104,7 @@ Object SegmentationFrame::createNewObject()
     Object new_object;
     new_object.pose = _toolbar->getPose();
     new_object.truncated = _toolbar->getTruncated();
-    new_object.type = _toolbar->getName();
+    new_object.name = _toolbar->getName();
     new_object.difficult = _toolbar->getDifficult();
 
     return new_object;

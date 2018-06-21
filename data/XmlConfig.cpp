@@ -9,7 +9,7 @@ constexpr static char const * const CONFIG_ROOT            = "config";
 constexpr static char const * const CONFIG_OPTION             = "option";
 constexpr static char const * const CONFIG_TYPES                  = "types";
 constexpr static char const * const CONFIG_DEFAULT_TYPE               = "default_type";
-constexpr static char const * const CONFIG_TYPE                       = "type";
+constexpr static char const * const CONFIG_TYPE                       = "name";
 constexpr static char const * const CONFIG_TYPE_NAME                      = "name";
 constexpr static char const * const CONFIG_TYPE_COLOUR                    = "colour";
 constexpr static char const * const CONFIG_VIEW_LIMIT      = "limit";
@@ -209,7 +209,7 @@ Object loadObject(Element * object)
     Element * name = object->FirstChildElement("name");
     Element * difficult = object->FirstChildElement("difficult");
 
-    result.type = name->GetText();
+    result.name = name->GetText();
     result.difficult = std::stoi(difficult->GetText());
 
     return result;
@@ -267,7 +267,7 @@ Element * insertObject(Document * doc, Object obj)
         bndbox->LinkEndChild(xmax);
         bndbox->LinkEndChild(ymax);
 
-        name->LinkEndChild(doc->NewText(obj.type.c_str()));
+        name->LinkEndChild(doc->NewText(obj.name.c_str()));
         xmax->SetText(obj.point_list[1].x);
         xmin->SetText(obj.point_list[0].x);
         ymax->SetText(obj.point_list[1].y);
@@ -286,7 +286,7 @@ Element * insertObject(Document * doc, Object obj)
         object->LinkEndChild(difficult);
         object->LinkEndChild(polygon);
 
-        name->LinkEndChild(doc->NewText(obj.type.c_str()));
+        name->LinkEndChild(doc->NewText(obj.name.c_str()));
         pose->LinkEndChild(doc->NewText(obj.pose.c_str()));
         truncated->LinkEndChild(doc->NewText(obj.truncated.c_str()));
         difficult->SetText(obj.difficult);

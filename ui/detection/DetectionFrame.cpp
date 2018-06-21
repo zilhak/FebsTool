@@ -109,40 +109,40 @@ void DetectionFrame::initializeLeftMenu(wxBoxSizer *h_sizer)
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
 
-    _file_list_viewer = new FileExplorer(this);
-    _file_list_viewer->SetBackgroundColour(wxColour(0xCCCCCC));
+    _file_list = new FileExplorer(this);
+    _file_list->SetBackgroundColour(wxColour(0xCCCCCC));
 
-    _image_info_box = new wxPanel(this, ID::FILE_EXPLORER);
-    _image_info_box->SetBackgroundColour(0xBBBBBB);
+    _infobox = new DetectionInfoBox(this, ID::FILE_EXPLORER);
+    _infobox->SetBackgroundColour(0xBBBBBB);
     wxGridSizer * panel_sizer = new wxGridSizer(2, 3, 5);
-    _image_info_box->SetSizer(panel_sizer);
+    _infobox->SetSizer(panel_sizer);
 
-    _info_image_name = new wxStaticText(_image_info_box, wxID_ANY, "");
-    _info_image_size = new wxStaticText(_image_info_box, wxID_ANY, "");
-    _info_mouse_x = new wxStaticText(_image_info_box, wxID_ANY, "");
-    _info_mouse_y = new wxStaticText(_image_info_box, wxID_ANY, "");
+    _info_image_name = new wxStaticText(_infobox, wxID_ANY, "");
+    _info_image_size = new wxStaticText(_infobox, wxID_ANY, "");
+    _info_mouse_x = new wxStaticText(_infobox, wxID_ANY, "");
+    _info_mouse_y = new wxStaticText(_infobox, wxID_ANY, "");
 
-    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "ImageName :"));
+    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "ImageName :"));
     panel_sizer->Add(_info_image_name);
-    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "ImageSize :"));
+    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "ImageSize :"));
     panel_sizer->Add(_info_image_size);
-    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "MouseX :"));
+    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "MouseX :"));
     panel_sizer->Add(_info_mouse_x);
-    panel_sizer->Add(new wxStaticText(_image_info_box, wxID_ANY, "MouseY :"));
+    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "MouseY :"));
     panel_sizer->Add(_info_mouse_y);
 
-    v_sizer->Add(_image_info_box, 1, wxEXPAND);
-    v_sizer->Add(_file_list_viewer, 5, wxEXPAND);
+    v_sizer->Add(_infobox, 1, wxEXPAND);
+    v_sizer->Add(_file_list, 5, wxEXPAND);
 
     h_sizer->Add(v_sizer, 0, wxEXPAND);
 }
 
 void DetectionFrame::initializeImageViewer(wxBoxSizer * sizer)
 {
-    _image_viewer = new ImagePanel(this, ID::IMAGE_VIEWER);
-    _image_viewer->SetBackgroundColour(wxColour(0xFFFFFF));
+    _image_panel = new ImagePanel(this, ID::IMAGE_VIEWER);
+    _image_panel->SetBackgroundColour(wxColour(0xFFFFFF));
 
-    sizer->Add(_image_viewer, 1, wxEXPAND);
+    sizer->Add(_image_panel, 1, wxEXPAND);
 }
 
 bool calculateRate(int image_width, int image_height)
@@ -189,8 +189,21 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
         return;
     }
 
+    wxFileName file_name(find->GetPath());
+    wxString name = file_name.GetFullName();
+    wxString file_ext = file_name.GetExt();
+    _dir = file_name.GetPath();
+
+    _file_list->openDir(_dir, { file_ext });
+    if (_file_list->highlightItem(name) != -1) {
+        _infobox->changeZoomBox(_image_panel->setBackgroundImage(file_name.GetFullPath(), _infobox->getZoom()));
+        _infobox->setImageName(name);
+        _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
+
+        _status = STATUS::IDLE;
+    }
+
     wxString temp = wxString::FromUTF8(find->GetFilename());
-    std::cout << temp << std::endl;
 
     makeFileList(find->GetDirectory());
     for (auto file : _file_list) {
@@ -242,10 +255,10 @@ void DetectionFrame::onListDoubleClick(wxListEvent & event)
 void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 {
     std::cout << event.GetKeyCode() << std::endl;
-    if (_image_viewer->isReady()) {
+    if (_image_panel->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
-            _image_viewer->setType(_type_combobox->GetValue());
-            if (_image_viewer->save()) {
+            _image_panel->setType(_type_combobox->GetValue());
+            if (_image_panel->save()) {
                 _file_list_viewer->xmlCheck(_current_file);
             }
         } else if (event.GetKeyCode() == 81) { //'q'
@@ -261,9 +274,9 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 82) { //'r'
             nextFile();
         } else if (event.GetKeyCode() == 84) { //'t
-            _image_viewer->deleteObject();
+            _image_panel->deleteObject();
         } else if (event.GetKeyCode() == 13) { //'enter'
-            _image_viewer->saveCropImage();
+            _image_panel->saveCropImage();
         } else if (event.GetKeyCode() == 49) { //'1'
             _type_combobox->SetValue(wxT("mouse"));
         } else if (event.GetKeyCode() == 50) { //'2'
@@ -334,7 +347,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             makeFileList(file.GetPath());
             refresh();
         } else if (event.GetKeyCode() == WXK_TAB) {
-            _image_viewer->nextObject();
+            _image_panel->nextObject();
         }
     }
     SetTitle(_current_file);
@@ -348,7 +361,7 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
     _info_mouse_x->SetLabel(wxString::Format("%d", x));
     _info_mouse_y->SetLabel(wxString::Format("%d", y));
 
-    if (event.GetId() == ID::IMAGE_VIEWER) {
+    if (event.GetId() == ID::image_panel) {
         if (event.GetWheelRotation() < 0) {
             if (_size_combobox->GetSelection() > 1) {
                 _size_combobox->Select(_size_combobox->GetSelection() - 1);
@@ -367,25 +380,25 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 
 void DetectionFrame::onSizeComboBox(wxCommandEvent &event)
 {
-    _image_viewer->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
-    if (_image_viewer->isReady()) {
-        _image_viewer->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
+    _image_panel->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
+    if (_image_panel->isReady()) {
+        _image_panel->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
     }
 }
 
 void DetectionFrame::onTypeComboBox(wxCommandEvent &event)
 {
-    _image_viewer->setType(_type_combobox->GetValue());
+    _image_panel->setType(_type_combobox->GetValue());
 }
 
 void DetectionFrame::onScaleComboBox(wxCommandEvent &event)
 {
-    _image_viewer->setDepth(wxAtoi(_scale_combobox->GetValue()));
+    _image_panel->setDepth(wxAtoi(_scale_combobox->GetValue()));
 }
 
 void DetectionFrame::onDifficultComboBox(wxCommandEvent &event)
 {
-    _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
+    _image_panel->setDiff(wxAtoi(_difficult_combobox->GetValue()));
 }
 
 void DetectionFrame::prevFile()
@@ -425,9 +438,9 @@ void DetectionFrame::showImage(wxString const & file_name)
 
     _image_index = _file_list_viewer->highlightItem(file_name);
     _current_file = file_name;
-    _image_viewer->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
+    _image_panel->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
 
     _info_image_name->SetLabel(wxString::Format("%s", _current_file));
 
-    _info_image_size->SetLabel(wxString::Format("%d x %d", _image_viewer->getImageWidth(), _image_viewer->getImageHeight()));
+    _info_image_size->SetLabel(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
 }

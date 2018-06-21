@@ -5,6 +5,8 @@
 
 #include <ui/component/ImagePanel.hpp>
 #include <ui/component/FileExplorer.hpp>
+#include <ui/detection/DetectionInfoBox.hpp>
+#include <ui/detection/DetectionToolBar.hpp>
 
 #include <set>
 #include <vector>
@@ -27,19 +29,22 @@ public:
         IMAGE_VIEWER,
         FILE_EXPLORER
     };
+    enum STATUS {
+        IDLE,
+
+    };
 
 private:
-    wxDir * _dir;
+    wxString _dir;
     wxString _current_file;
     std::set<wxString> _image_extension;
-    std::vector<wxString> _file_list;
     long _image_index;
 
 private:
+    FileExplorer * _file_list;
     wxPanel * _tool_bar;
-    FileExplorer * _file_list_viewer;
-    wxPanel * _image_info_box;
-    ImagePanel * _image_viewer;
+    DetectionInfoBox * _infobox;
+    ImagePanel * _image_panel;
 
 private:
     wxStaticText * _info_image_name;

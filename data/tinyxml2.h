@@ -337,7 +337,7 @@ public:
 
 
 /*
-	Template child class to create pools of the correct type.
+	Template child class to create pools of the correct name.
 */
 template< int SIZE >
 class MemPoolT : public MemPool

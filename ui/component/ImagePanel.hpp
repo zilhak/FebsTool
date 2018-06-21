@@ -95,6 +95,7 @@ public:
     wxRect getView() const { return _current_view; }
 
 public:
+    void setTempObject(Object const & obj);
     void addObject(Object const & obj);
     bool deleteObject();
     bool unpackObject();
