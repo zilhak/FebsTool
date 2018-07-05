@@ -121,6 +121,8 @@ long FileExplorer::highlightItem(long index)
     SetItemState(_highlighted_item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
     Refresh();
+    
+    return _highlighted_item;
 }
 
 long FileExplorer::getHighlightedItemIndex()
