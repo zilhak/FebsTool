@@ -31,7 +31,6 @@ public:
     DECLARE_EVENT_TABLE();
 
 private:
-    wxPanel * _open;
     SegmentationToolBar * _toolbar;
     SegmentationInfoBox * _infobox;
     FileExplorer * _file_list;

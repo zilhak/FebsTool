@@ -55,13 +55,13 @@ void SegmentationFrame::initializeToolBar(wxBoxSizer * v_sizer)
     wxPanel * toolbar_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100,40));
     wxBoxSizer * comp_sizer = new wxBoxSizer(wxHORIZONTAL);
 
-    _open = new wxPanel(toolbar_panel, wxID_ANY);
+    wxPanel * open_panel = new wxPanel(toolbar_panel, wxID_ANY);
     _toolbar = new SegmentationToolBar(toolbar_panel, wxID_ANY);
 
-    _open->SetBackgroundColour(COLOUR_TOOLBAR);
-    wxButton * open = new wxButton(_open, ButtonID::OPEN, wxT("Open"));
-    wxButton * setting = new wxButton(_open, ButtonID::SETTING, wxT("Setting"));
-    wxButton * help = new wxButton(_open, ButtonID::HELP, wxT("Help"));
+    open_panel->SetBackgroundColour(COLOUR_TOOLBAR);
+    wxButton * open = new wxButton(open_panel, ButtonID::OPEN, wxT("Open"));
+    wxButton * setting = new wxButton(open_panel, ButtonID::SETTING, wxT("Setting"));
+    wxButton * help = new wxButton(open_panel, ButtonID::HELP, wxT("Help"));
 
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -69,9 +69,9 @@ void SegmentationFrame::initializeToolBar(wxBoxSizer * v_sizer)
     h_sizer->Add(setting, 1, wxALL | wxALIGN_CENTER, 5);
     h_sizer->Add(help, 1, wxALL | wxALIGN_CENTER, 5);
 
-    _open->SetSizer(h_sizer);
+    open_panel->SetSizer(h_sizer);
 
-    comp_sizer->Add(_open, 1, wxALIGN_CENTER_VERTICAL);
+    comp_sizer->Add(open_panel, 1, wxALIGN_CENTER_VERTICAL);
     comp_sizer->Add(_toolbar, 3, wxLEFT | wxALIGN_CENTER_VERTICAL, 15);
 
     toolbar_panel->SetBackgroundColour(COLOUR_TOOLBAR);

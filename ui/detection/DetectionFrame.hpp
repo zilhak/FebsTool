@@ -19,9 +19,11 @@ public:
     wxDECLARE_EVENT_TABLE();
 
 public:
+    enum ButtonID {
+        OPEN,
+        SETTING
+    };
     enum ID {
-        BUTTON_OPEN,
-        BUTTON_XML,
         COMBO_SIZE,
         COMBO_TYPE,
         COMBO_SCALE,
@@ -42,7 +44,7 @@ private:
 
 private:
     FileExplorer * _file_list;
-    wxPanel * _tool_bar;
+    wxPanel * _toolbar;
     DetectionInfoBox * _infobox;
     ImagePanel * _image_panel;
 
@@ -53,12 +55,18 @@ private:
     wxStaticText * _info_mouse_y;
 
 private:
-    wxButton * _open_button;
-    wxButton * _close_button;
     wxComboBox * _size_combobox;
     wxComboBox * _type_combobox;
     wxComboBox * _scale_combobox;
     wxComboBox * _difficult_combobox;
+
+private:
+    wxString _folder1_name = wxT("folder_a");
+    wxString _folder2_name = wxT("folder_b");
+    wxString _folder3_name = wxT("folder_c");
+    wxString _folder4_name = wxT("folder_d");
+    wxString _folder5_name = wxT("folder_e");
+    wxString _folder6_name = wxT("folder_f");
 
 public:
     DetectionFrame(wxString const & title);
@@ -72,22 +80,13 @@ private:
     void initializeLeftMenu(wxBoxSizer * h_sizer);
     void initializeImageViewer(wxBoxSizer * h_sizer);
 
-private:
-    void makeFileList(wxString const directory);
-
-private:
-    void showImage(wxString const & file_name);
-
-private:
-    bool fileExtCheck(wxString const extension);
-
 private: // menu event.
-    void onSizeComboBox(wxCommandEvent &event);
+    void onZoomBox(wxCommandEvent &event);
     void onTypeComboBox(wxCommandEvent &event);
     void onScaleComboBox(wxCommandEvent &event);
     void onDifficultComboBox(wxCommandEvent &event);
     void onOpenButton(wxCommandEvent & event);
-    void onListDoubleClick(wxListEvent & event);
+    void onSelectFile(wxListEvent & event);
     void onExplore();
 
 private: // input event.
@@ -95,10 +94,10 @@ private: // input event.
     void onKeyboardEvent(wxKeyEvent & event);
 
 private:
-    void prevFile();
-    void nextFile();
+    void prev();
+    void next();
 
 private:
-    void refresh();
+    void moveFile(wxString const & folder_name);
 };
 

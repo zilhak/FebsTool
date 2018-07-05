@@ -30,8 +30,9 @@ void DetectionInfoBox::initializeSetting()
 
 void DetectionInfoBox::initializeComponent()
 {
-    wxGridSizer * grid = new wxGridSizer(6,2,5,5);
+    wxGridSizer * grid = new wxGridSizer(6,2,3,3);
 
+    _folder_name = new wxStaticText(this, wxID_ANY, "-----");
     _image_name = new wxStaticText(this, wxID_ANY, "-----");
     _image_size = new wxStaticText(this, wxID_ANY, "-----");
     _mouse_x = new wxStaticText(this, wxID_ANY, "-----");
@@ -39,6 +40,8 @@ void DetectionInfoBox::initializeComponent()
     _size_box = new wxComboBox(this, ID::ZOOM_BOX, wxT("100%"));
     _image_scale_box = new wxComboBox(this, wxID_ANY, wxT("3"));
 
+    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Folder Name :")));
+    grid->Add(_folder_name, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Image Name :")));
     grid->Add(_image_name, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Image Size :")));
@@ -62,7 +65,19 @@ void DetectionInfoBox::initializeStyle()
 
 void DetectionInfoBox::setZoomBox(int min, int max, int interval)
 {
+    _min = min;
+    _max = max;
+    _interval = interval;
 
+    int i = 25;
+    for (; i <= 500; i += 25) {
+        _size_box->Append(wxString::Format("%d%%",i));
+    }
+}
+
+void DetectionInfoBox::setFolderName(wxString const & name)
+{
+    _folder_name->SetLabel(name);
 }
 
 void DetectionInfoBox::setImageName(wxString const & name)

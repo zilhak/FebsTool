@@ -10,7 +10,7 @@ private:
     wxComboBox * _diff_box;
 
 public:
-    DetectionToolBar();
+    DetectionToolBar(wxWindow * parent, wxWindowID id);
     ~DetectionToolBar();
 
 private:

@@ -4,7 +4,7 @@
 
 #include "DetectionToolBar.hpp"
 
-DetectionToolBar::DetectionToolBar()
+DetectionToolBar::DetectionToolBar(wxWindow * parent, wxWindowID id) : wxPanel(parent, id)
 {
     initialize();
 }
@@ -22,7 +22,7 @@ void DetectionToolBar::initialize()
 
 void DetectionToolBar::initializeComponent()
 {
-    wxBoxSizer * sizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer * sizer = new wxBoxSizer(wxHORIZONTAL);
 
     _type_box = new wxComboBox(this, wxID_ANY);
     _diff_box = new wxComboBox(this, wxID_ANY);
@@ -38,9 +38,9 @@ void DetectionToolBar::initializeComponent()
 void DetectionToolBar::initializeDefaultData()
 {
     _type_box->SetEditable(false);
-    _type_box->Append(wxT("mouse"));
-    _type_box->Append(wxT("smoke"));
-    _type_box->Append(wxT("explosion"));
+    _type_box->Append(wxT("car"));
+    _type_box->Append(wxT("bus"));
+    _type_box->Append(wxT("truck"));
     _type_box->Select(0);
 
     _diff_box->SetEditable(false);

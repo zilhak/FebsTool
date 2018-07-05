@@ -1,16 +1,18 @@
 
 #include <ui/detection/DetectionFrame.hpp>
+#include <data/ThemeData.hpp>
 #include <iostream>
 
 wxBEGIN_EVENT_TABLE(DetectionFrame, wxDialog)
-    EVT_BUTTON(ID::BUTTON_OPEN, DetectionFrame::onOpenButton)
+    EVT_BUTTON(ButtonID::OPEN, DetectionFrame::onOpenButton)
     EVT_CHAR_HOOK(DetectionFrame::onKeyboardEvent)
     EVT_MOUSE_EVENTS(DetectionFrame::onMouseEvent)
-    EVT_COMBOBOX(ID::COMBO_SIZE, DetectionFrame::onSizeComboBox)
+    EVT_COMBOBOX(ID::COMBO_SIZE, DetectionFrame::onZoomBox)
+    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, DetectionFrame::onSelectFile)
+
     EVT_COMBOBOX(ID::COMBO_TYPE, DetectionFrame::onTypeComboBox)
     EVT_COMBOBOX(ID::COMBO_SCALE, DetectionFrame::onScaleComboBox)
     EVT_COMBOBOX(ID::COMBO_DIFFICULT, DetectionFrame::onDifficultComboBox)
-    EVT_LIST_ITEM_ACTIVATED(wxID_ANY, DetectionFrame::onListDoubleClick)
 wxEND_EVENT_TABLE()
 
 constexpr static char const * const TRASHBIN_NAME = "TrashCan";
@@ -57,84 +59,44 @@ void DetectionFrame::initializeSetting()
     _image_extension.insert(wxT("png"));
 }
 
-void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
+void DetectionFrame::initializeToolBar(wxBoxSizer * v_sizer)
 {
-    _tool_bar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100, 40));
+    wxPanel * toolbar_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(100,40));
+    wxBoxSizer * comp_sizer = new wxBoxSizer(wxHORIZONTAL);
+
+    wxPanel * open_panel = new wxPanel(toolbar_panel, wxID_ANY);
+    _toolbar = new DetectionToolBar(toolbar_panel, wxID_ANY);
+
+    open_panel->SetBackgroundColour(COLOUR_TOOLBAR);
+    wxButton * open = new wxButton(open_panel, ButtonID::OPEN, wxT("Open"));
+    wxButton * setting = new wxButton(open_panel, ButtonID::SETTING, wxT("Setting"));
+
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
-    _open_button = new wxButton(_tool_bar, ID::BUTTON_OPEN, wxT("Open"));
-    _close_button = new wxButton(_tool_bar, ID::BUTTON_XML, wxT("XML view"));
 
-    _size_combobox = new wxComboBox(_tool_bar, ID::COMBO_SIZE, wxT("100"));
-    _size_combobox->SetEditable(false);
-    for (int i = 10; i <= 600; i += 10) {
-        _size_combobox->Append(wxString::Format("%d", i));
-    }
-    _size_combobox->Select(9);
+    h_sizer->Add(open, 1, wxALL | wxALIGN_CENTER, 5);
+    h_sizer->Add(setting, 1, wxALL | wxALIGN_CENTER, 5);
 
-    _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
-    _type_combobox->SetEditable(false);
-    _type_combobox->Append(wxT("mouse"));
-    _type_combobox->Append(wxT("smoke"));
-    _type_combobox->Append(wxT("explosion"));
-    _type_combobox->Select(0);
+    open_panel->SetSizer(h_sizer);
 
-    _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
-    _scale_combobox->SetEditable(false);
-    _scale_combobox->Append(wxT("1"));
-    _scale_combobox->Append(wxT("2"));
-    _scale_combobox->Append(wxT("3"));
+    comp_sizer->Add(open_panel, 1, wxALIGN_CENTER_VERTICAL);
+    comp_sizer->Add(_toolbar, 3, wxLEFT | wxALIGN_CENTER_VERTICAL, 15);
 
-    _difficult_combobox = new wxComboBox(_tool_bar, ID::COMBO_DIFFICULT, wxT("0"));
-    _difficult_combobox->Append(wxT("0"));
-    _difficult_combobox->Append(wxT("1"));
-    _difficult_combobox->Append(wxT("2"));
+    toolbar_panel->SetBackgroundColour(COLOUR_TOOLBAR);
+    toolbar_panel->SetSizer(comp_sizer);
 
-    h_sizer->Add(_open_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
-    h_sizer->Add(_close_button, 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxRIGHT, 15);
-    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Size:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
-    h_sizer->Add(_size_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
-    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Type:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
-    h_sizer->Add(_type_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
-    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Scale:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
-    h_sizer->Add(_scale_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
-    h_sizer->Add(new wxStaticText(_tool_bar, wxID_ANY, "Difficult:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 5);
-    h_sizer->Add(_difficult_combobox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 15);
-
-    _tool_bar->SetSizer(h_sizer);
-
-    sizer->Add(_tool_bar, 0, wxEXPAND);
+    v_sizer->Add(toolbar_panel, 0, wxEXPAND);
 }
 
 void DetectionFrame::initializeLeftMenu(wxBoxSizer *h_sizer)
 {
-    wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
-
+    wxBoxSizer * comp_sizer = new wxBoxSizer(wxVERTICAL);
+    _infobox = new DetectionInfoBox(this, wxID_ANY);
     _file_list = new FileExplorer(this);
-    _file_list->SetBackgroundColour(wxColour(0xCCCCCC));
 
-    _infobox = new DetectionInfoBox(this, ID::FILE_EXPLORER);
-    _infobox->SetBackgroundColour(0xBBBBBB);
-    wxGridSizer * panel_sizer = new wxGridSizer(2, 3, 5);
-    _infobox->SetSizer(panel_sizer);
+    comp_sizer->Add(_infobox, 0, wxEXPAND);
+    comp_sizer->Add(_file_list, 1, wxEXPAND);
 
-    _info_image_name = new wxStaticText(_infobox, wxID_ANY, "");
-    _info_image_size = new wxStaticText(_infobox, wxID_ANY, "");
-    _info_mouse_x = new wxStaticText(_infobox, wxID_ANY, "");
-    _info_mouse_y = new wxStaticText(_infobox, wxID_ANY, "");
-
-    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "ImageName :"));
-    panel_sizer->Add(_info_image_name);
-    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "ImageSize :"));
-    panel_sizer->Add(_info_image_size);
-    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "MouseX :"));
-    panel_sizer->Add(_info_mouse_x);
-    panel_sizer->Add(new wxStaticText(_infobox, wxID_ANY, "MouseY :"));
-    panel_sizer->Add(_info_mouse_y);
-
-    v_sizer->Add(_infobox, 1, wxEXPAND);
-    v_sizer->Add(_file_list, 5, wxEXPAND);
-
-    h_sizer->Add(v_sizer, 0, wxEXPAND);
+    h_sizer->Add(comp_sizer, 0, wxEXPAND);
 }
 
 void DetectionFrame::initializeImageViewer(wxBoxSizer * sizer)
@@ -143,39 +105,6 @@ void DetectionFrame::initializeImageViewer(wxBoxSizer * sizer)
     _image_panel->SetBackgroundColour(wxColour(0xFFFFFF));
 
     sizer->Add(_image_panel, 1, wxEXPAND);
-}
-
-bool calculateRate(int image_width, int image_height)
-{
-//    bool result = false;
-//    int screen_x = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
-//    int screen_y = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-
-//    if (image_width > screen_x) {
-//        result_x = screen_x - 50;
-//        x_rate = static_cast<double>(image_width) / static_cast<double>(screen_x - 50);
-//        result = true;
-//    } else {
-//        result_x = image_width;
-//    }
-//    if (image_height > screen_y) {
-//        result_y = screen_y - 100;
-//        y_rate = static_cast<double>(image_height) / static_cast<double>(screen_y-100);
-//        result = true;
-//    } else {
-//        result_y = image_height;
-//    }
-
-    return true;
-}
-
-bool DetectionFrame::fileExtCheck(wxString const extension)
-{
-    if (_image_extension.find(extension) != _image_extension.end()) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 void DetectionFrame::onOpenButton(wxCommandEvent & event)
@@ -199,57 +128,12 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
         _infobox->changeZoomBox(_image_panel->setBackgroundImage(file_name.GetFullPath(), _infobox->getZoom()));
         _infobox->setImageName(name);
         _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
-
-        _status = STATUS::IDLE;
-    }
-
-    wxString temp = wxString::FromUTF8(find->GetFilename());
-
-    makeFileList(find->GetDirectory());
-    for (auto file : _file_list) {
-        if (file == find->GetFilename()) {
-            //loadXmlInfo(find->GetDirectory() + file);
-            showImage(file);
-            return;
-        }
-    }
-    std::cout << "Cannot Found file!!!" << std::endl;
-    std::cout << "Tip: if path name have korean, this error occur." << std::endl;
-}
-
-void DetectionFrame::makeFileList(wxString const directory)
-{
-    _file_list_viewer->DeleteAllItems();
-    _file_list.clear();
-
-    _dir = new wxDir(directory);
-
-    _dir->GetFirst(&_current_file);
-    wxFileName file(directory + "/" + _current_file);
-
-    do {
-        file.Assign(directory + "/" + _current_file);
-        if (fileExtCheck(file.GetExt())) {
-            _file_list.push_back(_current_file);
-        }
-    } while (_dir->GetNext((&_current_file)));
-
-    std::sort(_file_list.begin(), _file_list.end());
-
-    for (int index = 0; index < _file_list.size(); index++) {
-        file.Assign(directory + "/" + _file_list.at(index));
-       _file_list_viewer->InsertItem(index, wxString::FromUTF8(_file_list.at(index)));
-       if (wxFileExists(directory + "/" + file.GetName() + ".xml")) {
-           _file_list_viewer->SetItem(index, 1, ("O"));
-       } else {
-           _file_list_viewer->SetItem(index, 1, ("X"));
-       }
     }
 }
 
-void DetectionFrame::onListDoubleClick(wxListEvent & event)
+void DetectionFrame::onSelectFile(wxListEvent & event)
 {
-    showImage(event.GetLabel());
+
 }
 
 void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
@@ -259,10 +143,10 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         if (event.GetKeyCode() == 69) { // 'e'
             _image_panel->setType(_type_combobox->GetValue());
             if (_image_panel->save()) {
-                _file_list_viewer->xmlCheck(_current_file);
+                _file_list->xmlCheck(_current_file);
             }
         } else if (event.GetKeyCode() == 81) { //'q'
-            prevFile();
+            prev();
         } else if (event.GetKeyCode() == 87) { //'w'
 
         } else if (event.GetKeyCode() == 83) { //'s'
@@ -272,80 +156,23 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 68) { //'d'
 
         } else if (event.GetKeyCode() == 82) { //'r'
-            nextFile();
+            next();
         } else if (event.GetKeyCode() == 84) { //'t
             _image_panel->deleteObject();
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_panel->saveCropImage();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _type_combobox->SetValue(wxT("mouse"));
+            _type_combobox->SetValue(wxT("car"));
         } else if (event.GetKeyCode() == 50) { //'2'
-            _type_combobox->SetValue(wxT("smoke"));
+            _type_combobox->SetValue(wxT("bus"));
         } else if (event.GetKeyCode() == 51) { //'3'
-            _type_combobox->SetValue(wxT("explosion"));
+            _type_combobox->SetValue(wxT("truck"));
         } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
-            wxFileName file(_dir->GetName() + "/" + _current_file);
-            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
 
-            if (!wxDirExists(trashbin_path)) {
-                wxMkdir(trashbin_path);
-            }
-            wxString duplicate_number = "";
-            int number = 0;
-            while (!wxRenameFile(file.GetFullPath(),
-                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
-                                 false)) {
-                number++;
-                duplicate_number = wxString::Format("(%d)", number);
-            }
-            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
-                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
-                        trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
-            }
-            makeFileList(file.GetPath());
-            refresh();
         } else if (event.GetKeyCode() == WXK_PAGEUP) { //'pageup'
-            wxFileName file(_dir->GetName() + "/" + _current_file);
-            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp1";
 
-            if (!wxDirExists(trashbin_path)) {
-                wxMkdir(trashbin_path);
-            }
-            wxString duplicate_number = "";
-            int number = 0;
-            while (!wxRenameFile(file.GetFullPath(),
-                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
-                                 false)) {
-                number++;
-                duplicate_number = wxString::Format("(%d)", number);
-            }
-            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
-                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
-                             trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
-            }
-            makeFileList(file.GetPath());
-            refresh();
-        } else if (event.GetKeyCode() == WXK_PAGEDOWN) { //'delete'
-            wxFileName file(_dir->GetName() + "/" + _current_file);
-            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp2";
+        } else if (event.GetKeyCode() == WXK_PAGEDOWN) {
 
-            if (!wxDirExists(trashbin_path)) {
-                wxMkdir(trashbin_path);
-            }
-            wxString duplicate_number = "";
-            int number = 0;
-            while (!wxRenameFile(file.GetFullPath(),
-                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
-                                 false)) {
-                number++;
-                duplicate_number = wxString::Format("(%d)", number);
-            }
-            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
-                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
-                             trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
-            }
-            makeFileList(file.GetPath());
-            refresh();
         } else if (event.GetKeyCode() == WXK_TAB) {
             _image_panel->nextObject();
         }
@@ -355,34 +182,46 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 
 void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 {
-    int x = static_cast<int>(static_cast<double>(event.GetX() - 15) * 100.0 / wxAtof(_size_combobox->GetValue()));
-    int y = static_cast<int>(static_cast<double>(event.GetY() - 15) * 100.0 / wxAtof(_size_combobox->GetValue()));
 
-    _info_mouse_x->SetLabel(wxString::Format("%d", x));
-    _info_mouse_y->SetLabel(wxString::Format("%d", y));
-
-    if (event.GetId() == ID::image_panel) {
-        if (event.GetWheelRotation() < 0) {
-            if (_size_combobox->GetSelection() > 1) {
-                _size_combobox->Select(_size_combobox->GetSelection() - 1);
-                wxCommandEvent evt;
-                onSizeComboBox(evt);
-            }
-        } else if (event.GetWheelRotation() > 0) {
-            if (_size_combobox->GetSelection() < _size_combobox->GetCount() - 1) {
-                _size_combobox->Select(_size_combobox->GetSelection() + 1);
-                wxCommandEvent evt;
-                onSizeComboBox(evt);
-            }
-        }
-    }
 }
 
-void DetectionFrame::onSizeComboBox(wxCommandEvent &event)
+void DetectionFrame::onZoomBox(wxCommandEvent &event)
 {
     _image_panel->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
     if (_image_panel->isReady()) {
-        _image_panel->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
+        _image_panel->setSize(100);
+    }
+}
+
+void DetectionFrame::prev()
+{
+
+}
+
+void DetectionFrame::next()
+{
+
+}
+
+void DetectionFrame::moveFile(wxString const &folder_name)
+{
+    wxFileName file(_dir + "/" + _current_file);
+    wxString path = _dir + "/" + folder_name;
+
+    if (!wxDirExists(path)) {
+        wxMkdir(path);
+    }
+    wxString duplicate_number = "";
+    int number = 0;
+    while (!wxRenameFile(file.GetFullPath(),
+                         path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
+                         false)) {
+        number++;
+        duplicate_number = wxString::Format("(%d)", number);
+    }
+    if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
+        wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
+                path + "/" + file.GetName() + duplicate_number + ".xml", true);
     }
 }
 
@@ -399,48 +238,4 @@ void DetectionFrame::onScaleComboBox(wxCommandEvent &event)
 void DetectionFrame::onDifficultComboBox(wxCommandEvent &event)
 {
     _image_panel->setDiff(wxAtoi(_difficult_combobox->GetValue()));
-}
-
-void DetectionFrame::prevFile()
-{
-    if (_image_index > 0) {
-        _image_index--;
-        showImage(_file_list.at(_image_index));
-        if (_file_list_viewer->getHighlightedItemIndex() < _file_list_viewer->GetItemCount() - 5) {
-            _file_list_viewer->ScrollLines(-1);
-        }
-    }
-}
-
-void DetectionFrame::nextFile()
-{
-    if (_image_index < _file_list.size() - 1) {
-        _image_index++;
-        showImage(_file_list.at(_image_index));
-        if (_file_list_viewer->getHighlightedItemIndex() > 5) {
-            _file_list_viewer->ScrollLines(1);
-        }
-    }
-}
-
-void DetectionFrame::refresh()
-{
-    if (_image_index < _file_list.size()) {
-        showImage(_file_list.at(_image_index));
-    } else if (--_image_index < _file_list.size()){
-        showImage(_file_list.at(_image_index));
-    }
-}
-
-void DetectionFrame::showImage(wxString const & file_name)
-{
-    SetTitle(file_name);
-
-    _image_index = _file_list_viewer->highlightItem(file_name);
-    _current_file = file_name;
-    _image_panel->setBackgroundImage(_dir->GetName() + "/" + _file_list_viewer->getHighlightedItem());
-
-    _info_image_name->SetLabel(wxString::Format("%s", _current_file));
-
-    _info_image_size->SetLabel(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
 }
