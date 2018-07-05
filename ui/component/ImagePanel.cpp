@@ -135,6 +135,40 @@ void ImagePanel::saveCropImage()
     image.GetSubImage(sub_rect).SaveFile(crop_path + "crop_" + _image_file.GetName()+ wxString::Format("_%03d.", i) + _image_file.GetExt());
 }
 
+void ImagePanel::changeObjectType()
+{
+    if(_rect_vector.size() > _current_object_index) {
+        (_rect_vector.begin() + _current_object_index)->type = _image_type;
+        _current_object_index = static_cast<int>(_rect_vector.size());
+        _click = false;
+        saveToXml(_rect_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
+        Refresh();
+    }
+}
+
+void ImagePanel::changeObjectDiff()
+{
+    if(_rect_vector.size() > _current_object_index) {
+        (_rect_vector.begin() + _current_object_index)->difficult = _image_diff;
+        _current_object_index = static_cast<int>(_rect_vector.size());
+        _click = false;
+        saveToXml(_rect_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
+        Refresh();
+    }
+}
+
+void ImagePanel::hideName(bool hide)
+{
+    _hide_name = !_hide_name;
+    Refresh();
+}
+
+void ImagePanel::hideBox(bool hide)
+{
+    _hide_box = !_hide_box;
+    Refresh();
+}
+
 void ImagePanel::onPaint(wxPaintEvent & event)
 {
     if (!_background_bitmap.IsOk()) {
@@ -146,6 +180,7 @@ void ImagePanel::onPaint(wxPaintEvent & event)
 
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     int i = 0;
+
     for (BoundingBox const & rect: _rect_vector) {
         if (i == _current_object_index) {
             if (_click) {
@@ -164,9 +199,13 @@ void ImagePanel::onPaint(wxPaintEvent & event)
         int width = static_cast<int>(static_cast<double>(rect.x2 - rect.x1) * _scale_setting);
         int height = static_cast<int>(static_cast<double>(rect.y2 - rect.y1) * _scale_setting);
 
-        dc.DrawText(wxString(rect.type + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
-        dc.DrawRectangle(x, y, width, height);
-        dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
+        if (!_hide_name) {
+            dc.DrawText(wxString(rect.type + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
+        }
+        if (!_hide_box) {
+            dc.DrawRectangle(x, y, width, height);
+            dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
+        }
         i++;
     }
 

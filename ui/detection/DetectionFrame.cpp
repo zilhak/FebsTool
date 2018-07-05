@@ -73,9 +73,9 @@ void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
 
     _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
     _type_combobox->SetEditable(false);
-    _type_combobox->Append(wxT("mouse"));
-    _type_combobox->Append(wxT("smoke"));
-    _type_combobox->Append(wxT("explosion"));
+    _type_combobox->Append(wxT("car"));
+    _type_combobox->Append(wxT("bus"));
+    _type_combobox->Append(wxT("truck"));
     _type_combobox->Select(0);
 
     _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
@@ -335,6 +335,10 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             refresh();
         } else if (event.GetKeyCode() == WXK_TAB) {
             _image_viewer->nextObject();
+        } else if (event.GetKeyCode() == WXK_SHIFT) {
+            _image_viewer->hideBox(true);
+        } else if (event.GetKeyCode() == WXK_ALT) {
+            _image_viewer->hideName(true);
         }
     }
     SetTitle(_current_file);
@@ -376,6 +380,7 @@ void DetectionFrame::onSizeComboBox(wxCommandEvent &event)
 void DetectionFrame::onTypeComboBox(wxCommandEvent &event)
 {
     _image_viewer->setType(_type_combobox->GetValue());
+    _image_viewer->changeObjectType();
 }
 
 void DetectionFrame::onScaleComboBox(wxCommandEvent &event)
@@ -386,6 +391,7 @@ void DetectionFrame::onScaleComboBox(wxCommandEvent &event)
 void DetectionFrame::onDifficultComboBox(wxCommandEvent &event)
 {
     _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
+    _image_viewer->changeObjectDiff();
 }
 
 void DetectionFrame::prevFile()

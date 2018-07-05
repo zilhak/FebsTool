@@ -6,9 +6,15 @@
 #define FEPSTOOL_FILEMANAGERFRAME_HPP
 
 #include <wx/wx.h>
+#include <ui/filemanager/ManagerControlBox.hpp>
+#include <ui/filemanager/ManagerPanel.hpp>
 
 class FileManagerFrame : public wxDialog
 {
+private:
+    ManagerControlBox * _control_box;
+    ManagerPanel * _screen;
+
 public:
     FileManagerFrame(wxString const & title);
     virtual ~FileManagerFrame();

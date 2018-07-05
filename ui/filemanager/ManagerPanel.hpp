@@ -5,9 +5,13 @@
 #ifndef FEPSTOOL_MANAGERPANEL_HPP
 #define FEPSTOOL_MANAGERPANEL_HPP
 
+#include <wx/wx.h>
 
-class ManagerPanel
+class ManagerPanel : public wxPanel
 {
+public:
+    ManagerPanel(wxWindow * parent, wxWindowID id);
+    virtual ~ManagerPanel();
 };
 
 

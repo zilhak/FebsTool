@@ -13,7 +13,7 @@ FileExplorer::FileExplorer(wxWindow * parent) : wxListCtrl(parent,
                                                            wxID_ANY,
                                                            wxDefaultPosition,
                                                            wxSize(250, 100),
-                                                           wxLC_REPORT)
+                                                           wxLC_REPORT | wxLC_SINGLE_SEL)
 {
     initialize();
 }
@@ -103,6 +103,8 @@ long FileExplorer::highlightItem(wxString filename)
     _highlighted_item = FindItem(0, filename);
     SetItemTextColour(_highlighted_item, wxColour(HILIGHTED_COLOUR));
 
+    SetItemState(_highlighted_item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+
     Refresh();
 
     return _highlighted_item;
@@ -116,6 +118,7 @@ long FileExplorer::highlightItem(long index)
 
     _highlighted_item = index;
     SetItemTextColour(_highlighted_item, wxColour(HILIGHTED_COLOUR));
+    SetItemState(_highlighted_item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
     Refresh();
 }

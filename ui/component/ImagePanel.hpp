@@ -37,6 +37,9 @@ private:
     STATUS mode = STATUS::IDLE;
     bool _click = false;
     bool _is_ready = false;
+    bool _is_selected = false;
+    bool _hide_name = false;
+    bool _hide_box = false;
 
 private:
     std::vector<BoundingBox> _rect_vector;
@@ -57,6 +60,12 @@ public:
     void load();
     void setBackgroundImage(wxString filepath, wxString filename);
     void saveCropImage();
+    void changeObjectDiff();
+    void changeObjectType();
+
+public:
+    void hideName(bool hide);
+    void hideBox(bool hide);
 
 public:
     int getImageWidth() const {return _image_width;}
@@ -73,6 +82,7 @@ public:
 
 public:
     bool isReady() {return _is_ready;};
+    bool isSelected() {return _is_selected;}
 
 private:
     void onPaint(wxPaintEvent & event);
