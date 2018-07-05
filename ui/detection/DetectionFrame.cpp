@@ -11,11 +11,13 @@ wxBEGIN_EVENT_TABLE(DetectionFrame, wxDialog)
     EVT_COMBOBOX(ID::COMBO_SCALE, DetectionFrame::onScaleComboBox)
     EVT_COMBOBOX(ID::COMBO_DIFFICULT, DetectionFrame::onDifficultComboBox)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY, DetectionFrame::onListDoubleClick)
+//    EVT_SASH_DRAGGED(ID::SASH, DetectionFrame::onDragSash)
 wxEND_EVENT_TABLE()
 
-constexpr static char const * const TRASHBIN_NAME = "TrashCan";
+constexpr static char const * const TRASHBIN_NAME = "best";
 
-DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+                                                         _left_min_size(300, 600), _right_min_size(500, 600)
 {
     initialize();
 }
@@ -73,10 +75,12 @@ void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
 
     _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
     _type_combobox->SetEditable(false);
-    _type_combobox->Append(wxT("mouse"));
-    _type_combobox->Append(wxT("smoke"));
-    _type_combobox->Append(wxT("explosion"));
+
+    _type_combobox->Append(wxT("car"));
+    _type_combobox->Append(wxT("truck"));
+    _type_combobox->Append(wxT("bus"));
     _type_combobox->Select(0);
+
 
     _scale_combobox = new wxComboBox(_tool_bar, ID::COMBO_SCALE, wxT("3"));
     _scale_combobox->SetEditable(false);
@@ -107,6 +111,11 @@ void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
 
 void DetectionFrame::initializeLeftMenu(wxBoxSizer *h_sizer)
 {
+//    _sash_panel = new wxSashLayoutWindow(this, ID::SASH, wxDefaultPosition, wxDefaultSize, wxSW_3D | wxCLIP_CHILDREN);
+//    _sash_panel->SetDefaultBorderSize(2);
+//    _sash_panel->SetOrientation(wxLAYOUT_VERTICAL);
+//    _sash_panel->SetAlignment(wxLAYOUT_LEFT);
+//    _sash_panel->SetSashVisible(wxSASH_RIGHT, true);
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
 
     _file_list_viewer = new FileExplorer(this);
@@ -134,7 +143,11 @@ void DetectionFrame::initializeLeftMenu(wxBoxSizer *h_sizer)
     v_sizer->Add(_image_info_box, 1, wxEXPAND);
     v_sizer->Add(_file_list_viewer, 5, wxEXPAND);
 
+//    _sash_panel->SetMinSize(_left_min_size);
+//    _sash_panel->SetSizer(v_sizer);
+
     h_sizer->Add(v_sizer, 0, wxEXPAND);
+//    h_sizer->Add(_sash_panel, 1, wxEXPAND);
 }
 
 void DetectionFrame::initializeImageViewer(wxBoxSizer * sizer)
@@ -245,6 +258,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
     if (_image_viewer->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
             _image_viewer->setType(_type_combobox->GetValue());
+            _image_viewer->setDiff(wxAtoi(_difficult_combobox->GetValue()));
             if (_image_viewer->save()) {
                 _file_list_viewer->xmlCheck(_current_file);
             }
@@ -265,11 +279,15 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_viewer->saveCropImage();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _type_combobox->SetValue(wxT("mouse"));
+            _type_combobox->SetValue(wxT("car"));
         } else if (event.GetKeyCode() == 50) { //'2'
-            _type_combobox->SetValue(wxT("smoke"));
+            _type_combobox->SetValue(wxT("truck"));
         } else if (event.GetKeyCode() == 51) { //'3'
-            _type_combobox->SetValue(wxT("explosion"));
+            _type_combobox->SetValue(wxT("bus"));
+        } else if (event.GetKeyCode() == 45) {
+            _difficult_combobox->SetValue(wxT("0"));
+        } else if (event.GetKeyCode() == 61) {
+            _difficult_combobox->SetValue(wxT("1"));
         } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
@@ -291,9 +309,9 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == WXK_PAGEUP) { //'pageup'
+        } else if (event.GetKeyCode() == WXK_SPACE || event.GetKeyCode() == 67) { // 'space' 'c'
             wxFileName file(_dir->GetName() + "/" + _current_file);
-            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp1";
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
 
             if (!wxDirExists(trashbin_path)) {
                 wxMkdir(trashbin_path);
@@ -312,9 +330,51 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == WXK_PAGEDOWN) { //'delete'
+        } else if (event.GetKeyCode() == WXK_END || event.GetKeyCode() == 88) { //'end' 'x'
             wxFileName file(_dir->GetName() + "/" + _current_file);
-            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp2";
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "middle";
+
+            if (!wxDirExists(trashbin_path)) {
+                wxMkdir(trashbin_path);
+            }
+            wxString duplicate_number = "";
+            int number = 0;
+            while (!wxRenameFile(file.GetFullPath(),
+                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
+                                 false)) {
+                number++;
+                duplicate_number = wxString::Format("(%d)", number);
+            }
+            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
+                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
+                             trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
+            }
+            makeFileList(file.GetPath());
+            refresh();
+        } else if (event.GetKeyCode() == WXK_PAGEDOWN || event.GetKeyCode() == 90) { //'delete' 'z'
+            wxFileName file(_dir->GetName() + "/" + _current_file);
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "bad";
+
+            if (!wxDirExists(trashbin_path)) {
+                wxMkdir(trashbin_path);
+            }
+            wxString duplicate_number = "";
+            int number = 0;
+            while (!wxRenameFile(file.GetFullPath(),
+                                 trashbin_path + "/" + file.GetName() + duplicate_number + "." + file.GetExt(),
+                                 false)) {
+                number++;
+                duplicate_number = wxString::Format("(%d)", number);
+            }
+            if (wxFileExists(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml")) {
+                wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
+                             trashbin_path + "/" + file.GetName() + duplicate_number + ".xml", true);
+            }
+            makeFileList(file.GetPath());
+            refresh();
+        } else if (event.GetKeyCode() == WXK_HOME || event.GetKeyCode() == 86) { //'delete'
+            wxFileName file(_dir->GetName() + "/" + _current_file);
+            wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "IRimage";
 
             if (!wxDirExists(trashbin_path)) {
                 wxMkdir(trashbin_path);
@@ -339,6 +399,39 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
     }
     SetTitle(_current_file);
 }
+
+//void DetectionFrame::onDragSash(wxSashEvent & event)
+//{
+//    int left_previous_width = _sash_panel->GetSize().x;
+//    int left_width = event.GetDragRect().width;
+//    int changed_width = left_width - left_previous_width;
+//    int right_width = _image_viewer->GetSize().x - changed_width;
+//    int right_x = _image_viewer->GetPosition().x + changed_width;
+//
+//    if (left_width < _left_min_size.x) {
+//        left_width = _left_min_size.x;
+//        right_width = GetSize().x - left_width;
+//        right_x = left_width;
+//    }
+//
+//    if (right_width < _right_min_size.x) {
+//        right_width = _right_min_size.x;
+//        left_width = GetSize().x - right_width;
+//        right_x = left_width;
+//    }
+//
+//    _sash_panel->SetSize(wxSize(left_width, event.GetDragRect().height));
+//    _image_viewer->SetPosition(wxPoint(right_x, _image_viewer->GetPosition().y));
+//    _image_viewer->SetSize(wxSize(right_width, _right_min_size.y));
+//
+//    wxSizer * sizer = GetSizer();
+//
+//    wxSizerItem * left_item = sizer->GetItem(_sash_panel, true);
+//    wxSizerItem * right_item = sizer->GetItem(_image_viewer, true);
+//    left_item->SetInitSize(left_width, _left_min_size.y);
+//    right_item->SetInitSize(right_width, _right_min_size.y);
+//    Layout();
+//}
 
 void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 {

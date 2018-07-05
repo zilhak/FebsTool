@@ -1,4 +1,5 @@
 #include <ui/component/ImagePanel.hpp>
+#include <wx/dcbuffer.h>
 
 wxBEGIN_EVENT_TABLE(ImagePanel, wxPanel)
     EVT_PAINT(ImagePanel::onPaint)
@@ -141,7 +142,8 @@ void ImagePanel::onPaint(wxPaintEvent & event)
         return;
     }
 
-    wxPaintDC dc(this);
+//    wxPaintDC dc(this);
+    wxAutoBufferedPaintDC dc(this);
     dc.DrawBitmap(_background_bitmap , _image_x, _image_y);
 
     dc.SetBrush(*wxTRANSPARENT_BRUSH);

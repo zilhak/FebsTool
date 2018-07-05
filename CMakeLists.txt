@@ -6,7 +6,7 @@ aux_source_directory(. SRC_LIST)
 include_directories(${CMAKE_SOURCE_DIR})
 link_directories(${CMAKE_SOURCE_DIR})
 
-find_package(wxWidgets COMPONENTS core base REQUIRED)
+find_package(wxWidgets COMPONENTS adv core base REQUIRED)
 IF(wxWidgets_FOUND)
     include(${wxWidgets_USE_FILE})
 ELSE(wxWidgets_FOUND)

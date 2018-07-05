@@ -2,6 +2,7 @@
 #include <wx/dir.h>
 #include <wx/listctrl.h>
 #include <wx/filename.h>
+#include <wx/laywin.h>
 
 #include <ui/component/ImagePanel.hpp>
 #include <ui/component/FileExplorer.hpp>
@@ -25,7 +26,8 @@ public:
         COMBO_SCALE,
         COMBO_DIFFICULT,
         IMAGE_VIEWER,
-        FILE_EXPLORER
+        FILE_EXPLORER,
+        SASH
     };
 
 private:
@@ -34,12 +36,15 @@ private:
     std::set<wxString> _image_extension;
     std::vector<wxString> _file_list;
     long _image_index;
+    wxSize _left_min_size;
+    wxSize _right_min_size;
 
 private:
     wxPanel * _tool_bar;
     FileExplorer * _file_list_viewer;
     wxPanel * _image_info_box;
     ImagePanel * _image_viewer;
+//    wxSashLayoutWindow * _sash_panel;
 
 private:
     wxStaticText * _info_image_name;
@@ -88,6 +93,7 @@ private: // menu event.
 private: // input event.
     void onMouseEvent(wxMouseEvent & event);
     void onKeyboardEvent(wxKeyEvent & event);
+//    void onDragSash(wxSashEvent & event);
 
 private:
     void prevFile();
