@@ -46,7 +46,7 @@ void FileOpenPanel::onOpenButton(wxCommandEvent & event)
         return;
     }
 
-    wxFileName file_name(wxString::FromUTF8(find->GetPath()));
+    wxFileName file_name(wxString::FromUTF8(find->GetPath().c_str()));
     _file_name = wxString::FromUTF8(file_name.GetName().ToStdString().c_str());
     _file_ext = file_name.GetExt();
     _path = file_name.GetPath();

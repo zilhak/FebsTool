@@ -189,7 +189,7 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
         return;
     }
 
-    wxString temp = wxString::FromUTF8(find->GetFilename());
+    wxString temp = wxString::FromUTF8(find->GetFilename().c_str());
     std::cout << temp << std::endl;
 
     makeFileList(find->GetDirectory());
@@ -225,7 +225,7 @@ void DetectionFrame::makeFileList(wxString const directory)
 
     for (int index = 0; index < _file_list.size(); index++) {
         file.Assign(directory + "/" + _file_list.at(index));
-       _file_list_viewer->InsertItem(index, wxString::FromUTF8(_file_list.at(index)));
+       _file_list_viewer->InsertItem(index, wxString::FromUTF8(_file_list.at(index).c_str()));
        if (wxFileExists(directory + "/" + file.GetName() + ".xml")) {
            _file_list_viewer->SetItem(index, 1, ("O"));
        } else {

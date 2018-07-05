@@ -4,7 +4,7 @@
 
 #include "FileManagerFrame.hpp"
 
-FileManagerFrame::FileManagerFrame(wxWindow * parent, wxWindowID id) : wxDialog(parent, id, wxT("File Manager"))
+FileManagerFrame::FileManagerFrame(wxString const & title) : wxDialog(NULL, wxID_ANY, wxT("File Manager"))
 {
     initialize();
 }

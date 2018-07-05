@@ -10,7 +10,7 @@
 class FileManagerFrame : public wxDialog
 {
 public:
-    FileManagerFrame(wxWindow * parent, wxWindowID id);
+    FileManagerFrame(wxString const & title);
     virtual ~FileManagerFrame();
 
 private:

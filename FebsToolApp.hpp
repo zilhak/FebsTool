@@ -11,7 +11,7 @@ public:
 
 public:
     virtual bool OnInit();
-//    virtual int OnExit();
+    virtual int OnRun();
 };
 
 
