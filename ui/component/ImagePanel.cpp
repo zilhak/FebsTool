@@ -216,15 +216,11 @@ void ImagePanel::drawBackGround(wxDC & dc)
 
 void ImagePanel::drawObject(wxDC & dc)
 {
-    if (!_show_objects) {
-        return;
-    }
 
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     for (int i = 0; i < _obj_vector.size(); ++i) {
         if (i == _selected_obj) {
-            dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
-            dc.SetTextForeground(COLOUR_IMAGE_PANEL_BOX_SELECTED);
+            continue;
         } else {
             wxColour colour = wxColour(0x00FFFF);
             for (int j = 0; j < _name_list.size(); ++j) {
@@ -237,15 +233,22 @@ void ImagePanel::drawObject(wxDC & dc)
             dc.SetTextForeground(colour);
         }
 
-        if (_obj_vector[i].point_list.size() > 2) {
-            int list_size = _obj_vector[i].point_list.size();
-            for (int j = 0; j < list_size; ++j) {
-                dc.DrawLine(convertToVirtualLocation(_obj_vector[i].point_list[j], false),
-                            convertToVirtualLocation(_obj_vector[i].point_list[(j + 1) % list_size], false));
+        if (_show_objects) {
+            if (_obj_vector[i].type == ObjectType::SEGMENTATION) {
+                int list_size = _obj_vector[i].point_list.size();
+                for (int j = 0; j < list_size; ++j) {
+                    dc.DrawLine(convertToVirtualLocation(_obj_vector[i].point_list[j], false),
+                                convertToVirtualLocation(_obj_vector[i].point_list[(j + 1) % list_size], false));
+                }
+            } else if (_obj_vector[i].type == ObjectType::DETECTION){
+                dc.DrawRectangle(wxRect(_obj_vector[i].point_list[0], _obj_vector[i].point_list[1]));
+                dc.DrawRectangle(wxRect(_obj_vector[i].point_list[0].x-1,
+                                        _obj_vector[i].point_list[0].y-1,
+                                        _obj_vector[i].point_list[1].x+1,
+                                        _obj_vector[i].point_list[1].y+1));
             }
-        } else {
-            // TODO: add rect algorithm
         }
+
         if (_show_name) {
             dc.SetFont(wxFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
             wxPoint middle_point = (_obj_vector[i].point_list[0] + _obj_vector[i].point_list[_obj_vector[i].point_list.size() / 2]) / 2;
@@ -257,9 +260,39 @@ void ImagePanel::drawObject(wxDC & dc)
 void ImagePanel::drawTempObject(wxDC & dc)
 {
     dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
-    if (_temp_obj_kind == ObjectType::DETECTION) {
+    if (_temp_obj.type == ObjectType::DETECTION) {
+        if (_temp_obj.point_list.size() == 1) {
+            int x1 = _temp_obj.point_list[0].x;
+            int x2 = _mouse.x;
+            int y1 = _temp_obj.point_list[0].y;
+            int y2 = _mouse.y;
 
-    } else if (_temp_obj_kind == ObjectType::SEGMENTATION) {
+            if (x1 > x2) {
+                int temp = x1;
+                x1 = x2;
+                x2 = temp;
+            }
+
+            if (y1 > y2) {
+                int temp = y1;
+                y1 = y2;
+                y2 = temp;
+            }
+
+            dc.DrawRectangle(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1]));
+            dc.DrawRectangle(wxRect(_temp_obj.point_list[0].x-1,
+                                    _temp_obj.point_list[0].y-1,
+                                    _temp_obj.point_list[1].x+1,
+                                    _temp_obj.point_list[1].y+1));
+
+        } else if (_temp_obj.point_list.size() == 2) {
+            dc.DrawRectangle(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1]));
+            dc.DrawRectangle(wxRect(_temp_obj.point_list[0].x-1,
+                                    _temp_obj.point_list[0].y-1,
+                                    _temp_obj.point_list[1].x+1,
+                                    _temp_obj.point_list[1].y+1));
+        }
+    } else if (_temp_obj.type == ObjectType::SEGMENTATION) {
         int list_size = _temp_obj.point_list.size();
         if (list_size < 1) {
             return;
@@ -282,6 +315,11 @@ void ImagePanel::drawTempObject(wxDC & dc)
             dc.DrawText(_temp_obj.name, convertToVirtualLocation(_temp_obj.point_list.back(), false));
         }
     }
+}
+
+void ImagePanel::drawDetectionObject(wxDC &dc, wxPoint p1, wxPoint p2)
+{
+
 }
 
 void ImagePanel::addObject(Object const & obj)
@@ -355,7 +393,7 @@ bool ImagePanel::startAddObject(Object new_obj)
 
     _temp_obj = new_obj;
     _undo_obj = _selected_obj;
-    _selected_obj = _obj_vector.size();
+    _selected_obj = static_cast<int>(_obj_vector.size());
 
     _temp_obj.point_list.push_back(convertToActualLocation(_mouse.x, _mouse.y));
 
@@ -364,13 +402,21 @@ bool ImagePanel::startAddObject(Object new_obj)
 
 void ImagePanel::addPointToNewObject()
 {
+    if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.size() != 1) {
+        return;
+    }
     _temp_obj.point_list.push_back(convertToActualLocation(_mouse.x, _mouse.y));
 }
 
 void ImagePanel::endAddObject()
 {
-    if (_temp_obj.point_list.size() < 3) {
+    if (_temp_obj.type == ObjectType::SEGMENTATION && _temp_obj.point_list.size() < 3) {
         wxMessageBox(wxT("it is not polygon."));
+        cancelAddObject();
+        return;
+    }
+
+    if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.size() != 2) {
         cancelAddObject();
         return;
     }

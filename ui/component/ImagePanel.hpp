@@ -97,6 +97,7 @@ public:
 
 public:
     bool startAddObject(Object new_obj);
+    void addPointToNewObject();
     void endAddObject();
     void cancelAddObject();
     void pointUp();
@@ -105,9 +106,6 @@ public:
     void pointRight();
     void showObjectName();
     void showObjects();
-
-public: // Segmentation only method
-    void addPointToNewObject();
     bool undo();
 
 public:
@@ -117,6 +115,7 @@ private:
     void drawBackGround(wxDC & dc);
     void drawObject(wxDC & dc);
     void drawTempObject(wxDC & dc);
+    void drawDetectionObject(wxDC & dc, wxPoint p1, wxPoint p2);
 
 private:
     void onPaint(wxPaintEvent & event);

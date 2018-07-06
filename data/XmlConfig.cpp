@@ -182,6 +182,8 @@ Object loadObject(Element * object)
 
     Element * bndbox = object->FirstChildElement("bndbox");
     if (bndbox == nullptr) {
+        result.type = ObjectType::SEGMENTATION;
+
         Element * pose = object->FirstChildElement("pose");
         Element * truncated = object->FirstChildElement("truncated");
         Element * polygon = object->FirstChildElement("polygon");
@@ -197,6 +199,8 @@ Object loadObject(Element * object)
             result.point_list.push_back(wxPoint(std::stoi(x->GetText()), std::stoi(y->GetText())));
         }
     } else {
+        result.type = ObjectType::DETECTION;
+
         Element * xmin = bndbox->FirstChildElement("xmin");
         Element * xmax = bndbox->FirstChildElement("xmax");
         Element * ymin = bndbox->FirstChildElement("ymin");
@@ -249,7 +253,7 @@ ImageInfo loadXmlInfo(wxString image_file_not_ext)
 Element * insertObject(Document * doc, Object obj)
 {
     Element * object = doc->NewElement("object");
-    if (obj.point_list.size() == 2) {
+    if (obj.type == ObjectType::DETECTION) {
         Element * name = doc->NewElement("name");
         Element * bndbox = doc->NewElement("bndbox");
         Element * xmax = doc->NewElement("xmax");
@@ -273,7 +277,7 @@ Element * insertObject(Document * doc, Object obj)
         ymax->SetText(obj.point_list[1].y);
         ymin->SetText(obj.point_list[0].y);
         difficult->SetText(obj.difficult);
-    } else if (obj.point_list.size() > 2) {
+    } else if (obj.type == ObjectType::SEGMENTATION) {
         Element * name = doc->NewElement("name");
         Element * pose = doc->NewElement("pose");
         Element * truncated = doc->NewElement("truncated");

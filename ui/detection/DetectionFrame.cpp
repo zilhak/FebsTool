@@ -196,7 +196,9 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
         new_object.type = ObjectType::DETECTION;
         new_object.difficult = _toolbar->getDifficult();
 
-        _image_panel->addObject(new_object);
+        _image_panel->startAddObject(new_object);
+    } else if (event.LeftUp()) {
+        _image_panel->addPointToNewObject();
     }
 }
 
