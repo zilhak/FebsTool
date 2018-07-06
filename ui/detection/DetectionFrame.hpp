@@ -44,7 +44,7 @@ private:
 
 private:
     FileExplorer * _file_list;
-    wxPanel * _toolbar;
+    DetectionToolBar * _toolbar;
     DetectionInfoBox * _infobox;
     ImagePanel * _image_panel;
 

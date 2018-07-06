@@ -55,9 +55,9 @@ wxString DetectionToolBar::getType()
     return _type_box->GetValue();
 }
 
-wxString DetectionToolBar::getDifficult()
+int DetectionToolBar::getDifficult()
 {
-    return _diff_box->GetValue();
+    return wxAtoi(_diff_box->GetValue());
 }
 
 void DetectionToolBar::setType(wxString type)

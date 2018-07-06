@@ -19,7 +19,7 @@ void SegmentationInfoBox::initialize()
 
 void SegmentationInfoBox::initializeComponent()
 {
-    wxGridSizer * grid = new wxGridSizer(6,2,5,5);
+    wxFlexGridSizer * grid = new wxFlexGridSizer(6,2,5,5);
 
     _image_name = new wxStaticText(this, wxID_ANY, "-----");
     _image_size = new wxStaticText(this, wxID_ANY, "-----");
@@ -128,7 +128,7 @@ int SegmentationInfoBox::getZoom()
 
 int SegmentationInfoBox::getImageScale()
 {
-    wxString value = _size_box->GetValue();
+    wxString value = _image_scale_box->GetValue();
 
     return wxAtoi(value.SubString(0, value.length() - 1));
 }

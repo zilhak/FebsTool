@@ -20,7 +20,7 @@ private:
 
 public:
     wxString getType();
-    wxString getDifficult();
+    int getDifficult();
 
 public:
     void setType(wxString type);

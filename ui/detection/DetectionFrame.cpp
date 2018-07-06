@@ -126,6 +126,7 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
     _file_list->openDir(_dir, { file_ext });
     if (_file_list->highlightItem(name) != -1) {
         _infobox->changeZoomBox(_image_panel->setBackgroundImage(file_name.GetFullPath(), _infobox->getZoom()));
+        _infobox->setFolderName(file_name.GetDirs().back());
         _infobox->setImageName(name);
         _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
     }
@@ -138,7 +139,7 @@ void DetectionFrame::onSelectFile(wxListEvent & event)
 
 void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 {
-    std::cout << event.GetKeyCode() << std::endl;
+    std::cout << "Inserted keycode : "<< event.GetKeyCode() << std::endl;
     if (_image_panel->isReady()) {
         if (event.GetKeyCode() == 69) { // 'e'
             _image_panel->setType(_type_combobox->GetValue());
@@ -182,14 +183,28 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 
 void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 {
+    if (event.GetWheelRotation() > 0) {
+        _infobox->zoomIn();
+        _image_panel->setSize(_infobox->getZoom());
+    } else if (event.GetWheelRotation() < 0) {
+        _infobox->zoomOut();
+        _image_panel->setSize(_infobox->getZoom());
+    }
 
+    if (event.LeftDown()) {
+        Object new_object;
+        new_object.type = ObjectType::DETECTION;
+        new_object.difficult = _toolbar->getDifficult();
+
+        _image_panel->addObject(new_object);
+    }
 }
 
 void DetectionFrame::onZoomBox(wxCommandEvent &event)
 {
     _image_panel->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
     if (_image_panel->isReady()) {
-        _image_panel->setSize(100);
+        _image_panel->setSize(_infobox->getZoom());
     }
 }
 

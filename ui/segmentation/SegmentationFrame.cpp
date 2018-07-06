@@ -210,7 +210,7 @@ void SegmentationFrame::onMouse(wxMouseEvent & event)
     _image_panel->setMousePoint(mouse_x, mouse_y);
 
     if (event.LeftDown() && _status == STATUS::IDLE)  {
-        if (_image_panel->startAddObject(ImagePanel::ObjectKind::SEGMENTATION, createNewObject())) {
+        if (_image_panel->startAddObject(createNewObject())) {
             _status = STATUS::DRAWING;
         }
     } else if (event.LeftDown() && _status == STATUS::DRAWING) {

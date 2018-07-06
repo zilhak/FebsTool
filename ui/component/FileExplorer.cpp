@@ -10,6 +10,7 @@
 
 BEGIN_EVENT_TABLE(FileExplorer, wxListCtrl)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY, FileExplorer::onSelect)
+    EVT_SIZE(FileExplorer::onSize)
 END_EVENT_TABLE()
 
 
@@ -188,6 +189,13 @@ void FileExplorer::onSelect(wxListEvent & event)
     if (highlightItem(event.GetIndex()) == -1) {
         return;
     }
+
+    event.Skip();
+}
+
+void FileExplorer::onSize(wxSizeEvent & event)
+{
+    SetColumnWidth(0, GetSize().GetWidth() - 60);
 
     event.Skip();
 }

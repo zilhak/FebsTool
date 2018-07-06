@@ -44,6 +44,7 @@ public:
 
 public:
     void onSelect(wxListEvent & event);
+    void onSize(wxSizeEvent & event);
 };
 
 

@@ -30,7 +30,7 @@ void DetectionInfoBox::initializeSetting()
 
 void DetectionInfoBox::initializeComponent()
 {
-    wxGridSizer * grid = new wxGridSizer(6,2,3,3);
+    wxFlexGridSizer * grid = new wxFlexGridSizer(6,2,3,3);
 
     _folder_name = new wxStaticText(this, wxID_ANY, "-----");
     _image_name = new wxStaticText(this, wxID_ANY, "-----");
@@ -39,6 +39,10 @@ void DetectionInfoBox::initializeComponent()
     _mouse_y = new wxStaticText(this, wxID_ANY, "-----");
     _size_box = new wxComboBox(this, ID::ZOOM_BOX, wxT("100%"));
     _image_scale_box = new wxComboBox(this, wxID_ANY, wxT("3"));
+
+    for (int i = 1; i <= 3; ++i) {
+        _image_scale_box->Append(std::to_string(i));
+    }
 
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Folder Name :")));
     grid->Add(_folder_name, 0, wxLEFT, 5);
@@ -51,9 +55,9 @@ void DetectionInfoBox::initializeComponent()
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Mouse Y :")));
     grid->Add(_mouse_y, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Zoom :")));
-    grid->Add(_size_box, 0, wxLEFT, 5);
+    grid->Add(_size_box, 0, wxLEFT | wxEXPAND, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Scale :")));
-    grid->Add(_image_scale_box, 0, wxLEFT, 5);
+    grid->Add(_image_scale_box, 0, wxLEFT | wxEXPAND, 5);
 
     SetSizer(grid);
 }
@@ -69,8 +73,7 @@ void DetectionInfoBox::setZoomBox(int min, int max, int interval)
     _max = max;
     _interval = interval;
 
-    int i = 25;
-    for (; i <= 500; i += 25) {
+    for (int i = min; i <= max; i += interval) {
         _size_box->Append(wxString::Format("%d%%",i));
     }
 }
@@ -82,40 +85,64 @@ void DetectionInfoBox::setFolderName(wxString const & name)
 
 void DetectionInfoBox::setImageName(wxString const & name)
 {
-
+    _image_name->SetLabel(name);
 }
 
 void DetectionInfoBox::setImageSize(wxString const & size)
 {
-
+    _image_size->SetLabel(size);
 }
 
 void DetectionInfoBox::setMouseInfo(wxPoint const & point)
 {
-
+    _mouse_x->SetLabel(std::to_string(point.x));
+    _mouse_y->SetLabel(std::to_string(point.y));
 }
 
 void DetectionInfoBox::zoomIn()
 {
+    int cur_zoom = getZoom() + _interval;
 
+    if (cur_zoom > _max) {
+        cur_zoom = _max;
+    }
+
+    changeZoomBox(cur_zoom);
 }
 
 void DetectionInfoBox::zoomOut()
 {
+    int cur_zoom = getZoom() - _interval;
 
+    if (cur_zoom < 10) {
+        cur_zoom = 10;
+    }
+    if (cur_zoom < _min) {
+        cur_zoom = _min;
+    }
+
+    changeZoomBox(cur_zoom);
 }
 
 void DetectionInfoBox::changeZoomBox(int ratio)
 {
+    if (ratio < 10 || _max < ratio) {
+        return;
+    }
 
+    _size_box->ChangeValue(wxString::Format("%d%%", ratio));
 }
 
 int DetectionInfoBox::getZoom()
 {
-    return 0;
+    wxString value = _size_box->GetValue();
+
+    return wxAtoi(value.SubString(0, value.length() - 1));
 }
 
 int DetectionInfoBox::getImageScale()
 {
-    return 0;
+    wxString value = _image_scale_box->GetValue();
+
+    return wxAtoi(value);
 }

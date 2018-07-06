@@ -15,10 +15,6 @@ public:
         IDLE,
         MOUSE_DOWN
     };
-    enum class ObjectKind {
-        DETECTION,
-        SEGMENTATION
-    };
 
 private:
     wxImage _original_image;
@@ -31,9 +27,7 @@ private:
     int _bitmap_height;
 
 private:
-    wxString _image_type = "car";
     int _image_depth = 3;
-    int _image_diff = 0;
     double _zoom_setting = 1;
 
 private:
@@ -60,9 +54,9 @@ private:
 private:
     std::vector<Object> _obj_vector;
     std::vector<Name> _name_list;
-    Object _new_object;
+    Object _temp_obj;
+    ObjectType _temp_obj_kind = ObjectType::DETECTION;
     Object _unpacked_object;
-    ObjectKind _new_obj_kind = ObjectKind::DETECTION;
 
 public:
     ImagePanel(wxWindow * parent, wxWindowID id);
@@ -72,10 +66,10 @@ public:
     void reset();
 
 public:
+    void setType(wxString const & type);
+    void setDiff(int diff);
     void setSize(int scale);
-    void setType(wxString type) {_image_type = type;}
     void setDepth(int depth) {_image_depth = depth;}
-    void setDiff(int diff) {_image_diff = diff;}
     int setBackgroundImage(wxString const & file, int scale = -1);
     void setNameList(std::vector<Name> & name_list) {_name_list = name_list;}
     void setInitSize(wxSize max, wxSize min) {_min_init_size = min; _max_init_size = max;}
@@ -95,7 +89,6 @@ public:
     wxRect getView() const { return _current_view; }
 
 public:
-    void setTempObject(Object const & obj);
     void addObject(Object const & obj);
     bool deleteObject();
     bool unpackObject();
@@ -103,17 +96,19 @@ public:
     void nextObject();
 
 public:
-    bool startAddObject(ObjectKind kind, Object new_obj);
-    void addPointToNewObject();
+    bool startAddObject(Object new_obj);
     void endAddObject();
     void cancelAddObject();
-    bool undo();
     void pointUp();
     void pointDown();
     void pointLeft();
     void pointRight();
     void showObjectName();
     void showObjects();
+
+public: // Segmentation only method
+    void addPointToNewObject();
+    bool undo();
 
 public:
     bool isReady() {return _is_ready;};
