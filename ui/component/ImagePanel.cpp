@@ -154,11 +154,11 @@ void ImagePanel::onPaint(wxPaintEvent & event)
                 i++;
                 continue;
             }
-            dc.SetPen(*wxCYAN_PEN);
+            dc.SetPen(wxPen(*wxCYAN, 1));
             dc.SetTextForeground(*wxCYAN);
         } else {
-            dc.SetPen(*wxYELLOW_PEN);
-            dc.SetTextForeground(*wxYELLOW);
+            dc.SetPen(wxPen(*wxGREEN, 1));
+            dc.SetTextForeground(*wxGREEN);
         }
 
         int x = _image_x + static_cast<int>(static_cast<double>(rect.x1) * _scale_setting);
@@ -168,7 +168,7 @@ void ImagePanel::onPaint(wxPaintEvent & event)
 
         dc.DrawText(wxString(rect.type + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
         dc.DrawRectangle(x, y, width, height);
-        dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
+        //dc.DrawRectangle(x - 1, y - 1, width + 2, height + 2);
         i++;
     }
 
@@ -199,8 +199,8 @@ void ImagePanel::onPaint(wxPaintEvent & event)
         dc.SetPen(*wxCYAN_PEN);
         dc.DrawRectangle(_temp_rect.x1, _temp_rect.y1,
                          _temp_rect.x2 - _temp_rect.x1, _temp_rect.y2 - _temp_rect.y1);
-        dc.DrawRectangle(_temp_rect.x1 - 1, _temp_rect.y1 - 1,
-                         _temp_rect.x2 - _temp_rect.x1 + 2, _temp_rect.y2 - _temp_rect.y1 + 2);
+        //dc.DrawRectangle(_temp_rect.x1 - 1, _temp_rect.y1 - 1,
+        //                 _temp_rect.x2 - _temp_rect.x1 + 2, _temp_rect.y2 - _temp_rect.y1 + 2);
     }
 
 }

@@ -284,10 +284,16 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             _type_combobox->SetValue(wxT("truck"));
         } else if (event.GetKeyCode() == 51) { //'3'
             _type_combobox->SetValue(wxT("bus"));
-        } else if (event.GetKeyCode() == 45) {
+        } else if (event.GetKeyCode() == 45) { // '-'
             _difficult_combobox->SetValue(wxT("0"));
-        } else if (event.GetKeyCode() == 61) {
+        } else if (event.GetKeyCode() == 61) { // '='
             _difficult_combobox->SetValue(wxT("1"));
+        } else if (event.GetKeyCode() == 306) { // 'shift'
+            if (_difficult_combobox->GetValue() == wxT("0")) {
+                _difficult_combobox->SetValue(wxT("1"));
+            } else {
+                _difficult_combobox->SetValue(wxT("0"));
+            }
         } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + TRASHBIN_NAME;
