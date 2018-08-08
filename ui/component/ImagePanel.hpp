@@ -13,7 +13,8 @@ public:
 public:
     enum class STATUS {
         IDLE,
-        MOUSE_DOWN
+        DRAWING_NEW_OBJECT,
+        EDIT_OBJECT
     };
 
 private:
@@ -30,32 +31,32 @@ private:
     int _image_depth = 3;
     double _zoom_setting = 1;
 
-private:
+private: // init size setting
     wxSize _min_init_size = wxSize(-1, -1);
     wxSize _max_init_size = wxSize(-1, -1);
 
-private:
-    bool _is_ready = false;
+private: // setting status
+    bool _is_loaded = false;
     int _selected_obj = -1;
     int _undo_obj = -1;
-    bool _size_change = false;
-    bool _show_name = false;
-    bool _show_objects = true;
-
-private:
-    wxRect _current_view;
-    wxRect _screen_rect;
     int _space_x = 10;
     int _space_y = 10;
 
-private:
-    wxPoint _mouse;
+private: // program status value
+    bool _show_name = false;
+    bool _show_objects = true;
 
-private:
+private: // status value
+    wxRect _current_view;
+    wxRect _screen_rect;
+    wxPoint _real_mouse_pos;
+    wxPoint _virtual_mouse_pos;
+    STATUS _status = STATUS::IDLE;
+
+private: // Objects
     std::vector<Object> _obj_vector;
     std::vector<Name> _name_list;
     Object _temp_obj;
-    ObjectType _temp_obj_kind = ObjectType::DETECTION;
     Object _unpacked_object;
 
 public:
@@ -95,43 +96,50 @@ public:
     void previousObject();
     void nextObject();
 
-public:
-    bool startAddObject(Object new_obj);
-    void addPointToNewObject();
-    void endAddObject();
-    void cancelAddObject();
+public: // Add segmentation object
+    bool startAddSegment(Object const & new_obj);
+    void addPointToNewSegment();
+    void endAddSegment();
+    void cancelAddSegment();
+    bool undoSegment();
+
+public: // Add detection object
+    bool startAddTempDetection(Object const & new_obj);
+    void endAddTempDetection();
+    void saveTempDetection();
+    void undoDetection();
+
+public: // on Add object event
     void pointUp();
     void pointDown();
     void pointLeft();
     void pointRight();
     void showObjectName();
     void showObjects();
-    bool undo();
 
 public:
-    bool isReady() {return _is_ready;};
+    bool isLoaded() {return _is_loaded;};
 
-private:
+private: // draw.
     void drawBackGround(wxDC & dc);
     void drawObject(wxDC & dc);
     void drawTempObject(wxDC & dc);
-    void drawDetectionObject(wxDC & dc, wxPoint p1, wxPoint p2);
 
-private:
+private: // events.
     void onPaint(wxPaintEvent & event);
     void onMouse(wxMouseEvent & event);
     void onSize(wxSizeEvent & event);
 
-private:
+private: // location adjust
     wxPoint virtualLocationAdjust(int x, int y);
     wxPoint actualLocationAdjust(int x, int y);
 
-public:
+public: // point calculation
     wxPoint convertToActualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(wxPoint const & actual_point, bool bind_point = true);
 
-public:
+public: // action
     void saveCropImage();
 };
 

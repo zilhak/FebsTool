@@ -132,15 +132,24 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
     }
 }
 
+void DetectionFrame::setImagePanel()
+{
+    _image_panel->cancelAddSegment();
+    _infobox->changeZoomBox(_image_panel->setBackgroundImage(_dir + "/" + _file_list->getHighlightedItem()));
+    _image_panel->setSize(_infobox->getZoom());
+    _infobox->setImageName(_file_list->getHighlightedItem());
+    _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
+}
+
 void DetectionFrame::onSelectFile(wxListEvent & event)
 {
-
+    setImagePanel();
 }
 
 void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 {
     std::cout << "Inserted keycode : "<< event.GetKeyCode() << std::endl;
-    if (_image_panel->isReady()) {
+    if (_image_panel->isLoaded()) {
         if (event.GetKeyCode() == 69) { // 'e'
             _image_panel->setType(_type_combobox->GetValue());
             if (_image_panel->save()) {
@@ -196,28 +205,32 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
         new_object.type = ObjectType::DETECTION;
         new_object.difficult = _toolbar->getDifficult();
 
-        _image_panel->startAddObject(new_object);
+        _image_panel->startAddTempDetection(new_object);
     } else if (event.LeftUp()) {
-        _image_panel->addPointToNewObject();
+        _image_panel->endAddTempDetection();
     }
 }
 
 void DetectionFrame::onZoomBox(wxCommandEvent &event)
 {
     _image_panel->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
-    if (_image_panel->isReady()) {
+    if (_image_panel->isLoaded()) {
         _image_panel->setSize(_infobox->getZoom());
     }
 }
 
 void DetectionFrame::prev()
 {
-
+    if (_file_list->prev()) {
+        setImagePanel();
+    }
 }
 
 void DetectionFrame::next()
 {
-
+    if (_file_list->next()) {
+        setImagePanel();
+    }
 }
 
 void DetectionFrame::moveFile(wxString const &folder_name)

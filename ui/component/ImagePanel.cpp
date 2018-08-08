@@ -68,14 +68,14 @@ int ImagePanel::setBackgroundImage(wxString const & file, int scale)
         
     }
 
-    _is_ready = true;
+    _is_loaded = true;
 
     return scale;
 }
 
 void ImagePanel::setMousePoint(int x, int y)
 {
-    _mouse = virtualLocationAdjust(x, y);
+    _virtual_mouse_pos = virtualLocationAdjust(x, y);
 }
 
 void ImagePanel::setView(int x, int y)
@@ -165,48 +165,9 @@ void ImagePanel::onPaint(wxPaintEvent & event)
     wxPaintDC dc(this);
     wxBufferedDC bg(&dc);
     bg.Clear();
-    if (_size_change) {
-        dc.Clear();
-        _size_change = false;
-    }
     drawBackGround(bg);
     drawObject(bg);
     drawTempObject(bg);
-}
-
-void ImagePanel::setType(wxString const & type)
-{
-    if (_temp_obj.type == ObjectType::DETECTION && _selected_obj < _obj_vector.size() && _selected_obj != -1) {
-        _obj_vector.at(_selected_obj).name = type;
-    }
-    _temp_obj.name = type;
-
-   Refresh();
-}
-
-void ImagePanel::setDiff(int diff)
-{
-    if (_temp_obj.type == ObjectType::DETECTION && _selected_obj < _obj_vector.size() && _selected_obj != -1) {
-        _obj_vector.at(_selected_obj).difficult = diff;
-    }
-    _temp_obj.difficult = diff;
-
-    Refresh();
-}
-
-void ImagePanel::onMouse(wxMouseEvent & event)
-{
-    event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-    event.Skip();
-}
-
-void ImagePanel::onSize(wxSizeEvent & event)
-{
-    if (!_background_bitmap.IsOk()) {
-        return;
-    }
-    setView(_current_view.x, _current_view.y);
-    Refresh();
 }
 
 void ImagePanel::drawBackGround(wxDC & dc)
@@ -216,7 +177,6 @@ void ImagePanel::drawBackGround(wxDC & dc)
 
 void ImagePanel::drawObject(wxDC & dc)
 {
-
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     for (int i = 0; i < _obj_vector.size(); ++i) {
         if (i == _selected_obj) {
@@ -263,9 +223,9 @@ void ImagePanel::drawTempObject(wxDC & dc)
     if (_temp_obj.type == ObjectType::DETECTION) {
         if (_temp_obj.point_list.size() == 1) {
             int x1 = _temp_obj.point_list[0].x;
-            int x2 = _mouse.x;
+            int x2 = _virtual_mouse_pos.x;
             int y1 = _temp_obj.point_list[0].y;
-            int y2 = _mouse.y;
+            int y2 = _virtual_mouse_pos.y;
 
             if (x1 > x2) {
                 int temp = x1;
@@ -298,15 +258,15 @@ void ImagePanel::drawTempObject(wxDC & dc)
             return;
         } else if (list_size == 1) {
             dc.DrawLine(convertToVirtualLocation(_temp_obj.point_list[0], false),
-                        _mouse);
+                        _virtual_mouse_pos);
         } else {
             for (int i = 0; i < list_size - 1; ++i) {
                 dc.DrawLine(convertToVirtualLocation(_temp_obj.point_list[i], false),
                             convertToVirtualLocation(_temp_obj.point_list[i + 1], false));
             }
             dc.DrawLine(convertToVirtualLocation(_temp_obj.point_list.back(), false),
-                        _mouse);
-            dc.DrawLine(_mouse,
+                        _virtual_mouse_pos);
+            dc.DrawLine(_virtual_mouse_pos,
                         convertToVirtualLocation(_temp_obj.point_list.front(), false));
         }
         if (_show_name) {
@@ -315,11 +275,6 @@ void ImagePanel::drawTempObject(wxDC & dc)
             dc.DrawText(_temp_obj.name, convertToVirtualLocation(_temp_obj.point_list.back(), false));
         }
     }
-}
-
-void ImagePanel::drawDetectionObject(wxDC &dc, wxPoint p1, wxPoint p2)
-{
-
 }
 
 void ImagePanel::addObject(Object const & obj)
@@ -350,11 +305,6 @@ bool ImagePanel::unpackObject()
     if (_obj_vector.size() > _selected_obj) {
         _temp_obj = _obj_vector[_selected_obj];
         _unpacked_object = _temp_obj;
-        if (_temp_obj.point_list.size() > 2) {
-            _temp_obj_kind = ObjectType::SEGMENTATION;
-        } else {
-            _temp_obj_kind = ObjectType::DETECTION;
-        }
         _obj_vector.erase(_obj_vector.begin() + _selected_obj);
         _selected_obj = static_cast<int>(_obj_vector.size());
         
@@ -385,9 +335,9 @@ void ImagePanel::nextObject()
     Refresh();
 }
 
-bool ImagePanel::startAddObject(Object new_obj)
+bool ImagePanel::startAddSegment(Object const & new_obj)
 {
-    if (_current_view.Contains(_mouse) == false) {
+    if (_current_view.Contains(_virtual_mouse_pos) == false || new_obj.type != ObjectType::SEGMENTATION) {
         return false;
     }
 
@@ -395,29 +345,30 @@ bool ImagePanel::startAddObject(Object new_obj)
     _undo_obj = _selected_obj;
     _selected_obj = static_cast<int>(_obj_vector.size());
 
-    _temp_obj.point_list.push_back(convertToActualLocation(_mouse.x, _mouse.y));
+    _temp_obj.point_list.push_back(convertToActualLocation(_virtual_mouse_pos.x, _virtual_mouse_pos.y));
 
     return true;
 }
 
-void ImagePanel::addPointToNewObject()
+void ImagePanel::addPointToNewSegment()
 {
-    if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.size() != 1) {
+    if (_temp_obj.type != ObjectType::SEGMENTATION && _temp_obj.point_list.size() != 1) {
         return;
     }
-    _temp_obj.point_list.push_back(convertToActualLocation(_mouse.x, _mouse.y));
+
+    _temp_obj.point_list.push_back(convertToActualLocation(_virtual_mouse_pos.x, _virtual_mouse_pos.y));
 }
 
-void ImagePanel::endAddObject()
+void ImagePanel::endAddSegment()
 {
     if (_temp_obj.type == ObjectType::SEGMENTATION && _temp_obj.point_list.size() < 3) {
         wxMessageBox(wxT("it is not polygon."));
-        cancelAddObject();
+        cancelAddSegment();
         return;
     }
 
     if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.size() != 2) {
-        cancelAddObject();
+        cancelAddSegment();
         return;
     }
 
@@ -434,7 +385,7 @@ void ImagePanel::endAddObject()
     Refresh();
 }
 
-void ImagePanel::cancelAddObject()
+void ImagePanel::cancelAddSegment()
 {
     if (_unpacked_object.point_list.size() > 0) {
         _obj_vector.push_back(_unpacked_object);
@@ -443,7 +394,7 @@ void ImagePanel::cancelAddObject()
     _temp_obj.point_list.clear();
 }
 
-bool ImagePanel::undo()
+bool ImagePanel::undoSegment()
 {    
     if (_selected_obj == -1) {
         return true;
@@ -455,7 +406,68 @@ bool ImagePanel::undo()
 
     if (_temp_obj.point_list.size() == 0) {
         return false;
+    } else {
+        return true;
     }
+}
+
+bool ImagePanel::startAddTempDetection(Object const & new_obj)
+{
+    if (_current_view.Contains(_virtual_mouse_pos) == false || new_obj.type != ObjectType::DETECTION) {
+        return false;
+    }
+
+    if (_selected_obj < _obj_vector.size() && _selected_obj != -1) {
+        _unpacked_object = _obj_vector[_selected_obj];
+        _obj_vector.erase(_obj_vector.begin() + _selected_obj);
+    } else {
+        _unpacked_object.point_list.clear();
+    }
+
+    _temp_obj = new_obj;
+    _undo_obj = _selected_obj;
+    _selected_obj = static_cast<int>(_obj_vector.size());
+
+    _temp_obj.point_list.push_back(_virtual_mouse_pos);
+
+    _status = STATUS::DRAWING_NEW_OBJECT;
+    return true;
+}
+
+void ImagePanel::endAddTempDetection()
+{
+    if (_temp_obj.type != ObjectType::DETECTION) {
+        return;
+    }
+
+    if (_temp_obj.point_list.size() < 2) {
+        _temp_obj.point_list.push_back(_virtual_mouse_pos);
+    }
+
+    _status = STATUS::EDIT_OBJECT;
+}
+
+void ImagePanel::saveTempDetection()
+{
+    if (_temp_obj.type != ObjectType::DETECTION) {
+        return;
+    }
+    _obj_vector.push_back(_temp_obj);
+    save();
+
+    _status = STATUS::IDLE;
+}
+
+void ImagePanel::undoDetection()
+{
+    _status = STATUS::IDLE;
+
+    if (_unpacked_object.point_list.size() == 2) {
+        _obj_vector.push_back(_unpacked_object);
+        _unpacked_object.point_list.clear();
+    }
+
+    Refresh();
 }
 
 void ImagePanel::pointUp()
@@ -463,8 +475,11 @@ void ImagePanel::pointUp()
     if (_temp_obj.point_list.empty()) {
         return;
     }
-    if (_temp_obj.point_list.back().y > 0) {
+
+    if (_temp_obj.type == ObjectType::SEGMENTATION && _temp_obj.point_list.back().y > 0) {
         _temp_obj.point_list.back().y--;
+    } else if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.front().y > 0) {
+        _temp_obj.point_list.front().y--;
     }
 }
 
@@ -473,8 +488,11 @@ void ImagePanel::pointDown()
     if (_temp_obj.point_list.empty()) {
         return;
     }
-    if (_temp_obj.point_list.back().y < _image_height) {
+
+    if (_temp_obj.type == ObjectType::SEGMENTATION && _temp_obj.point_list.back().y < _image_height) {
         _temp_obj.point_list.back().y++;
+    } else if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.front().y <_image_height) {
+        _temp_obj.point_list.front().y++;
     }
 }
 
@@ -483,8 +501,11 @@ void ImagePanel::pointLeft()
     if (_temp_obj.point_list.empty()) {
         return;
     }
-    if (_temp_obj.point_list.back().x > 0) {
+
+    if (_temp_obj.type == ObjectType::SEGMENTATION && _temp_obj.point_list.back().x > 0) {
         _temp_obj.point_list.back().x--;
+    } else if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.front().x > 0) {
+        _temp_obj.point_list.front().x--;
     }
 }
 
@@ -493,8 +514,11 @@ void ImagePanel::pointRight()
     if (_temp_obj.point_list.empty()) {
         return;
     }
-    if (_temp_obj.point_list.back().x < _image_width) {
+
+    if (_temp_obj.type == ObjectType::SEGMENTATION && _temp_obj.point_list.back().x < _image_width) {
         _temp_obj.point_list.back().x++;
+    } else if (_temp_obj.type == ObjectType::DETECTION && _temp_obj.point_list.front().x < _image_width) {
+        _temp_obj.point_list.front().x++;
     }
 }
 
@@ -507,6 +531,49 @@ void ImagePanel::showObjectName()
 void ImagePanel::showObjects()
 {
     _show_objects = !_show_objects;
+    Refresh();
+}
+
+void ImagePanel::saveCropImage()
+{
+
+}
+
+void ImagePanel::setType(wxString const & type)
+{
+    if (_selected_obj < _obj_vector.size() && _selected_obj != -1) {
+        _obj_vector.at(_selected_obj).name = type;
+    }
+    _temp_obj.name = type;
+
+    Refresh();
+}
+
+void ImagePanel::setDiff(int diff)
+{
+    if (_selected_obj < _obj_vector.size() && _selected_obj != -1) {
+        _obj_vector.at(_selected_obj).difficult = diff;
+    }
+    _temp_obj.difficult = diff;
+
+    Refresh();
+}
+
+void ImagePanel::onMouse(wxMouseEvent & event)
+{
+    _real_mouse_pos = event.GetPosition();
+    _virtual_mouse_pos = convertToVirtualLocation(_real_mouse_pos, false);
+
+    event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+    event.Skip();
+}
+
+void ImagePanel::onSize(wxSizeEvent & event)
+{
+    if (!_background_bitmap.IsOk()) {
+        return;
+    }
+    setView(_current_view.x, _current_view.y);
     Refresh();
 }
 
@@ -576,9 +643,4 @@ wxPoint ImagePanel::convertToVirtualLocation(int x, int y, bool bind_point)
 wxPoint ImagePanel::convertToVirtualLocation(wxPoint const & actual_point, bool bind_point)
 {
     return convertToVirtualLocation(actual_point.x, actual_point.y, bind_point);
-}
-
-void ImagePanel::saveCropImage()
-{
-
 }

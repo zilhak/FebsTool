@@ -112,7 +112,7 @@ Object SegmentationFrame::createNewObject()
 
 void SegmentationFrame::setImagePanel()
 {
-    _image_panel->cancelAddObject();
+    _image_panel->cancelAddSegment();
     _infobox->changeZoomBox(_image_panel->setBackgroundImage(_dir + "/" + _file_list->getHighlightedItem()));
     _image_panel->setSize(_infobox->getZoom());
     _infobox->setImageName(_file_list->getHighlightedItem());
@@ -210,11 +210,11 @@ void SegmentationFrame::onMouse(wxMouseEvent & event)
     _image_panel->setMousePoint(mouse_x, mouse_y);
 
     if (event.LeftDown() && _status == STATUS::IDLE)  {
-        if (_image_panel->startAddObject(createNewObject())) {
+        if (_image_panel->startAddSegment(createNewObject())) {
             _status = STATUS::DRAWING;
         }
     } else if (event.LeftDown() && _status == STATUS::DRAWING) {
-        _image_panel->addPointToNewObject();
+        _image_panel->addPointToNewSegment();
     } else if (event.GetWheelRotation() != 0) {
         if (event.GetWheelRotation() > 0) {
             _infobox->zoomIn();
@@ -283,7 +283,7 @@ void SegmentationFrame::onKeyboard(wxKeyEvent & event)
         switch (event.GetKeyCode()) {
         case WXK_ESCAPE:
             _status = STATUS::IDLE;
-            _image_panel->cancelAddObject();
+                _image_panel->cancelAddSegment();
             break;
         case 87 : //w
             _image_panel->pointUp();
@@ -299,11 +299,11 @@ void SegmentationFrame::onKeyboard(wxKeyEvent & event)
             break;
         case 69 : //e
             _file_list->xmlCheck();
-            _image_panel->endAddObject();
+                _image_panel->endAddSegment();
             _status = STATUS::IDLE;
             break;
         case 70: // f
-            if (!_image_panel->undo()) {
+            if (!_image_panel->undoSegment()) {
                 _status = STATUS::IDLE;
             }
             break;
