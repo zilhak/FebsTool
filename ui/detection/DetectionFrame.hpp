@@ -6,6 +6,7 @@
 
 #include <ui/component/ImagePanel.hpp>
 #include <ui/component/FileExplorer.hpp>
+#include <ui/component/FindDialog.hpp>
 
 #include <set>
 #include <vector>
@@ -27,7 +28,8 @@ public:
         COMBO_DIFFICULT,
         IMAGE_VIEWER,
         FILE_EXPLORER,
-        SASH
+        SASH,
+        MAKE_TYPE
     };
 
 private:
@@ -38,6 +40,9 @@ private:
     long _image_index;
     wxSize _left_min_size;
     wxSize _right_min_size;
+    wxArrayString _type_list;
+
+    wxString _dir_name;
 
 private:
     wxPanel * _tool_bar;
@@ -59,6 +64,7 @@ private:
     wxComboBox * _type_combobox;
     wxComboBox * _scale_combobox;
     wxComboBox * _difficult_combobox;
+    wxTextCtrl * _make_type_ctrl;
 
 public:
     DetectionFrame(wxString const & title);
@@ -80,6 +86,12 @@ private:
 
 private:
     bool fileExtCheck(wxString const extension);
+
+private:
+    bool moveToDir(wxString const & dir_name);
+
+private:
+    void openFindDialog(wxString const & title, std::vector<wxString> const & file_list, wxString const & img_kind);
 
 private: // menu event.
     void onSizeComboBox(wxCommandEvent &event);
