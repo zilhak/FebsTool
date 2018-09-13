@@ -49,19 +49,8 @@ wxString FindDialog::makeFindName()
 {
     wxString result;
     wxString ctrl_value = _find_ctrl->GetValue();
-    //if (wxAtoi(ctrl_value) < 10) {
-    //    _result_number = wxT("0000") + _find_ctrl->GetValue();
-    //} else if (wxAtoi(ctrl_value) < 100) {
-    //    _result_number = wxT("000") + _find_ctrl->GetValue();
-    //} else if (wxAtoi(ctrl_value) < 1000) {
-    //    _result_number = wxT("00") + _find_ctrl->GetValue();
-    //} else if (wxAtoi(ctrl_value) < 10000) {
-    //    _result_number = wxT("0") + _find_ctrl->GetValue();
-    //} else {
-    //    _result_number = _find_ctrl->GetValue();
-    //}
-    _result_number = wxString::Format(wxT("%5d"), _find_ctrl->GetValue());
-    std::cout << "Find Image Number : " << _result_number.ToStdString() << std::endl;
+
+    _result_number = wxString::Format(wxT("%05d"), wxAtoi(ctrl_value));
 
     result = _find_name + _img_kind + _result_number;
 
