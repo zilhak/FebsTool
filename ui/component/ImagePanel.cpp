@@ -75,7 +75,7 @@ int ImagePanel::setBackgroundImage(wxString const & file, int scale)
 
 void ImagePanel::setMousePoint(int x, int y)
 {
-    _virtual_mouse_pos = virtualLocationAdjust(x, y);
+    _actual_mouse_pos = virtualLocationAdjust(x, y);
 }
 
 void ImagePanel::setView(int x, int y)
@@ -138,7 +138,7 @@ void ImagePanel::moveView(int x, int y)
 
 void ImagePanel::load()
 {
-    _obj_vector = loadFromXml(_image_file.GetPath() + "\\" + _image_file.GetName());
+    _obj_vector = loadFromXml(_image_file.GetPath() + "/" + _image_file.GetName());
     if (_obj_vector.size() < 1) {
         _selected_obj = 0;
     } else {
@@ -150,6 +150,7 @@ bool ImagePanel::save()
 {
     if (_background_bitmap.IsOk()) {
         saveToXml(_obj_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
+        _selected_obj = _obj_vector.size();
         Refresh();
         return true;
     } else {
@@ -180,7 +181,8 @@ void ImagePanel::drawObject(wxDC & dc)
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     for (int i = 0; i < _obj_vector.size(); ++i) {
         if (i == _selected_obj) {
-            continue;
+            cancelAddSegment();
+            dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
         } else {
             wxColour colour = wxColour(0x00FFFF);
             for (int j = 0; j < _name_list.size(); ++j) {
@@ -201,11 +203,9 @@ void ImagePanel::drawObject(wxDC & dc)
                                 convertToVirtualLocation(_obj_vector[i].point_list[(j + 1) % list_size], false));
                 }
             } else if (_obj_vector[i].type == ObjectType::DETECTION){
-                dc.DrawRectangle(wxRect(_obj_vector[i].point_list[0], _obj_vector[i].point_list[1]));
-                dc.DrawRectangle(wxRect(_obj_vector[i].point_list[0].x-1,
-                                        _obj_vector[i].point_list[0].y-1,
-                                        _obj_vector[i].point_list[1].x+1,
-                                        _obj_vector[i].point_list[1].y+1));
+                wxRect rect = wxRect(_obj_vector[i].point_list[0], _obj_vector[i].point_list[1]);
+                dc.DrawRectangle(convertToVirtualRect(rect));
+                dc.DrawRectangle(convertToVirtualRect(wxRect(rect.x - 1, rect.y -1, rect.width + 2, rect.height + 2)));
             }
         }
 
@@ -221,11 +221,11 @@ void ImagePanel::drawTempObject(wxDC & dc)
 {
     dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
     if (_temp_obj.type == ObjectType::DETECTION) {
-        if (_temp_obj.point_list.size() == 1) {
+        if (_status == STATUS::DRAWING_NEW_OBJECT) {
             int x1 = _temp_obj.point_list[0].x;
-            int x2 = _virtual_mouse_pos.x;
+            int x2 = _actual_mouse_pos.x;
             int y1 = _temp_obj.point_list[0].y;
-            int y2 = _virtual_mouse_pos.y;
+            int y2 = _actual_mouse_pos.y;
 
             if (x1 > x2) {
                 int temp = x1;
@@ -238,19 +238,27 @@ void ImagePanel::drawTempObject(wxDC & dc)
                 y1 = y2;
                 y2 = temp;
             }
+            dc.DrawRectangle(convertToVirtualRect(wxRect(x1, y1, x2 - x1, y2 - y1)));
+//            dc.DrawRectangle(convertToVirtualRect(wxRect(x1 - 1, y1 - 1, x2 - x1 + 2, y2 - y1 + 2)));
+        } else if (_status == STATUS::EDIT_OBJECT) {
+            int x1 = _temp_obj.point_list[0].x;
+            int x2 = _temp_obj.point_list[1].x;
+            int y1 = _temp_obj.point_list[0].y;
+            int y2 = _temp_obj.point_list[1].y;
 
-            dc.DrawRectangle(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1]));
-            dc.DrawRectangle(wxRect(_temp_obj.point_list[0].x-1,
-                                    _temp_obj.point_list[0].y-1,
-                                    _temp_obj.point_list[1].x+1,
-                                    _temp_obj.point_list[1].y+1));
+            if (x1 > x2) {
+                int temp = x1;
+                x1 = x2;
+                x2 = temp;
+            }
 
-        } else if (_temp_obj.point_list.size() == 2) {
-            dc.DrawRectangle(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1]));
-            dc.DrawRectangle(wxRect(_temp_obj.point_list[0].x-1,
-                                    _temp_obj.point_list[0].y-1,
-                                    _temp_obj.point_list[1].x+1,
-                                    _temp_obj.point_list[1].y+1));
+            if (y1 > y2) {
+                int temp = y1;
+                y1 = y2;
+                y2 = temp;
+            }
+            dc.DrawRectangle(convertToVirtualRect(wxRect(x1, y1, x2 - x1, y2 - y1)));
+            dc.DrawRectangle(convertToVirtualRect(wxRect(x1 - 1, y1 - 1, x2 - x1 + 2, y2 - y1 + 2)));
         }
     } else if (_temp_obj.type == ObjectType::SEGMENTATION) {
         int list_size = _temp_obj.point_list.size();
@@ -258,15 +266,15 @@ void ImagePanel::drawTempObject(wxDC & dc)
             return;
         } else if (list_size == 1) {
             dc.DrawLine(convertToVirtualLocation(_temp_obj.point_list[0], false),
-                        _virtual_mouse_pos);
+                        _actual_mouse_pos);
         } else {
             for (int i = 0; i < list_size - 1; ++i) {
                 dc.DrawLine(convertToVirtualLocation(_temp_obj.point_list[i], false),
                             convertToVirtualLocation(_temp_obj.point_list[i + 1], false));
             }
             dc.DrawLine(convertToVirtualLocation(_temp_obj.point_list.back(), false),
-                        _virtual_mouse_pos);
-            dc.DrawLine(_virtual_mouse_pos,
+                        _actual_mouse_pos);
+            dc.DrawLine(_actual_mouse_pos,
                         convertToVirtualLocation(_temp_obj.point_list.front(), false));
         }
         if (_show_name) {
@@ -289,7 +297,11 @@ bool ImagePanel::deleteObject()
         _obj_vector.erase(_obj_vector.begin() + _selected_obj);
         _selected_obj = static_cast<int>(_obj_vector.size());
         saveToXml(_obj_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
-    } 
+    } else if (_obj_vector.back().type == ObjectType::DETECTION) {
+        _obj_vector.pop_back();
+        _selected_obj = static_cast<int>(_obj_vector.size());
+        saveToXml(_obj_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
+    }
     Refresh();
 
     if (_obj_vector.empty()) {
@@ -322,6 +334,7 @@ void ImagePanel::previousObject()
     } else {
         _selected_obj = static_cast<int>(_obj_vector.size());
     }
+    _status = STATUS::IDLE;
     Refresh();
 }
 
@@ -332,12 +345,13 @@ void ImagePanel::nextObject()
     } else {
         _selected_obj = 0;
     }
+    _status = STATUS::IDLE;
     Refresh();
 }
 
 bool ImagePanel::startAddSegment(Object const & new_obj)
 {
-    if (_current_view.Contains(_virtual_mouse_pos) == false || new_obj.type != ObjectType::SEGMENTATION) {
+    if (_current_view.Contains(_actual_mouse_pos) == false || new_obj.type != ObjectType::SEGMENTATION) {
         return false;
     }
 
@@ -345,7 +359,7 @@ bool ImagePanel::startAddSegment(Object const & new_obj)
     _undo_obj = _selected_obj;
     _selected_obj = static_cast<int>(_obj_vector.size());
 
-    _temp_obj.point_list.push_back(convertToActualLocation(_virtual_mouse_pos.x, _virtual_mouse_pos.y));
+    _temp_obj.point_list.push_back(convertToActualLocation(_actual_mouse_pos.x, _actual_mouse_pos.y));
 
     return true;
 }
@@ -356,7 +370,7 @@ void ImagePanel::addPointToNewSegment()
         return;
     }
 
-    _temp_obj.point_list.push_back(convertToActualLocation(_virtual_mouse_pos.x, _virtual_mouse_pos.y));
+    _temp_obj.point_list.push_back(convertToActualLocation(_actual_mouse_pos.x, _actual_mouse_pos.y));
 }
 
 void ImagePanel::endAddSegment()
@@ -413,7 +427,7 @@ bool ImagePanel::undoSegment()
 
 bool ImagePanel::startAddTempDetection(Object const & new_obj)
 {
-    if (_current_view.Contains(_virtual_mouse_pos) == false || new_obj.type != ObjectType::DETECTION) {
+    if (_current_view.Contains(_actual_mouse_pos) == false || new_obj.type != ObjectType::DETECTION) {
         return false;
     }
 
@@ -428,7 +442,7 @@ bool ImagePanel::startAddTempDetection(Object const & new_obj)
     _undo_obj = _selected_obj;
     _selected_obj = static_cast<int>(_obj_vector.size());
 
-    _temp_obj.point_list.push_back(_virtual_mouse_pos);
+    _temp_obj.point_list.push_back(_actual_mouse_pos);
 
     _status = STATUS::DRAWING_NEW_OBJECT;
     return true;
@@ -441,21 +455,31 @@ void ImagePanel::endAddTempDetection()
     }
 
     if (_temp_obj.point_list.size() < 2) {
-        _temp_obj.point_list.push_back(_virtual_mouse_pos);
+        _temp_obj.point_list.push_back(_actual_mouse_pos);
     }
 
     _status = STATUS::EDIT_OBJECT;
 }
 
-void ImagePanel::saveTempDetection()
+bool ImagePanel::saveTempDetection()
 {
-    if (_temp_obj.type != ObjectType::DETECTION) {
-        return;
+    if (_temp_obj.type == ObjectType::DETECTION && _status == STATUS::EDIT_OBJECT) {
+        _obj_vector.emplace_back(_temp_obj);
+        _temp_obj.point_list.clear();
+    } else {
+        return false;
     }
-    _obj_vector.push_back(_temp_obj);
+
     save();
 
     _status = STATUS::IDLE;
+
+    return true;
+}
+
+void ImagePanel::cancelAddDetection()
+{
+
 }
 
 void ImagePanel::undoDetection()
@@ -561,8 +585,8 @@ void ImagePanel::setDiff(int diff)
 
 void ImagePanel::onMouse(wxMouseEvent & event)
 {
-    _real_mouse_pos = event.GetPosition();
-    _virtual_mouse_pos = convertToVirtualLocation(_real_mouse_pos, false);
+    _virtual_mouse_pos = event.GetPosition();
+    _actual_mouse_pos = convertToActualLocation(_virtual_mouse_pos.x, _virtual_mouse_pos.y, false);
 
     event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
     event.Skip();
@@ -643,4 +667,22 @@ wxPoint ImagePanel::convertToVirtualLocation(int x, int y, bool bind_point)
 wxPoint ImagePanel::convertToVirtualLocation(wxPoint const & actual_point, bool bind_point)
 {
     return convertToVirtualLocation(actual_point.x, actual_point.y, bind_point);
+}
+
+wxRect ImagePanel::convertToVirtualRect(wxRect const & actual_rect, bool bind_point)
+{
+    wxPoint point = convertToVirtualLocation(actual_rect.x, actual_rect.y);
+    int width = actual_rect.width * _zoom_setting;
+    int height = actual_rect.height * _zoom_setting;
+
+    return wxRect(point.x, point.y, width, height);
+}
+
+wxRect ImagePanel::convertToActualRect(wxRect const & virtual_rect, bool bind_point)
+{
+    wxPoint point = convertToVirtualLocation(virtual_rect.x, virtual_rect.y);
+    int width = static_cast<int>(static_cast<double>(virtual_rect.width) / _zoom_setting);
+    int height = static_cast<int>(static_cast<double>(virtual_rect.height) / _zoom_setting);
+
+    return wxRect(point.x, point.y, width, height);
 }

@@ -164,13 +164,13 @@ std::vector<Object> loadFromXml(wxString image_file_not_ext)
 {
     std::vector<Object> result;
     Document document;
-    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());;
-    if (err != tinyxml2::XML_NO_ERROR) {
+    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());
+    if (err == tinyxml2::XML_NO_ERROR) {
+        Node * root = document.FirstChildElement("annotation");
+        for(Element * object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object")){
+            result.push_back(loadObject(object));
+        }
         return result;
-    }
-    Node * root = document.FirstChildElement("annotation");
-    for(Element * object = root->FirstChildElement("object"); object != NULL; object = object->NextSiblingElement("object")){
-        result.push_back(loadObject(object));
     }
 
     return result;
@@ -353,7 +353,7 @@ bool saveToXml (std::vector<Object> check_list, wxFileName file, ImageInfo info)
     database->LinkEndChild(document.NewText("The bogonet image database"));
     image->LinkEndChild(document.NewText("SaveZone"));
 
-    tinyxml2::XMLError a = document.SaveFile((file.GetPath() + "\\" + file.GetName() + ".xml").c_str());
+    tinyxml2::XMLError a = document.SaveFile((file.GetPath() + "/" + file.GetName() + ".xml").c_str());
 
     document.Clear();
     return true;

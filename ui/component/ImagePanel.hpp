@@ -49,8 +49,8 @@ private: // program status value
 private: // status value
     wxRect _current_view;
     wxRect _screen_rect;
-    wxPoint _real_mouse_pos;
     wxPoint _virtual_mouse_pos;
+    wxPoint _actual_mouse_pos;
     STATUS _status = STATUS::IDLE;
 
 private: // Objects
@@ -87,6 +87,7 @@ public:
 public:
     int getImageWidth() const {return _image_width;}
     int getImageHeight() const {return _image_height;}
+    wxPoint getActualMouse() const { return _actual_mouse_pos; }
     wxRect getView() const { return _current_view; }
 
 public:
@@ -106,7 +107,8 @@ public: // Add segmentation object
 public: // Add detection object
     bool startAddTempDetection(Object const & new_obj);
     void endAddTempDetection();
-    void saveTempDetection();
+    bool saveTempDetection();
+    void cancelAddDetection();
     void undoDetection();
 
 public: // on Add object event
@@ -138,6 +140,8 @@ public: // point calculation
     wxPoint convertToActualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(wxPoint const & actual_point, bool bind_point = true);
+    wxRect convertToVirtualRect(wxRect const & actual_rect, bool bind_point = true);
+    wxRect convertToActualRect(wxRect const & virtual_rect, bool bind_point = true);
 
 public: // action
     void saveCropImage();

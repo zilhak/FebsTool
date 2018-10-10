@@ -151,8 +151,8 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
     std::cout << "Inserted keycode : "<< event.GetKeyCode() << std::endl;
     if (_image_panel->isLoaded()) {
         if (event.GetKeyCode() == 69) { // 'e'
-            _image_panel->setType(_type_combobox->GetValue());
-            if (_image_panel->save()) {
+            _image_panel->setType(_toolbar->getType());
+            if (_image_panel->saveTempDetection()) {
                 _file_list->xmlCheck(_current_file);
             }
         } else if (event.GetKeyCode() == 81) { //'q'
@@ -200,6 +200,8 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
         _image_panel->setSize(_infobox->getZoom());
     }
 
+    _infobox->setMouseInfo(_image_panel->getActualMouse());
+
     if (event.LeftDown()) {
         Object new_object;
         new_object.type = ObjectType::DETECTION;
@@ -209,6 +211,8 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
     } else if (event.LeftUp()) {
         _image_panel->endAddTempDetection();
     }
+
+    _image_panel->Refresh();
 }
 
 void DetectionFrame::onZoomBox(wxCommandEvent &event)
