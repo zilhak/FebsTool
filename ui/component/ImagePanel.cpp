@@ -181,7 +181,6 @@ void ImagePanel::drawObject(wxDC & dc)
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     for (int i = 0; i < _obj_vector.size(); ++i) {
         if (i == _selected_obj) {
-            cancelAddSegment();
             dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
         } else {
             wxColour colour = wxColour(0x00FFFF);
