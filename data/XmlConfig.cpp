@@ -87,6 +87,7 @@ std::vector<BoundingBox> loadFromXml(wxString image_file_not_ext)
 BoundingBox loadObject(Element * object)
 {
     Element * name = object->FirstChildElement("name");
+    Element * comment = object->FirstChildElement("comment");
     Element * bndbox = object->FirstChildElement("bndbox");
     Element * difficult = object->FirstChildElement("difficult");
 
@@ -95,12 +96,19 @@ BoundingBox loadObject(Element * object)
     Element * ymin = bndbox->FirstChildElement("ymin");
     Element * ymax = bndbox->FirstChildElement("ymax");
 
+    wxString comment_str = "";
+
+    if (comment != nullptr) {
+        comment_str = comment->GetText();
+    }
+
     return BoundingBox(name->GetText(),
                   std::stoi(xmin->GetText()),
                   std::stoi(ymin->GetText()),
                   std::stoi(xmax->GetText()),
                   std::stoi(ymax->GetText()),
-                  std::stoi(difficult->GetText()));
+                  std::stoi(difficult->GetText()),
+                  comment_str);
 }
 
 ImageInfo loadXmlInfo(wxString image_file_not_ext)

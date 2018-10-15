@@ -201,6 +201,7 @@ void ImagePanel::onPaint(wxPaintEvent & event)
 
         if (!_hide_name) {
             dc.DrawText(wxString(rect.type + "(" + std::to_string(rect.difficult) + ")"), x + 1, y + 1);
+            dc.DrawText(rect.comment, x + 1, y + 15);
         }
         if (!_hide_box) {
             dc.DrawRectangle(x, y, width, height);

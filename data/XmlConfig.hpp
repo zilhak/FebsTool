@@ -22,6 +22,7 @@ struct BoundingBox : TargetObject
 {
     wxString type;
     int difficult = -1;
+    wxString comment;
 
     int x1 = -1;
     int y1 = -1;
@@ -29,8 +30,8 @@ struct BoundingBox : TargetObject
     int y2 = -1;
 
     BoundingBox() { /* EMPTY */ }
-    BoundingBox(wxString type, int x1, int y1, int x2, int y2, int difficult) :
-            type(type), x1(x1), y1(y1), x2(x2), y2(y2), difficult(difficult)
+    BoundingBox(wxString type, int x1, int y1, int x2, int y2, int difficult, wxString comment = "") :
+            type(type), x1(x1), y1(y1), x2(x2), y2(y2), difficult(difficult), comment(comment)
     { /* EMPTY */ }
 };
 

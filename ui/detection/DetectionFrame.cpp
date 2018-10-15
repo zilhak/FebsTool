@@ -71,8 +71,9 @@ void DetectionFrame::initializeToolBar(wxBoxSizer * sizer)
     }
     _size_combobox->Select(9);
 
-    _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("car"));
+    _type_combobox = new wxComboBox(_tool_bar, ID::COMBO_TYPE, wxT("person"));
     _type_combobox->SetEditable(false);
+    _type_combobox->Append(wxT("person"));
     _type_combobox->Append(wxT("car"));
     _type_combobox->Append(wxT("bus"));
     _type_combobox->Append(wxT("truck"));
