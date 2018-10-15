@@ -146,6 +146,7 @@ Element * insertObject(Document * doc, BoundingBox rect)
 {
     Element * object = doc->NewElement("object");
     Element * name = doc->NewElement("name");
+    Element * comment = doc->NewElement("comment");
     Element * bndbox = doc->NewElement("bndbox");
     Element * xmax = doc->NewElement("xmax");
     Element * xmin = doc->NewElement("xmin");
@@ -154,6 +155,7 @@ Element * insertObject(Document * doc, BoundingBox rect)
     Element * difficult = doc->NewElement("difficult");
 
     object->LinkEndChild(name);
+    object->LinkEndChild(comment);
     object->LinkEndChild(bndbox);
     object->LinkEndChild(difficult);
 
@@ -163,6 +165,7 @@ Element * insertObject(Document * doc, BoundingBox rect)
     bndbox->LinkEndChild(ymax);
 
     name->LinkEndChild(doc->NewText(rect.type.c_str()));
+    comment->LinkEndChild(doc->NewText(rect.comment.c_str()));
     xmax->SetText(rect.x2);
     xmin->SetText(rect.x1);
     ymax->SetText(rect.y2);

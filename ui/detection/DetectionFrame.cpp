@@ -335,7 +335,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             makeFileList(file.GetPath());
             refresh();
         } else if (event.GetKeyCode() == WXK_TAB) {
-            _image_viewer->nextObject();
+            _image_viewer->previousObject();
         } else if (event.GetKeyCode() == WXK_SHIFT) {
             _image_viewer->hideBox(true);
         } else if (event.GetKeyCode() == WXK_ALT) {
