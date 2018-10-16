@@ -43,8 +43,9 @@ private: // setting status
     int _space_y = 10;
 
 private: // program status value
-    bool _show_name = false;
+    bool _show_name = true;
     bool _show_objects = true;
+    bool _show_crosshair = true;
 
 private: // status value
     wxRect _current_view;
@@ -111,6 +112,10 @@ public: // Add detection object
     void cancelAddDetection();
     void undoDetection();
 
+public:
+    void selectDetectionByClick();
+    void deleteDetectionByClick();
+
 public: // on Add object event
     void pointUp();
     void pointDown();
@@ -118,6 +123,7 @@ public: // on Add object event
     void pointRight();
     void showObjectName();
     void showObjects();
+    void showCrossHair();
 
 public:
     bool isLoaded() {return _is_loaded;};
@@ -126,6 +132,7 @@ private: // draw.
     void drawBackGround(wxDC & dc);
     void drawObject(wxDC & dc);
     void drawTempObject(wxDC & dc);
+    void drawCrossHair(wxDC & dc);
 
 private: // events.
     void onPaint(wxPaintEvent & event);

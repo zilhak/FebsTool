@@ -149,6 +149,7 @@ ConfigData loadConfig()
 
 void saveNameList(std::vector<Name> list)
 {
+
 }
 
 std::vector<Name> loadNameList()
@@ -211,41 +212,14 @@ Object loadObject(Element * object)
     }
 
     Element * name = object->FirstChildElement("name");
+    Element * comment = object->FirstChildElement("comment");
     Element * difficult = object->FirstChildElement("difficult");
 
     result.name = name->GetText();
-    result.difficult = std::stoi(difficult->GetText());
-
-    return result;
-}
-
-ImageInfo loadXmlInfo(wxString image_file_not_ext)
-{
-    ImageInfo result(0, 0);
-
-    tinyxml2::XMLDocument document;
-    tinyxml2::XMLError err = document.LoadFile((image_file_not_ext + ".xml").c_str());
-    if (err != tinyxml2::XML_NO_ERROR) {
-        return result;
+    if (comment != nullptr) {
+        result.comment = comment->GetText();
     }
-    char * c;
-    tinyxml2::StrPair * pair;
-    std::cout << document.ParseDeep(c, pair) << std::endl;
-
-    tinyxml2::XMLNode * root = document.FirstChildElement("annotation");
-
-    tinyxml2::XMLElement * object = root->FirstChildElement("object");
-    tinyxml2::XMLElement * name = object->FirstChildElement("name");
-    tinyxml2::XMLElement * diff = object->FirstChildElement("difficult");
-
-    tinyxml2::XMLElement * size = root->FirstChildElement("size");
-    tinyxml2::XMLElement * depth = size->FirstChildElement("depth");
-    tinyxml2::XMLElement * height = size->FirstChildElement("height");
-    tinyxml2::XMLElement * width = size->FirstChildElement("height");
-
-    result.image_width = std::stoi(width->GetText());
-    result.image_height = std::stoi(height->GetText());
-    result.depth = std::stoi(depth->GetText());
+    result.difficult = std::stoi(difficult->GetText());
 
     return result;
 }
@@ -255,6 +229,7 @@ Element * insertObject(Document * doc, Object obj)
     Element * object = doc->NewElement("object");
     if (obj.type == ObjectType::DETECTION) {
         Element * name = doc->NewElement("name");
+        Element * comment = doc->NewElement("comment");
         Element * bndbox = doc->NewElement("bndbox");
         Element * xmax = doc->NewElement("xmax");
         Element * xmin = doc->NewElement("xmin");
@@ -263,6 +238,7 @@ Element * insertObject(Document * doc, Object obj)
         Element * difficult = doc->NewElement("difficult");
 
         object->LinkEndChild(name);
+        object->LinkEndChild(comment);
         object->LinkEndChild(bndbox);
         object->LinkEndChild(difficult);
 
@@ -272,6 +248,7 @@ Element * insertObject(Document * doc, Object obj)
         bndbox->LinkEndChild(ymax);
 
         name->LinkEndChild(doc->NewText(obj.name.c_str()));
+        comment->LinkEndChild(doc->NewText(obj.comment.c_str()));
         xmax->SetText(obj.point_list[1].x);
         xmin->SetText(obj.point_list[0].x);
         ymax->SetText(obj.point_list[1].y);
@@ -279,18 +256,21 @@ Element * insertObject(Document * doc, Object obj)
         difficult->SetText(obj.difficult);
     } else if (obj.type == ObjectType::SEGMENTATION) {
         Element * name = doc->NewElement("name");
+        Element * comment = doc->NewElement("comment");
         Element * pose = doc->NewElement("pose");
         Element * truncated = doc->NewElement("truncated");
         Element * difficult = doc->NewElement("difficult");
         Element * polygon = doc->NewElement("polygon");
 
         object->LinkEndChild(name);
+        object->LinkEndChild(comment);
         object->LinkEndChild(pose);
         object->LinkEndChild(truncated);
         object->LinkEndChild(difficult);
         object->LinkEndChild(polygon);
 
         name->LinkEndChild(doc->NewText(obj.name.c_str()));
+        comment->LinkEndChild(doc->NewText(obj.comment.c_str()));
         pose->LinkEndChild(doc->NewText(obj.pose.c_str()));
         truncated->LinkEndChild(doc->NewText(obj.truncated.c_str()));
         difficult->SetText(obj.difficult);

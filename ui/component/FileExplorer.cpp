@@ -151,6 +151,8 @@ long FileExplorer::highlightItem(long index)
 
     Refresh();
 
+    CheckItem(_highlighted_item, true);
+
     return _highlighted_item;
 }
 

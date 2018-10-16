@@ -57,6 +57,11 @@ void DetectionFrame::initializeSetting()
     _image_extension.insert(wxT("jpg"));
     _image_extension.insert(wxT("jpeg"));
     _image_extension.insert(wxT("png"));
+
+    _folder_name_list.emplace_back(wxT("folder1"));
+    _folder_name_list.emplace_back(wxT("folder2"));
+    _folder_name_list.emplace_back(wxT("folder3"));
+    _folder_name_list.emplace_back(wxT("folder4"));
 }
 
 void DetectionFrame::initializeToolBar(wxBoxSizer * v_sizer)
@@ -177,14 +182,24 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             _type_combobox->SetValue(wxT("bus"));
         } else if (event.GetKeyCode() == 51) { //'3'
             _type_combobox->SetValue(wxT("truck"));
-        } else if (event.GetKeyCode() == WXK_DELETE) { //'delete'
-
-        } else if (event.GetKeyCode() == WXK_PAGEUP) { //'pageup'
-
-        } else if (event.GetKeyCode() == WXK_PAGEDOWN) {
-
+        } else if (event.GetKeyCode() == 66) { //'b'
+            _image_panel->showObjects();
+        } else if (event.GetKeyCode() == 78) { //'n'
+            _image_panel->showObjectName();
+        } else if (event.GetKeyCode() == 72) { //'h'
+            _image_panel->showCrossHair();
+        } else if (event.GetKeyCode() == 90) { //'z'
+            if (_folder_name_list.size() > 0) { moveFile(_folder_name_list[0]); }
+        } else if (event.GetKeyCode() == 88) { //'x'
+            if (_folder_name_list.size() > 1) { moveFile(_folder_name_list[1]); }
+        } else if (event.GetKeyCode() == 67) { //'c'
+            if (_folder_name_list.size() > 2) { moveFile(_folder_name_list[2]); }
+        } else if (event.GetKeyCode() == 86) { //'v'
+            if (_folder_name_list.size() > 3) { moveFile(_folder_name_list[3]); }
         } else if (event.GetKeyCode() == WXK_TAB) {
             _image_panel->nextObject();
+        } else if (event.GetKeyCode() == 96) { // '`'
+            _image_panel->previousObject();
         }
     }
     SetTitle(_current_file);
@@ -192,6 +207,16 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 
 void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 {
+    if (event.m_shiftDown) {
+        if (event.LeftDown() || event.LeftDClick()) {
+            _image_panel->selectDetectionByClick();
+        } else if (event.RightDown() || event.RightDClick()) {
+            _image_panel->deleteDetectionByClick();
+        }
+        _image_panel->Refresh();
+        return;
+    }
+
     if (event.GetWheelRotation() > 0) {
         _infobox->zoomIn();
         _image_panel->setSize(_infobox->getZoom());
@@ -217,7 +242,6 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 
 void DetectionFrame::onZoomBox(wxCommandEvent &event)
 {
-    _image_panel->setSize(static_cast<double>(wxAtoi(_size_combobox->GetValue())));
     if (_image_panel->isLoaded()) {
         _image_panel->setSize(_infobox->getZoom());
     }

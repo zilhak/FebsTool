@@ -28,6 +28,7 @@ struct Object
     ObjectType type;
     wxString name;
     int difficult = -1;
+    wxString comment;
 
     wxString pose = "NULL";
     wxString truncated = "NULL";
@@ -51,6 +52,7 @@ struct ImageInfo {
 struct Name {
     wxString name;
     wxString colour;
+    int line_width = 2;
 };
 
 enum class Action {

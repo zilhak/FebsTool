@@ -21,12 +21,11 @@ std::vector<Name> loadNameList();
 // ex) file "/usr/home/bogonets/example.jpg" -> loadFromXml("/usr/home/bogonets/example");
 std::vector<Object> loadFromXml(wxString file_path_and_name_not_ext);
 Object loadObject(Element * root);
-ImageInfo loadXmlInfo (wxString image_file_not_ext);
 
-Element * insertObject(Document * doc, Object check);
 bool saveToXml (std::vector<Object> check_list,
                 wxFileName file,
                 ImageInfo info);
+Element * insertObject(Document * doc, Object check);
 
 #endif //IMAGESEARCHER_XMLCONFIG_H
 

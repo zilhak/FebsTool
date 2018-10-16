@@ -40,7 +40,7 @@ private:
     wxString _dir;
     wxString _current_file;
     std::set<wxString> _image_extension;
-    long _image_index;
+    std::vector<wxString> _folder_name_list;
 
 private:
     FileExplorer * _file_list;
@@ -49,24 +49,9 @@ private:
     ImagePanel * _image_panel;
 
 private:
-    wxStaticText * _info_image_name;
-    wxStaticText * _info_image_size;
-    wxStaticText * _info_mouse_x;
-    wxStaticText * _info_mouse_y;
-
-private:
-    wxComboBox * _size_combobox;
     wxComboBox * _type_combobox;
     wxComboBox * _scale_combobox;
     wxComboBox * _difficult_combobox;
-
-private:
-    wxString _folder1_name = wxT("folder_a");
-    wxString _folder2_name = wxT("folder_b");
-    wxString _folder3_name = wxT("folder_c");
-    wxString _folder4_name = wxT("folder_d");
-    wxString _folder5_name = wxT("folder_e");
-    wxString _folder6_name = wxT("folder_f");
 
 public:
     DetectionFrame(wxString const & title);
