@@ -14,6 +14,7 @@ private:
 
 private:
     wxString _directory;
+    std::vector<wxString> _ext_list;
     std::vector<wxString> _file_list;
 
 public:
@@ -24,7 +25,8 @@ private:
     void initialize();
 
 public:
-    void openDir(wxString dir, std::vector<wxString>);
+    void openDir(wxString dir, std::vector<wxString> ext);
+    void reopenDir();
     void deleteFile(wxString file_name);
     void refreshList();
 

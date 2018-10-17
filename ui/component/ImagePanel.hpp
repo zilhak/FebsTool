@@ -50,6 +50,7 @@ private: // program status value
 private: // status value
     wxRect _current_view;
     wxRect _screen_rect;
+    wxPoint _previous_mouse_pos;
     wxPoint _virtual_mouse_pos;
     wxPoint _actual_mouse_pos;
     STATUS _status = STATUS::IDLE;
@@ -145,8 +146,11 @@ private: // location adjust
 
 public: // point calculation
     wxPoint convertToActualLocation(int x, int y, bool bind_point = true);
+    wxPoint convertToActualLocation(wxPoint const & virtual_point, bool bind_point = true);
     wxPoint convertToVirtualLocation(int x, int y, bool bind_point = true);
     wxPoint convertToVirtualLocation(wxPoint const & actual_point, bool bind_point = true);
+    wxPoint bindView(int x, int y);
+    wxPoint bindView(wxPoint point);
     wxRect convertToVirtualRect(wxRect const & actual_rect, bool bind_point = true);
     wxRect convertToActualRect(wxRect const & virtual_rect, bool bind_point = true);
 

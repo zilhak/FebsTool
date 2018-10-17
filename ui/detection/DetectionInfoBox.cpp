@@ -32,7 +32,12 @@ void DetectionInfoBox::initializeComponent()
 {
     wxFlexGridSizer * grid = new wxFlexGridSizer(6,2,3,3);
 
+    grid->AddGrowableCol(0);
+    grid->AddGrowableCol(1);
+
     _folder_name = new wxStaticText(this, wxID_ANY, "-----");
+    _folder_image_count = new wxStaticText(this, wxID_ANY, "-----");
+    _folder_image_idx = new wxStaticText(this, wxID_ANY, "-----");
     _image_name = new wxStaticText(this, wxID_ANY, "-----");
     _image_size = new wxStaticText(this, wxID_ANY, "-----");
     _mouse_x = new wxStaticText(this, wxID_ANY, "-----");
@@ -46,6 +51,10 @@ void DetectionInfoBox::initializeComponent()
 
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Folder Name :")));
     grid->Add(_folder_name, 0, wxLEFT, 5);
+    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Folder Size :")));
+    grid->Add(_folder_image_count, 0, wxLEFT, 5);
+    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Image Index :")));
+    grid->Add(_folder_image_idx, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Image Name :")));
     grid->Add(_image_name, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Image Size :")));
@@ -81,6 +90,16 @@ void DetectionInfoBox::setZoomBox(int min, int max, int interval)
 void DetectionInfoBox::setFolderName(wxString const & name)
 {
     _folder_name->SetLabel(name);
+}
+
+void DetectionInfoBox::setFolderSize(int size)
+{
+    _folder_image_count->SetLabel(wxString::Format("%d", size));
+}
+
+void DetectionInfoBox::setImageIndex(int index)
+{
+    _folder_image_idx->SetLabel(wxString::Format("%d", index));
 }
 
 void DetectionInfoBox::setImageName(wxString const & name)

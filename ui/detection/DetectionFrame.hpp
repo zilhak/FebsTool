@@ -7,6 +7,7 @@
 #include <ui/component/FileExplorer.hpp>
 #include <ui/detection/DetectionInfoBox.hpp>
 #include <ui/detection/DetectionToolBar.hpp>
+#include <ui/settings/SettingFrame.hpp>
 
 #include <set>
 #include <vector>
@@ -43,15 +44,14 @@ private:
     std::vector<wxString> _folder_name_list;
 
 private:
+    int _previous_mouse_x;
+    int _previous_mouse_y;
+
+private:
     FileExplorer * _file_list;
     DetectionToolBar * _toolbar;
     DetectionInfoBox * _infobox;
     ImagePanel * _image_panel;
-
-private:
-    wxComboBox * _type_combobox;
-    wxComboBox * _scale_combobox;
-    wxComboBox * _difficult_combobox;
 
 public:
     DetectionFrame(wxString const & title);
@@ -67,12 +67,9 @@ private:
 
 private: // menu event.
     void onZoomBox(wxCommandEvent &event);
-    void onTypeComboBox(wxCommandEvent &event);
-    void onScaleComboBox(wxCommandEvent &event);
-    void onDifficultComboBox(wxCommandEvent &event);
     void onOpenButton(wxCommandEvent & event);
+    void onSettingButton(wxCommandEvent & event);
     void onSelectFile(wxListEvent & event);
-    void onExplore();
 
 private: // input event.
     void onMouseEvent(wxMouseEvent & event);

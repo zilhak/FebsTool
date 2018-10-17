@@ -5,17 +5,12 @@
 
 wxBEGIN_EVENT_TABLE(DetectionFrame, wxDialog)
     EVT_BUTTON(ButtonID::OPEN, DetectionFrame::onOpenButton)
+    EVT_BUTTON(ButtonID::SETTING, DetectionFrame::onSettingButton)
     EVT_CHAR_HOOK(DetectionFrame::onKeyboardEvent)
     EVT_MOUSE_EVENTS(DetectionFrame::onMouseEvent)
     EVT_COMBOBOX(ID::COMBO_SIZE, DetectionFrame::onZoomBox)
     EVT_LIST_ITEM_ACTIVATED(wxID_ANY, DetectionFrame::onSelectFile)
-
-    EVT_COMBOBOX(ID::COMBO_TYPE, DetectionFrame::onTypeComboBox)
-    EVT_COMBOBOX(ID::COMBO_SCALE, DetectionFrame::onScaleComboBox)
-    EVT_COMBOBOX(ID::COMBO_DIFFICULT, DetectionFrame::onDifficultComboBox)
 wxEND_EVENT_TABLE()
-
-constexpr static char const * const TRASHBIN_NAME = "TrashCan";
 
 DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 {
@@ -132,16 +127,25 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
     if (_file_list->highlightItem(name) != -1) {
         _infobox->changeZoomBox(_image_panel->setBackgroundImage(file_name.GetFullPath(), _infobox->getZoom()));
         _infobox->setFolderName(file_name.GetDirs().back());
+        _infobox->setFolderSize(_file_list->GetItemCount());
+        _infobox->setImageIndex(static_cast<int>(_file_list->getHighlightedItemIndex()) + 1);
         _infobox->setImageName(name);
         _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
     }
 }
 
+void DetectionFrame::onSettingButton(wxCommandEvent & event)
+{
+    std::shared_ptr<SettingFrame> setting(new SettingFrame(this, wxID_ANY));
+
+    setting->ShowModal();
+}
+
 void DetectionFrame::setImagePanel()
 {
-    _image_panel->cancelAddSegment();
     _infobox->changeZoomBox(_image_panel->setBackgroundImage(_dir + "/" + _file_list->getHighlightedItem()));
     _image_panel->setSize(_infobox->getZoom());
+    _infobox->setImageIndex(static_cast<int>(_file_list->getHighlightedItemIndex()) + 1);
     _infobox->setImageName(_file_list->getHighlightedItem());
     _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
 }
@@ -157,8 +161,10 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
     if (_image_panel->isLoaded()) {
         if (event.GetKeyCode() == 69) { // 'e'
             _image_panel->setType(_toolbar->getType());
+            _image_panel->setDiff(_toolbar->getDifficult());
+            _image_panel->setDepth(_infobox->getImageScale());
             if (_image_panel->saveTempDetection()) {
-                _file_list->xmlCheck(_current_file);
+                _file_list->xmlCheck();
             }
         } else if (event.GetKeyCode() == 81) { //'q'
             prev();
@@ -177,11 +183,11 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_panel->saveCropImage();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _type_combobox->SetValue(wxT("car"));
+            _toolbar->setType(wxT("car"));
         } else if (event.GetKeyCode() == 50) { //'2'
-            _type_combobox->SetValue(wxT("bus"));
+            _toolbar->setType(wxT("bus"));
         } else if (event.GetKeyCode() == 51) { //'3'
-            _type_combobox->SetValue(wxT("truck"));
+            _toolbar->setType(wxT("truck"));
         } else if (event.GetKeyCode() == 66) { //'b'
             _image_panel->showObjects();
         } else if (event.GetKeyCode() == 78) { //'n'
@@ -202,11 +208,14 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             _image_panel->previousObject();
         }
     }
-    SetTitle(_current_file);
+    SetTitle(_file_list->getHighlightedItem());
 }
 
 void DetectionFrame::onMouseEvent(wxMouseEvent & event)
 {
+    int mouse_x = event.GetX();
+    int mouse_y = event.GetY();
+
     if (event.m_shiftDown) {
         if (event.LeftDown() || event.LeftDClick()) {
             _image_panel->selectDetectionByClick();
@@ -235,6 +244,14 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
         _image_panel->startAddTempDetection(new_object);
     } else if (event.LeftUp()) {
         _image_panel->endAddTempDetection();
+    } else if (event.RightDown()) {
+        _previous_mouse_x = mouse_x;
+        _previous_mouse_y = mouse_y;
+    } else if (event.RightIsDown()) {
+        _image_panel->moveView(_previous_mouse_x - mouse_x,
+                               _previous_mouse_y - mouse_y);
+        _previous_mouse_x = mouse_x;
+        _previous_mouse_y = mouse_y;
     }
 
     _image_panel->Refresh();
@@ -263,8 +280,13 @@ void DetectionFrame::next()
 
 void DetectionFrame::moveFile(wxString const &folder_name)
 {
-    wxFileName file(_dir + "/" + _current_file);
+    wxFileName file(_dir + "/" + _file_list->getHighlightedItem());
     wxString path = _dir + "/" + folder_name;
+
+    if (!wxFileExists(file.GetFullPath())) {
+        wxMessageBox(wxT("File not exists."));
+        return;
+    }
 
     if (!wxDirExists(path)) {
         wxMkdir(path);
@@ -281,19 +303,7 @@ void DetectionFrame::moveFile(wxString const &folder_name)
         wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
                 path + "/" + file.GetName() + duplicate_number + ".xml", true);
     }
-}
 
-void DetectionFrame::onTypeComboBox(wxCommandEvent &event)
-{
-    _image_panel->setType(_type_combobox->GetValue());
-}
-
-void DetectionFrame::onScaleComboBox(wxCommandEvent &event)
-{
-    _image_panel->setDepth(wxAtoi(_scale_combobox->GetValue()));
-}
-
-void DetectionFrame::onDifficultComboBox(wxCommandEvent &event)
-{
-    _image_panel->setDiff(wxAtoi(_difficult_combobox->GetValue()));
+    _file_list->reopenDir();
+    setImagePanel();
 }

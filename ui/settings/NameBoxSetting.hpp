@@ -1,9 +1,10 @@
-#pragma once
+
+
 #include <wx/wx.h>
 #include <wx/grid.h>
-#include <wx/colordlg.h>
-#include "../../data/XmlConfig.hpp"
-#include <memory>
+//#include <wx/colordlg.h>
+#include <data/XmlConfig.hpp>
+//#include <memory>
 
 class NameBoxSetting : public wxPanel
 {
@@ -46,7 +47,7 @@ private:
     void refreshDefault();
 };
 
-//
+
 //class TableRenderer : public wxGridCellStringRenderer
 //{
 //private:

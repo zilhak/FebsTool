@@ -20,7 +20,7 @@ void GeneralSetting::initialize()
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
 
-    initializeTitle(v_sizer, wxT(""));
+    initializeTitle(v_sizer, wxT("Zoom"));
     initializeInterval(v_sizer);
     initializeTitle(v_sizer, wxT("Limit Image Size"));
     initializeSizeLimit(v_sizer);
@@ -43,11 +43,11 @@ void GeneralSetting::initializeInterval(wxBoxSizer * v_sizer)
     _zoom_max_ctrl = new wxSpinCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxALIGN_RIGHT, 20, 5000, _config->zoom_max);
     _zoom_interval_ctrl = new wxSpinCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxALIGN_RIGHT, 1, 2500, _config->zoom_interval);
     
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�� �ּҰ� : ")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("Zoom Minimum : ")), 0, wxLEFT, 5);
     grid_sizer->Add(_zoom_min_ctrl, 0, wxLEFT, 5);
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�� �ִ밪 : ")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("Zoom Maximum : ")), 0, wxLEFT, 5);
     grid_sizer->Add(_zoom_max_ctrl, 0, wxLEFT, 5);
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�� ����(��) : ")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("Zoom Interval : ")), 0, wxLEFT, 5);
     grid_sizer->Add(_zoom_interval_ctrl, 0, wxLEFT, 5);
 
     panel->SetSizer(grid_sizer);
@@ -65,13 +65,13 @@ void GeneralSetting::initializeSizeLimit(wxBoxSizer * v_sizer)
     _max_size_x = new wxSpinCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxALIGN_RIGHT, -1, 10000, -1);
     _max_size_y = new wxSpinCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS | wxALIGN_RIGHT, -1, 10000, -1);
     
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�ּ� ���� :")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("image size min x :")), 0, wxLEFT, 5);
     grid_sizer->Add(_min_size_x, 0, wxLEFT, 5);
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�ּ� ���� :")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("image size min y :")), 0, wxLEFT, 5);
     grid_sizer->Add(_min_size_y, 0, wxLEFT, 5);
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�ִ� ���� :")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("image size max x :")), 0, wxLEFT, 5);
     grid_sizer->Add(_max_size_x, 0, wxLEFT, 5);
-    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("�ִ� ���� :")), 0, wxLEFT, 5);
+    grid_sizer->Add(new wxStaticText(panel, wxID_ANY, wxT("image size max y :")), 0, wxLEFT, 5);
     grid_sizer->Add(_max_size_y, 0, wxLEFT, 5);
 
     panel->SetSizer(grid_sizer);

@@ -16,6 +16,8 @@ public:
 
 private:
     wxStaticText * _folder_name;
+    wxStaticText * _folder_image_count;
+    wxStaticText * _folder_image_idx;
     wxStaticText * _image_name;
     wxStaticText * _image_size;
     wxStaticText * _mouse_x;
@@ -41,6 +43,8 @@ private:
 public:
     void setZoomBox(int min, int max, int interval);
     void setFolderName(wxString const & name);
+    void setFolderSize(int size);
+    void setImageIndex(int index);
     void setImageName(wxString const & name);
     void setImageSize(wxString const & size);
     void setMouseInfo(wxPoint const & point);

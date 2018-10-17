@@ -249,10 +249,13 @@ Element * insertObject(Document * doc, Object obj)
 
         name->LinkEndChild(doc->NewText(obj.name.c_str()));
         comment->LinkEndChild(doc->NewText(obj.comment.c_str()));
-        xmax->SetText(obj.point_list[1].x);
-        xmin->SetText(obj.point_list[0].x);
-        ymax->SetText(obj.point_list[1].y);
-        ymin->SetText(obj.point_list[0].y);
+
+        wxRect rect(obj.point_list[0], obj.point_list[1]);
+
+        xmax->SetText(rect.GetRight());
+        xmin->SetText(rect.x);
+        ymax->SetText(rect.GetBottom());
+        ymin->SetText(rect.y);
         difficult->SetText(obj.difficult);
     } else if (obj.type == ObjectType::SEGMENTATION) {
         Element * name = doc->NewElement("name");

@@ -166,8 +166,8 @@ void ImagePanel::onPaint(wxPaintEvent & event)
     bg.Clear();
     drawBackGround(bg);
     drawObject(bg);
-    drawCrossHair(bg);
     drawTempObject(bg);
+    drawCrossHair(bg);
 }
 
 void ImagePanel::drawBackGround(wxDC & dc)
@@ -181,6 +181,7 @@ void ImagePanel::drawObject(wxDC & dc)
     for (int i = 0; i < _obj_vector.size(); ++i) {
         if (i == _selected_obj) {
             dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
+            dc.SetTextForeground(COLOUR_IMAGE_PANEL_BOX_SELECTED);
         } else {
             wxColour colour = wxColour(0x00FFFF);
             for (int j = 0; j < _name_list.size(); ++j) {
@@ -202,7 +203,7 @@ void ImagePanel::drawObject(wxDC & dc)
                 }
             } else if (_obj_vector[i].type == ObjectType::DETECTION){
                 wxRect rect = wxRect(_obj_vector[i].point_list[0], _obj_vector[i].point_list[1]);
-                dc.DrawRectangle(convertToVirtualRect(rect));
+                dc.DrawRectangle(convertToVirtualRect(rect, false));
             }
         }
 
@@ -214,7 +215,7 @@ void ImagePanel::drawObject(wxDC & dc)
                 dc.DrawText(_obj_vector[i].name, convertToVirtualLocation(middle_point, false));
             } else if (_obj_vector[i].type == ObjectType::DETECTION) {
                 dc.SetFont(wxFont(15, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-                dc.DrawText(_obj_vector[i].name, convertToVirtualLocation(_obj_vector[i].point_list[0]));
+                dc.DrawText(_obj_vector[i].name, convertToVirtualLocation(_obj_vector[i].point_list[0], false));
                 dc.DrawText(_obj_vector[i].comment, convertToVirtualLocation(_obj_vector[i].point_list[0].x,
                                                                _obj_vector[i].point_list[0].y + 20, false));
             }
@@ -227,41 +228,9 @@ void ImagePanel::drawTempObject(wxDC & dc)
     dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_BOX_SELECTED, 2));
     if (_temp_obj.type == ObjectType::DETECTION) {
         if (_status == STATUS::DRAWING_NEW_OBJECT) {
-            int x1 = _temp_obj.point_list[0].x;
-            int x2 = _actual_mouse_pos.x;
-            int y1 = _temp_obj.point_list[0].y;
-            int y2 = _actual_mouse_pos.y;
-
-            if (x1 > x2) {
-                int temp = x1;
-                x1 = x2;
-                x2 = temp;
-            }
-
-            if (y1 > y2) {
-                int temp = y1;
-                y1 = y2;
-                y2 = temp;
-            }
-            dc.DrawRectangle(convertToVirtualRect(wxRect(x1, y1, x2 - x1, y2 - y1)));
+            dc.DrawRectangle(convertToVirtualRect(wxRect(_temp_obj.point_list[0], convertToActualLocation(bindView(_virtual_mouse_pos)))));
         } else if (_status == STATUS::EDIT_OBJECT) {
-            int x1 = _temp_obj.point_list[0].x;
-            int x2 = _temp_obj.point_list[1].x;
-            int y1 = _temp_obj.point_list[0].y;
-            int y2 = _temp_obj.point_list[1].y;
-
-            if (x1 > x2) {
-                int temp = x1;
-                x1 = x2;
-                x2 = temp;
-            }
-
-            if (y1 > y2) {
-                int temp = y1;
-                y1 = y2;
-                y2 = temp;
-            }
-            dc.DrawRectangle(convertToVirtualRect(wxRect(x1, y1, x2 - x1, y2 - y1)));
+            dc.DrawRectangle(convertToVirtualRect(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1])));
         }
     } else if (_temp_obj.type == ObjectType::SEGMENTATION) {
         int list_size = _temp_obj.point_list.size();
@@ -290,12 +259,12 @@ void ImagePanel::drawTempObject(wxDC & dc)
 
 void ImagePanel::drawCrossHair(wxDC & dc)
 {
-    if (_show_crosshair) {
+    if (_show_crosshair && _status != STATUS::DRAWING_NEW_OBJECT) {
         dc.SetPen(wxPen(COLOUR_IMAGE_PANEL_CROSSHAIR, 1));
-        if (_virtual_mouse_pos.x < _current_view.width + _space_x) {
+        if (_space_x < _virtual_mouse_pos.x && _virtual_mouse_pos.x < _current_view.width + _space_x) {
             dc.DrawLine(_virtual_mouse_pos.x, _space_y, _virtual_mouse_pos.x, _current_view.GetBottom() + _space_y);
         }
-        if (_virtual_mouse_pos.y < _current_view.height + _space_y) {
+        if (_space_y < _virtual_mouse_pos.y && _virtual_mouse_pos.y < _current_view.height + _space_y) {
             dc.DrawLine(_space_x, _virtual_mouse_pos.y, _current_view.GetRight() + _space_x, _virtual_mouse_pos.y);
         }
     }
@@ -417,11 +386,16 @@ void ImagePanel::endAddSegment()
 
 void ImagePanel::cancelAddSegment()
 {
+    _temp_obj.point_list.clear();
+
+    if (_unpacked_object.type != ObjectType::SEGMENTATION) {
+        return;
+    }
+
     if (_unpacked_object.point_list.size() > 0) {
         _obj_vector.push_back(_unpacked_object);
         _unpacked_object.point_list.clear();
     }
-    _temp_obj.point_list.clear();
 }
 
 bool ImagePanel::undoSegment()
@@ -458,7 +432,7 @@ bool ImagePanel::startAddTempDetection(Object const & new_obj)
     _undo_obj = _selected_obj;
     _selected_obj = static_cast<int>(_obj_vector.size());
 
-    _temp_obj.point_list.push_back(convertToActualLocation(_virtual_mouse_pos.x, _virtual_mouse_pos.y, true));
+    _temp_obj.point_list.push_back(convertToActualLocation(bindView(_virtual_mouse_pos)));
 
     _status = STATUS::DRAWING_NEW_OBJECT;
     return true;
@@ -471,7 +445,7 @@ void ImagePanel::endAddTempDetection()
     }
 
     if (_temp_obj.point_list.size() < 2) {
-        _temp_obj.point_list.push_back(_actual_mouse_pos);
+        _temp_obj.point_list.push_back(convertToActualLocation(bindView(_virtual_mouse_pos)));
     }
 
     _status = STATUS::EDIT_OBJECT;
@@ -480,6 +454,16 @@ void ImagePanel::endAddTempDetection()
 bool ImagePanel::saveTempDetection()
 {
     if (_temp_obj.type == ObjectType::DETECTION && _status == STATUS::EDIT_OBJECT) {
+        if (_temp_obj.point_list[0].x > _temp_obj.point_list[1].x) {
+            int tmp = _temp_obj.point_list[0].x;
+            _temp_obj.point_list[0].x = _temp_obj.point_list[1].x;
+            _temp_obj.point_list[1].x = tmp;
+        }
+        if (_temp_obj.point_list[0].y > _temp_obj.point_list[1].y) {
+            int tmp = _temp_obj.point_list[0].y;
+            _temp_obj.point_list[0].y = _temp_obj.point_list[1].y;
+            _temp_obj.point_list[1].y = tmp;
+        }
         _obj_vector.emplace_back(_temp_obj);
         _temp_obj.point_list.clear();
     } else {
@@ -694,6 +678,11 @@ wxPoint ImagePanel::convertToActualLocation(int x, int y, bool bind_point)
     return result;
 }
 
+wxPoint ImagePanel::convertToActualLocation(wxPoint const & virtual_point, bool bind_point)
+{
+    return convertToActualLocation(virtual_point.x, virtual_point.y, bind_point);
+}
+
 wxPoint ImagePanel::convertToVirtualLocation(int x, int y, bool bind_point)
 {
     wxPoint result;
@@ -713,9 +702,31 @@ wxPoint ImagePanel::convertToVirtualLocation(wxPoint const & actual_point, bool 
     return convertToVirtualLocation(actual_point.x, actual_point.y, bind_point);
 }
 
+wxPoint ImagePanel::bindView(int x, int y)
+{
+    if (x < _space_x) {
+        x = _space_x;
+    } else if (x > _current_view.width) {
+        x = _current_view.width + _space_x;
+    }
+
+    if (y < _space_y) {
+        y = _space_y;
+    } else if (y > _current_view.height) {
+        y = _current_view.height + _space_y;
+    }
+
+    return wxPoint(x, y);
+}
+
+wxPoint ImagePanel::bindView(wxPoint virtual_point)
+{
+    return bindView(virtual_point.x, virtual_point.y);
+}
+
 wxRect ImagePanel::convertToVirtualRect(wxRect const & actual_rect, bool bind_point)
 {
-    wxPoint point = convertToVirtualLocation(actual_rect.x, actual_rect.y);
+    wxPoint point = convertToVirtualLocation(actual_rect.x, actual_rect.y, bind_point);
     int width = actual_rect.width * _zoom_setting;
     int height = actual_rect.height * _zoom_setting;
 
@@ -724,7 +735,7 @@ wxRect ImagePanel::convertToVirtualRect(wxRect const & actual_rect, bool bind_po
 
 wxRect ImagePanel::convertToActualRect(wxRect const & virtual_rect, bool bind_point)
 {
-    wxPoint point = convertToVirtualLocation(virtual_rect.x, virtual_rect.y);
+    wxPoint point = convertToVirtualLocation(virtual_rect.x, virtual_rect.y, bind_point);
     int width = static_cast<int>(static_cast<double>(virtual_rect.width) / _zoom_setting);
     int height = static_cast<int>(static_cast<double>(virtual_rect.height) / _zoom_setting);
 

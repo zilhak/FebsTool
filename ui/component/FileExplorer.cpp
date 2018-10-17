@@ -33,7 +33,7 @@ void FileExplorer::initialize()
     SetBackgroundColour(COLOUR_FILELIST);
     InsertColumn(0, _("FileName"));
     SetColumnWidth(0, 190);
-    InsertColumn(1, _("Check"));
+    InsertColumn(1, _("Check"), wxLIST_FORMAT_CENTER);
     SetColumnWidth(1, 60);
 }
 
@@ -41,6 +41,7 @@ void FileExplorer::openDir(wxString directory, std::vector<wxString> ext_list)
 {
     _file_list.clear();
     _directory = directory;
+    _ext_list = ext_list;
 
     wxDir dir(directory);
     wxString file;
@@ -60,7 +61,15 @@ void FileExplorer::openDir(wxString directory, std::vector<wxString> ext_list)
 
     std::sort(_file_list.begin(), _file_list.end());
 
+    SetColumnWidth(0, GetSize().GetWidth() - 30);
+    SetColumnWidth(1, 40);
+
     refreshList();
+}
+
+void FileExplorer::reopenDir()
+{
+    openDir(_directory, _ext_list);
 }
 
 void FileExplorer::refreshList()
@@ -78,15 +87,21 @@ void FileExplorer::refreshList()
             SetItem(index, 1, ("X"));
         }
     }
+
+    if (_highlighted_item != -1) {
+        highlightItem(_highlighted_item);
+    }
 }
 
 void FileExplorer::deleteFile(wxString file)
 {
+    long item_idx = FindItem(0, file);
+
     std::remove(_file_list.begin(), _file_list.end(), file);
 
     refreshList();
 
-    if (_highlighted_item < _file_list.size()) {
+    if (_highlighted_item <= item_idx && _highlighted_item < _file_list.size()) {
         highlightItem(_highlighted_item);
     } else {
         _highlighted_item = _file_list.size() - 1;
