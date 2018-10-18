@@ -62,6 +62,8 @@ enum class Action {
 struct ConfigData {
     bool init = false;
 
+    ObjectType type = ObjectType::SEGMENTATION;
+
     wxString default_class = "NULL";
     std::vector<Name> class_list;
 
@@ -73,6 +75,9 @@ struct ConfigData {
 
     wxSize minimum_size = wxSize(-1, -1);
     wxSize maximum_size = wxSize(-1, -1);
+
+    ConfigData() {};
+    ConfigData(bool init) : init(init) {};
 };
 
 #endif //FEPSTOOL_FEBSSTRUTURE_HPP

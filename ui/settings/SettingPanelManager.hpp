@@ -26,7 +26,7 @@ private:
     bool _initialized = false;
 
 public:
-    SettingPanelManager(wxWindow * parent, wxWindowID id);
+    SettingPanelManager(wxWindow * parent, wxWindowID id, ObjectType type = ObjectType::SEGMENTATION);
     ~SettingPanelManager();
 
 public:

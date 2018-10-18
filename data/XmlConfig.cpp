@@ -5,7 +5,8 @@
 
 constexpr static char const * const CONFIG_FILE = "OC_Config.xml";
 
-constexpr static char const * const CONFIG_ROOT            = "config";
+constexpr static char const * const CONFIG_ROOT_DETECTION    = "config_detection";
+constexpr static char const * const CONFIG_ROOT_SEGMENTATION = "config_segmentation";
 constexpr static char const * const CONFIG_OPTION             = "option";
 constexpr static char const * const CONFIG_TYPES                  = "types";
 constexpr static char const * const CONFIG_DEFAULT_TYPE               = "default_type";
@@ -30,11 +31,16 @@ namespace config {
 bool saveConfig(ConfigData data)
 {
     Document document;
-    Node * root = document.NewElement(CONFIG_ROOT);
+
+    Node * root;
+    if (data.type == ObjectType::DETECTION) {
+        root = document.NewElement(CONFIG_ROOT_DETECTION);
+    } else if (data.type == ObjectType::SEGMENTATION) {
+        root = document.NewElement(CONFIG_ROOT_SEGMENTATION);
+    }
     Element * option = document.NewElement(CONFIG_OPTION);
     Element * types = document.NewElement(CONFIG_TYPES);
     Element * default_type = document.NewElement(CONFIG_DEFAULT_TYPE);
-    Element * type = document.NewElement(CONFIG_TYPE);
     Element * view_limit = document.NewElement(CONFIG_VIEW_LIMIT);
     Element * max_view_width = document.NewElement(CONFIG_MAX_VIEW_WIDTH);
     Element * max_view_height = document.NewElement(CONFIG_MAX_VIEW_HEIGHT);
@@ -96,18 +102,36 @@ bool saveConfig(ConfigData data)
     return true;
 }
 
-ConfigData loadConfig()
+ConfigData loadConfig(ObjectType type)
 {
-    ConfigData result;
-
     Document document;
     tinyxml2::XMLError err = document.LoadFile(CONFIG_FILE);
     if (err != tinyxml2::XML_NO_ERROR) {
-        result.init = true;
-        return result;
+        std::cout << "Config File Not Found. Create New Config." << std::endl;
+        return ConfigData(true);
     }
 
-    Node * root = document.FirstChildElement(CONFIG_ROOT);
+    Node * root;
+    if (type == ObjectType::DETECTION) {
+        root = document.FirstChildElement(CONFIG_ROOT_DETECTION);
+    } else if (type == ObjectType::SEGMENTATION) {
+        root = document.FirstChildElement(CONFIG_ROOT_SEGMENTATION);
+    }
+
+    if (root == nullptr) {
+        std::cout << "Setting Not Found." << std::endl;
+        return ConfigData(true);
+    }
+
+    ConfigData result = getConfigData(root);
+    result.type = type;
+
+    return result;
+}
+
+ConfigData getConfigData(Node * root)
+{
+    ConfigData result;
 
     Element * option = root->FirstChildElement(CONFIG_OPTION);
     Element * types = option->FirstChildElement(CONFIG_TYPES);

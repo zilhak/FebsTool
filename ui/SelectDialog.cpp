@@ -22,12 +22,12 @@ void SelectDialog::initialize()
 {
     wxBoxSizer * v_sizer = new wxBoxSizer(wxVERTICAL);
 
-    wxButton * button_classify = new wxButton(this, ButtonID::CLASSIFY, wxT("Classify"), wxDefaultPosition, wxSize(200,50));
+//    wxButton * button_classify = new wxButton(this, ButtonID::CLASSIFY, wxT("Classify"), wxDefaultPosition, wxSize(200,50));
     wxButton * button_detection = new wxButton(this, ButtonID::DETECTION, "Detection", wxDefaultPosition, wxSize(200,50));
     wxButton * button_segmentation = new wxButton(this, ButtonID::SEGMENTATION, "Segmentation", wxDefaultPosition, wxSize(200,50));
     wxButton * button_filemanager = new wxButton(this, ButtonID::FILE_MANAGER, "File Manager", wxDefaultPosition, wxSize(200,50));
 
-    v_sizer->Add(button_classify, 0, wxTOP | wxLEFT | wxRIGHT, 10);
+//    v_sizer->Add(button_classify, 0, wxTOP | wxLEFT | wxRIGHT, 10);
     v_sizer->Add(button_detection, 0, wxTOP | wxLEFT | wxRIGHT, 10);
     v_sizer->Add(button_segmentation, 0, wxTOP | wxLEFT | wxRIGHT, 10);
     v_sizer->Add(button_filemanager, 0, wxALL, 10);

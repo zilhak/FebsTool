@@ -4,7 +4,7 @@ BEGIN_EVENT_TABLE(SettingFrame, wxDialog)
     EVT_TREE_SEL_CHANGED(wxID_ANY, SettingFrame::onSelect)
 END_EVENT_TABLE()
 
-SettingFrame::SettingFrame(wxWindow * parent, wxWindowID id) : wxDialog(parent, id, wxT("Setting"))
+SettingFrame::SettingFrame(wxWindow * parent, wxWindowID id, ObjectType type) : wxDialog(parent, id, wxT("Setting")), _type(type)
 {
     SetMinSize(wxSize(640, 480));
     SetSize(wxSize(640, 480));

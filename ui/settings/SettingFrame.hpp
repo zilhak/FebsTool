@@ -12,9 +12,10 @@ private:
 private:
     SettingPanelManager * _list_manager;
     wxPanel * _target_panel;
+    ObjectType _type = ObjectType::SEGMENTATION;
 
 public:
-    SettingFrame(wxWindow * parent, wxWindowID id);
+    SettingFrame(wxWindow * parent, wxWindowID id, ObjectType type = ObjectType::SEGMENTATION);
     ~SettingFrame();
 
 private:

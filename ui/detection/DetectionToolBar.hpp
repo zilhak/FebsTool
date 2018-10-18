@@ -2,6 +2,7 @@
 #define FEPSTOOL_DETECTIONTOOLBAR_HPP
 
 #include <wx/wx.h>
+#include <data/FebsStruture.hpp>
 
 class DetectionToolBar : public wxPanel
 {
@@ -25,6 +26,9 @@ public:
 public:
     void setType(wxString type);
     void setDifficult(int difficult);
+
+public:
+    void setNameBox(std::vector<Name> const & class_list, wxString const & default_class);
 };
 
 

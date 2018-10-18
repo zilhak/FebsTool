@@ -80,3 +80,13 @@ void DetectionToolBar::setDifficult(int difficult)
     }
 }
 
+void DetectionToolBar::setNameBox(std::vector<Name> const & class_list, wxString const & default_class)
+{
+    _type_box->Clear();
+
+    for (auto const & name : class_list) {
+        _type_box->Append(name.name);
+    }
+
+    _type_box->SetValue(default_class);
+}

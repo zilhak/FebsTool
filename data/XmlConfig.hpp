@@ -12,7 +12,8 @@
 
 namespace config {
 bool saveConfig(ConfigData data);
-ConfigData loadConfig();
+ConfigData loadConfig(ObjectType type = ObjectType::SEGMENTATION);
+ConfigData getConfigData(Node * root);
 
 void saveNameList(std::vector<Name> list);
 std::vector<Name> loadNameList();

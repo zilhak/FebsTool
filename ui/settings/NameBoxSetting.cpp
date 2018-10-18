@@ -3,9 +3,9 @@
 BEGIN_EVENT_TABLE(NameBoxSetting, wxPanel)
     EVT_BUTTON(ID::BUTTON_ADD, NameBoxSetting::onAddButton)
     EVT_BUTTON(ID::BUTTON_DEFAULT, NameBoxSetting::onDefaultButton)
-//    EVT_GRID_CELL_LEFT_DCLICK(NameBoxSetting::onGridDClick)
-//    EVT_GRID_CELL_CHANGED(NameBoxSetting::onGridChange)
-//    EVT_GRID_CELL_LEFT_CLICK(NameBoxSetting::onGridClick)
+    EVT_GRID_CELL_LEFT_DCLICK(NameBoxSetting::onGridDClick)
+    EVT_GRID_CELL_CHANGED(NameBoxSetting::onGridChange)
+    EVT_GRID_CELL_LEFT_CLICK(NameBoxSetting::onGridClick)
     EVT_COMBOBOX(wxID_ANY, NameBoxSetting::onDefaultCombo)
 END_EVENT_TABLE()
 
@@ -113,39 +113,40 @@ void NameBoxSetting::initializeSetting()
 
 void NameBoxSetting::refresh()
 {
-//    wxString default_text = _default_combo->GetValue();
-//    _default_combo->Clear();
-//    bool exist_name = false;
-//    if (_item_grid->GetNumberRows() > 0) {
-//        _item_grid->DeleteRows(0, _item_grid->GetNumberRows());
-//    }
-//
-//    for (auto const & item : _config->class_list) {
-//        if (default_text == item.name) {
-//            exist_name = true;
-//        }
-//        _default_combo->Append(item.name);
-//
-//        int index = _item_grid->GetNumberRows();
-//        _item_grid->InsertRows(index);
-//        _item_grid->SetCellValue(index, GRID_COL_TYPE, item.name);
-//
-////        TableRenderer * render = new TableRenderer(item.colour);
-////        _item_grid->SetCellRenderer(index, GRID_COL_COLOUR, render);
-//        _item_grid->SetCellValue(index, GRID_COL_COLOUR, item.colour);
-//
-//        _item_grid->SetCellRenderer(index, GRID_COL_DELETE, new wxGridCellBoolRenderer);
-//        _item_grid->SetCellValue(index, GRID_COL_TYPE, item.name);
-//    }
-//    _default_combo->ChangeValue(_config->default_class);
-//
-//    if (!exist_name) {
-//        if (_config->class_list.size() > 0) {
-//            _default_combo->SetValue(_config->class_list[0].name);
-//        } else {
-//            _default_combo->SetValue("NULL");
-//        }
-//    }
+    wxString default_text = _default_combo->GetValue();
+    _default_combo->Clear();
+    bool exist_name = false;
+    if (_item_grid->GetNumberRows() > 0) {
+        _item_grid->DeleteRows(0, _item_grid->GetNumberRows());
+    }
+
+    for (auto const & item : _config->class_list) {
+        if (default_text == item.name) {
+            exist_name = true;
+        }
+        _default_combo->Append(item.name);
+
+        int index = _item_grid->GetNumberRows();
+        _item_grid->InsertRows(index);
+        _item_grid->SetCellValue(index, GRID_COL_TYPE, item.name);
+
+        TableRenderer * render = new TableRenderer(item.colour);
+        _item_grid->SetCellRenderer(index, GRID_COL_COLOUR, render);
+        _item_grid->SetCellValue(index, GRID_COL_COLOUR, item.colour);
+
+        _item_grid->SetCellRenderer(index, GRID_COL_DELETE, new wxGridCellBoolRenderer);
+        _item_grid->SetCellValue(index, GRID_COL_TYPE, item.name);
+    }
+    _default_combo->ChangeValue(_config->default_class);
+
+    if (!exist_name) {
+        if (_config->class_list.size() > 0) {
+            _default_combo->SetValue(_config->class_list[0].name);
+        } else {
+            _default_combo->SetValue("NULL");
+        }
+        _config->default_class = _default_combo->GetValue();
+    }
 
     Refresh();
 }
@@ -231,85 +232,85 @@ void NameBoxSetting::onGridChange(wxGridEvent & event)
 
 void NameBoxSetting::onGridClick(wxGridEvent & event)
 {
-//    int row = event.GetRow();
-//    int col = event.GetCol();
-//
-//    if (col == GRID_COL_DELETE) {
-//        wxString name = _item_grid->GetCellValue(row, GRID_COL_TYPE);
-//        wxMessageDialog * confirm = new wxMessageDialog(this, wxString("[") + name + wxT("] Delete item?"), wxT("Delete"), wxYES_NO);
-//        if (confirm->ShowModal() == wxID_YES) {
-//            for (int i = 0; i < _config->class_list.size(); ++i) {
-//                if (_config->class_list[i].name == name) {
-//                    _config->class_list.erase(_config->class_list.begin() + i);
-//                    break;
-//                }
-//            }
-//            refresh();
-//            return;
-//        }
-//    }
-//    else if (col == GRID_COL_COLOUR) {
-//        _item_grid->SelectRow(row);
-//        return;
-//    }
-//    event.Skip();
+    int row = event.GetRow();
+    int col = event.GetCol();
+
+    if (col == GRID_COL_DELETE) {
+        wxString name = _item_grid->GetCellValue(row, GRID_COL_TYPE);
+        wxMessageDialog * confirm = new wxMessageDialog(this, wxString("[") + name + wxT("] Delete item?"), wxT("Delete"), wxYES_NO);
+        if (confirm->ShowModal() == wxID_YES) {
+            for (int i = 0; i < _config->class_list.size(); ++i) {
+                if (_config->class_list[i].name == name) {
+                    _config->class_list.erase(_config->class_list.begin() + i);
+                    break;
+                }
+            }
+            refresh();
+            return;
+        }
+    }
+    else if (col == GRID_COL_COLOUR) {
+        _item_grid->SelectRow(row);
+        return;
+    }
+    event.Skip();
 }
 
 void NameBoxSetting::onGridDClick(wxGridEvent & event)
 {
-//    int row = event.GetRow();
-//    int col = event.GetCol();
-//
-//    if (col == GRID_COL_COLOUR) {
-//        std::shared_ptr<wxColourDialog> picker = std::shared_ptr<wxColourDialog>(new wxColourDialog(this));
-//
-//        if (picker->ShowModal() != wxID_OK) {
-//            return;
-//        }
-//
-//        wxColour colour = picker->GetColourData().GetColour();
-//        _item_grid->SetCellValue(row, col, wxString::Format("%ul", colour.GetRGB()));
-////        _item_grid->SetCellRenderer(row, col, new TableRenderer(_item_grid->GetCellValue(row, col)));
-//
-//        wxString name = _item_grid->GetCellValue(row, GRID_COL_TYPE);
-//        for (auto & item : _config->class_list) {
-//            if (item.name == name) {
-//                item.colour = wxString::Format("%ul", colour.GetRGB());
-//                break;
-//            }
-//        }
-//
-//        return;
-//    } else if (col == GRID_COL_TYPE) {
-//        event.Skip();
-//    } else {
-//        return;
-//    }
+    int row = event.GetRow();
+    int col = event.GetCol();
+
+    if (col == GRID_COL_COLOUR) {
+        std::shared_ptr<wxColourDialog> picker = std::shared_ptr<wxColourDialog>(new wxColourDialog(this));
+
+        if (picker->ShowModal() != wxID_OK) {
+            return;
+        }
+
+        wxColour colour = picker->GetColourData().GetColour();
+        _item_grid->SetCellValue(row, col, wxString::Format("%ul", colour.GetRGB()));
+        _item_grid->SetCellRenderer(row, col, new TableRenderer(_item_grid->GetCellValue(row, col)));
+
+        wxString name = _item_grid->GetCellValue(row, GRID_COL_TYPE);
+        for (auto & item : _config->class_list) {
+            if (item.name == name) {
+                item.colour = wxString::Format("%ul", colour.GetRGB());
+                break;
+            }
+        }
+
+        return;
+    } else if (col == GRID_COL_TYPE) {
+        event.Skip();
+    } else {
+        return;
+    }
 }
 
-//TableRenderer::TableRenderer(wxString const & col_str) : _col_str(col_str)
-//{
-//    /* EMPTY */
-//}
-//
-//TableRenderer::~TableRenderer()
-//{
-//    /* EMPTY */
-//}
-//
-//void TableRenderer::Draw(wxGrid & grid,
-//          wxGridCellAttr & attr,
-//          wxDC & dc,
-//          wxRect const & rect,
-//          int row,
-//          int col,
-//          bool isSelected)
-//{
-//    wxGridCellStringRenderer::Draw(grid, attr, dc ,rect, row, col, isSelected);
-//
-//    wxColour _colour = wxColour(wxAtol(_col_str));
-//
-//    dc.SetPen(_colour);
-//    dc.SetBrush(_colour);
-//    dc.DrawRectangle(rect);
-//}
+TableRenderer::TableRenderer(wxString const & col_str) : _col_str(col_str)
+{
+    /* EMPTY */
+}
+
+TableRenderer::~TableRenderer()
+{
+    /* EMPTY */
+}
+
+void TableRenderer::Draw(wxGrid & grid,
+          wxGridCellAttr & attr,
+          wxDC & dc,
+          wxRect const & rect,
+          int row,
+          int col,
+          bool isSelected)
+{
+    wxGridCellStringRenderer::Draw(grid, attr, dc ,rect, row, col, isSelected);
+
+    wxColour _colour = wxColour(wxAtol(_col_str));
+
+    dc.SetPen(_colour);
+    dc.SetBrush(_colour);
+    dc.DrawRectangle(rect);
+}

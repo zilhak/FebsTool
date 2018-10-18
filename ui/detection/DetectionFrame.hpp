@@ -81,6 +81,7 @@ private:
 
 private:
     void setImagePanel();
+    void applySetting();
 
 private:
     void moveFile(wxString const & folder_name);

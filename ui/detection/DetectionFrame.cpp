@@ -37,6 +37,7 @@ void DetectionFrame::initialize()
     v_sizer->Add(h_sizer, 1, wxEXPAND);
     SetSizer(v_sizer);
 
+    applySetting();
     Refresh();
 }
 
@@ -136,9 +137,11 @@ void DetectionFrame::onOpenButton(wxCommandEvent & event)
 
 void DetectionFrame::onSettingButton(wxCommandEvent & event)
 {
-    std::shared_ptr<SettingFrame> setting(new SettingFrame(this, wxID_ANY));
+    std::shared_ptr<SettingFrame> setting(new SettingFrame(this, wxID_ANY, ObjectType::DETECTION));
 
     setting->ShowModal();
+
+    applySetting();
 }
 
 void DetectionFrame::setImagePanel()
@@ -148,6 +151,28 @@ void DetectionFrame::setImagePanel()
     _infobox->setImageIndex(static_cast<int>(_file_list->getHighlightedItemIndex()) + 1);
     _infobox->setImageName(_file_list->getHighlightedItem());
     _infobox->setImageSize(wxString::Format("%d x %d", _image_panel->getImageWidth(), _image_panel->getImageHeight()));
+}
+
+void DetectionFrame::applySetting()
+{
+    ConfigData data = config::loadConfig();
+
+    if (data.init) {
+        Name init_name;
+        std::vector<wxString> name_list = {wxT("car"), wxT("bus"), wxT("truck")};
+        for (auto const & name : name_list) {
+            init_name.name = name;
+            init_name.colour = wxString::Format("%ul", 0x00FFFF);
+            data.class_list.push_back(init_name);
+        }
+        data.default_class = name_list[0];
+    }
+    _image_panel->setNameList(data.class_list);
+    _image_panel->setInitSize(data.maximum_size, data.minimum_size);
+    _infobox->setZoomBox(data.zoom_min, data.zoom_max, data.zoom_interval);
+    _toolbar->setNameBox(data.class_list, data.default_class);
+
+    _image_panel->Refresh();
 }
 
 void DetectionFrame::onSelectFile(wxListEvent & event)

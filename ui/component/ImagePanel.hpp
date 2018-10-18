@@ -74,7 +74,7 @@ public:
     void setSize(int scale);
     void setDepth(int depth) {_image_depth = depth;}
     int setBackgroundImage(wxString const & file, int scale = -1);
-    void setNameList(std::vector<Name> & name_list) {_name_list = name_list;}
+    void setNameList(std::vector<Name> const & name_list) {_name_list = name_list;}
     void setInitSize(wxSize max, wxSize min) {_min_init_size = min; _max_init_size = max;}
 
 public:

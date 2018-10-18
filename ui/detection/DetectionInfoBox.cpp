@@ -30,7 +30,7 @@ void DetectionInfoBox::initializeSetting()
 
 void DetectionInfoBox::initializeComponent()
 {
-    wxFlexGridSizer * grid = new wxFlexGridSizer(6,2,3,3);
+    wxFlexGridSizer * grid = new wxFlexGridSizer(9,2,3,3);
 
     grid->AddGrowableCol(0);
     grid->AddGrowableCol(1);

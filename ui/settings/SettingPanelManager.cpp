@@ -9,9 +9,10 @@
 BEGIN_EVENT_TABLE(SettingPanelManager, wxTreeCtrl)
 END_EVENT_TABLE()
 
-SettingPanelManager::SettingPanelManager(wxWindow * parent, wxWindowID id) : wxTreeCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT | wxSIMPLE_BORDER)
+SettingPanelManager::SettingPanelManager(wxWindow * parent, wxWindowID id, ObjectType type)
+        : wxTreeCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT | wxSIMPLE_BORDER)
 {
-    _config = config::loadConfig();
+    _config = config::loadConfig(type);
 }
 
 SettingPanelManager::~SettingPanelManager()
