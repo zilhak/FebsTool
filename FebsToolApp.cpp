@@ -6,6 +6,7 @@
 #include <ui/SelectDialog.hpp>
 #include <ui/detection/DetectionFrame.hpp>
 #include <ui/segmentation/SegmentationFrame.hpp>
+#include <ui/filemanager/FileManagerFrame.hpp>
 
 FebsToolApp::FebsToolApp() : wxApp()
 {
@@ -42,6 +43,7 @@ bool FebsToolApp::OnInit()
                 opened_dialog = new SegmentationFrame("Segmentation");
                 break;
             case SelectDialog::ButtonID::FILE_MANAGER:
+                opened_dialog = new FileManagerFrame("FileManager");
                 break;
             default:
                 opened_dialog = nullptr;
