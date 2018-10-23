@@ -66,6 +66,8 @@ int ImagePanel::setBackgroundImage(wxString const & file, int scale)
         setView(_current_view.x, _current_view.y);
     }
 
+    _status = STATUS::IDLE;
+
     _is_loaded = true;
 
     return scale;
@@ -230,7 +232,7 @@ void ImagePanel::drawTempObject(wxDC & dc)
         if (_status == STATUS::DRAWING_NEW_OBJECT) {
             dc.DrawRectangle(convertToVirtualRect(wxRect(_temp_obj.point_list[0], convertToActualLocation(bindView(_virtual_mouse_pos)))));
         } else if (_status == STATUS::EDIT_OBJECT) {
-            dc.DrawRectangle(convertToVirtualRect(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1])));
+            dc.DrawRectangle(convertToVirtualRect(wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1]), false));
         }
     } else if (_temp_obj.type == ObjectType::SEGMENTATION) {
         int list_size = _temp_obj.point_list.size();
@@ -278,6 +280,10 @@ void ImagePanel::addObject(Object const & obj)
 
 bool ImagePanel::deleteObject()
 {
+    if(_obj_vector.empty()) {
+        return false;
+    }
+
     if(_obj_vector.size() > _selected_obj) {
         _obj_vector.erase(_obj_vector.begin() + _selected_obj);
         _selected_obj = static_cast<int>(_obj_vector.size());
@@ -448,6 +454,13 @@ void ImagePanel::endAddTempDetection()
         _temp_obj.point_list.push_back(convertToActualLocation(bindView(_virtual_mouse_pos)));
     }
 
+    wxRect temp_rect(_temp_obj.point_list[0], _temp_obj.point_list[1]);
+
+    if (temp_rect.GetWidth() <= 10 || temp_rect.GetHeight() <= 10) {
+        _status = STATUS::IDLE;
+        return;
+    }
+
     _status = STATUS::EDIT_OBJECT;
 }
 
@@ -466,6 +479,9 @@ bool ImagePanel::saveTempDetection()
         }
         _obj_vector.emplace_back(_temp_obj);
         _temp_obj.point_list.clear();
+    } else if (_temp_obj.type == ObjectType::DETECTION && _status == STATUS::IDLE) {
+       _selected_obj = _obj_vector.size();
+        return false;
     } else {
         return false;
     }
@@ -502,6 +518,8 @@ void ImagePanel::selectDetectionByClick()
             return;
         }
     }
+
+    _selected_obj = _obj_vector.size();
 }
 
 void ImagePanel::deleteDetectionByClick()
@@ -706,13 +724,13 @@ wxPoint ImagePanel::bindView(int x, int y)
 {
     if (x < _space_x) {
         x = _space_x;
-    } else if (x > _current_view.width) {
+    } else if (x > _current_view.width + _space_x) {
         x = _current_view.width + _space_x;
     }
 
     if (y < _space_y) {
         y = _space_y;
-    } else if (y > _current_view.height) {
+    } else if (y > _current_view.height + _space_y) {
         y = _current_view.height + _space_y;
     }
 

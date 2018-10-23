@@ -84,6 +84,10 @@ public:
     void load();
 
 public:
+    void setStatus(STATUS status) { _status = status; }
+    STATUS getStatus() { return _status; }
+
+public:
     void moveView(int x, int y);
 
 public:

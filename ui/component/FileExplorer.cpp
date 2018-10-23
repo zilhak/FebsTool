@@ -99,7 +99,7 @@ void FileExplorer::deleteFile(wxString file)
 
     std::remove(_file_list.begin(), _file_list.end(), file);
 
-    refreshList();
+    DeleteItem(item_idx);
 
     if (_highlighted_item <= item_idx && _highlighted_item < _file_list.size()) {
         highlightItem(_highlighted_item);

@@ -246,6 +246,8 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
             _image_panel->selectDetectionByClick();
         } else if (event.RightDown() || event.RightDClick()) {
             _image_panel->deleteDetectionByClick();
+            _image_panel->save();
+            _image_panel->setStatus(ImagePanel::STATUS::IDLE);
         }
         _image_panel->Refresh();
         return;
@@ -329,6 +331,6 @@ void DetectionFrame::moveFile(wxString const &folder_name)
                 path + "/" + file.GetName() + duplicate_number + ".xml", true);
     }
 
-    _file_list->reopenDir();
+    _file_list->deleteFile(file.GetFullName());
     setImagePanel();
 }
