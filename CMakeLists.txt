@@ -20,7 +20,8 @@ set(SRC_MANAGER ui/filemanager/FileManagerFrame.hpp ui/filemanager/FileManagerFr
 set(SRC_COMPONENTS ui/component/FileExplorer.hpp ui/component/FileExplorer.cpp ui/component/ImagePanel.hpp ui/component/ImagePanel.cpp)
 set(SRC_DATA data/tinyxml2.h data/tinyxml2.cpp data/XmlConfig.hpp data/XmlConfig.cpp data/ThemeData.hpp data/EventData.cpp data/EventData.hpp)
 set(SRC_SETTING ui/settings/SettingFrame.cpp ui/settings/SettingFrame.hpp ui/settings/SettingPanelManager.cpp ui/settings/SettingPanelManager.hpp ui/settings/GeneralSetting.cpp ui/settings/GeneralSetting.hpp ui/settings/NameBoxSetting.cpp ui/settings/NameBoxSetting.hpp data/FebsID.hpp data/FebsStruture.hpp)
+set(ETC ETC/RunningTimeChecker.hpp ETC/RunningTimeChecker.cpp)
 
-add_executable(FepsTool ${SRC_BASE} ${SRC_COMPONENTS} ${SRC_DATA} ${SRC_DETECTION} ${SRC_SEGMENTATION} ${SRC_SETTING} ${SRC_MANAGER})
+add_executable(FepsTool ${SRC_BASE} ${SRC_COMPONENTS} ${SRC_DATA} ${SRC_DETECTION} ${SRC_SEGMENTATION} ${SRC_SETTING} ${SRC_MANAGER} ${ETC})
 target_link_libraries(FepsTool ${wxWidgets_LIBRARIES})
 

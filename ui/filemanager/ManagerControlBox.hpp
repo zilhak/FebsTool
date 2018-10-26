@@ -27,6 +27,9 @@ private:
     void initializeControl(wxSizer * sizer);
     void initializeData();
 
+public:
+    int getRow() { return _spin_row->GetValue(); };
+    int getCol() { return _spin_col->GetValue(); };
 
 };
 

@@ -50,6 +50,9 @@ public:
     void setMouseInfo(wxPoint const & point);
 
 public:
+    void decreaseFolderSize();
+
+public:
     void zoomIn();
     void zoomOut();
     void changeZoomBox(int ratio);

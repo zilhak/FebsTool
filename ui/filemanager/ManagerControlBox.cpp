@@ -36,8 +36,8 @@ void ManagerControlBox::initializeControl(wxSizer * sizer)
 {
     wxBoxSizer * h_sizer = new wxBoxSizer(wxHORIZONTAL);
 
-    _spin_col = new wxSpinCtrl(this, wxID_ANY, "2", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER, 1, 8, 5);
-    _spin_row = new wxSpinCtrl(this, wxID_ANY, "2", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER, 1, 8, 5);
+    _spin_col = new wxSpinCtrl(this, wxID_ANY, "5", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER, 1, 8, 5);
+    _spin_row = new wxSpinCtrl(this, wxID_ANY, "5", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER, 1, 8, 5);
 
     h_sizer->Add(new wxStaticText(this, wxID_ANY, " ROW : "));
     h_sizer->Add(_spin_row, 1);

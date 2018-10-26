@@ -118,6 +118,15 @@ void DetectionInfoBox::setMouseInfo(wxPoint const & point)
     _mouse_y->SetLabel(std::to_string(point.y));
 }
 
+void DetectionInfoBox::decreaseFolderSize()
+{
+    int folder_size = wxAtoi(_folder_image_count->GetLabelText());
+    if (folder_size > 0) {
+        --folder_size;
+    }
+    _folder_image_count->SetLabel(std::to_string(folder_size));
+}
+
 void DetectionInfoBox::zoomIn()
 {
     int cur_zoom = getZoom() + _interval;

@@ -95,7 +95,27 @@ void FileManagerFrame::onOpen(wxCommandEvent & event)
 
         std::sort(_file_list.begin(), _file_list.end());
 
+        int row = _control_box->getRow();
+        int col = _control_box->getCol();
+
+        _screen->setPath(dir_name);
+        _screen->setGrid(row, col);
+        _screen->setImages(subvector(0));
         _screen->teardown();
     }
+}
 
+
+std::vector<wxString> FileManagerFrame::subvector(int iter)
+{
+    int row = _control_box->getRow();
+    int col = _control_box->getCol();
+
+    if (iter >= _file_list.size()) {
+        return std::vector<wxString>();
+    } else if (iter + row * col >= _file_list.size()) {
+        return std::vector<wxString>(_file_list.begin() + iter, _file_list.end());
+    } else {
+        return std::vector<wxString>(_file_list.begin() + iter, _file_list.begin() + iter + row * col);
+    }
 }

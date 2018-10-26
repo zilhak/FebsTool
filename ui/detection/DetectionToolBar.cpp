@@ -70,6 +70,13 @@ void DetectionToolBar::setType(wxString type)
     }
 }
 
+void DetectionToolBar::setType(int num)
+{
+    if (_type_box->GetCount() > num) {
+        _type_box->Select(num);
+    }
+}
+
 void DetectionToolBar::setDifficult(int difficult)
 {
     for (int i = 0; i < _diff_box->GetCount(); ++i) {

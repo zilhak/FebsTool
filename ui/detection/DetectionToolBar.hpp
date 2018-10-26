@@ -25,6 +25,7 @@ public:
 
 public:
     void setType(wxString type);
+    void setType(int num);
     void setDifficult(int difficult);
 
 public:

@@ -47,6 +47,9 @@ private:
 
 private:
     void onOpen(wxCommandEvent & event);
+
+private:
+    std::vector<wxString> subvector(int iter);
 };
 
 

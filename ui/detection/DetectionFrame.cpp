@@ -208,11 +208,11 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_panel->saveCropImage();
         } else if (event.GetKeyCode() == 49) { //'1'
-            _toolbar->setType(wxT("car"));
+            _toolbar->setType(0);
         } else if (event.GetKeyCode() == 50) { //'2'
-            _toolbar->setType(wxT("bus"));
+            _toolbar->setType(1);
         } else if (event.GetKeyCode() == 51) { //'3'
-            _toolbar->setType(wxT("truck"));
+            _toolbar->setType(2);
         } else if (event.GetKeyCode() == 66) { //'b'
             _image_panel->showObjects();
         } else if (event.GetKeyCode() == 78) { //'n'
@@ -330,6 +330,7 @@ void DetectionFrame::moveFile(wxString const &folder_name)
         wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
                 path + "/" + file.GetName() + duplicate_number + ".xml", true);
     }
+    _infobox->setImageIndex();
 
     _file_list->deleteFile(file.GetFullName());
     setImagePanel();
