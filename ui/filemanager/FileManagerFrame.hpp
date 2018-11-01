@@ -18,9 +18,11 @@ private:
 
 private:
     std::vector<wxString> _file_list;
-    std::list<wxString> _selected_list;
+    std::vector<bool> _selected_list;
     std::vector<wxString> _deleted_list;
-    std::stack<int> _deleted_files;
+
+private:
+    int _iteration = 0;
 
 private:
     enum BUTTON_ID {
@@ -47,6 +49,15 @@ private:
 
 private:
     void onOpen(wxCommandEvent & event);
+    void onKeyBoardEvent(wxKeyEvent & event);
+    void onMouseEvent(wxMouseEvent & event);
+
+private:
+    void next();
+    void prev();
+
+private:
+    void toggleImage(int index);
 
 private:
     std::vector<wxString> subvector(int iter);

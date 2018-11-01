@@ -2,6 +2,8 @@
 
 BEGIN_EVENT_TABLE(FileManagerFrame, wxDialog)
     EVT_BUTTON(BUTTON_ID::OPEN, FileManagerFrame::onOpen)
+    EVT_CHAR_HOOK(FileManagerFrame::onKeyBoardEvent)
+    EVT_MOUSE_EVENTS(FileManagerFrame::onMouseEvent)
 END_EVENT_TABLE()
 
 FileManagerFrame::FileManagerFrame(wxString const & title) :
@@ -75,7 +77,6 @@ void FileManagerFrame::onOpen(wxCommandEvent & event)
         _file_list.clear();
         _selected_list.clear();
         _deleted_list.clear();
-        _deleted_files = std::stack<int>();
 
         wxDir dir(dir_name);
         wxString file;
@@ -98,13 +99,70 @@ void FileManagerFrame::onOpen(wxCommandEvent & event)
         int row = _control_box->getRow();
         int col = _control_box->getCol();
 
+        _iteration = 0;
         _screen->setPath(dir_name);
         _screen->setGrid(row, col);
-        _screen->setImages(subvector(0));
+        _screen->setImages(subvector(_iteration));
         _screen->teardown();
     }
 }
 
+void FileManagerFrame::onKeyBoardEvent(wxKeyEvent & event)
+{
+    std::cout << event.GetKeyCode() << std::endl;
+    switch (event.GetKeyCode()) {
+        case 65 :
+            break;
+        case 81 :
+            prev();
+            break;
+        case 82 :
+            next();
+            break;
+        default :
+            break;
+    }
+}
+
+void FileManagerFrame::onMouseEvent(wxMouseEvent & event)
+{
+    if (event.LeftDown()) {
+        int index = _screen->getImageRectIndex(event.GetPosition());
+        if (index != -1) {
+
+        }
+    }
+}
+
+void FileManagerFrame::prev()
+{
+    int row = _control_box->getRow();
+    int col = _control_box->getCol();
+
+    _iteration -= row * col;
+    if (_iteration < 0) {
+        _iteration = 0;
+    }
+    _screen->setImages(subvector(_iteration));
+}
+
+void FileManagerFrame::next()
+{
+    int row = _control_box->getRow();
+    int col = _control_box->getCol();
+
+    if (_iteration + row * col >= _file_list.size()) {
+        return;
+    }
+    _iteration += row * col;
+
+    _screen->setImages(subvector(_iteration));
+}
+
+void FileManagerFrame::toggleImage(int index)
+{
+    _selected_list[_iteration + index] = !_selected_list[_iteration + index];
+}
 
 std::vector<wxString> FileManagerFrame::subvector(int iter)
 {

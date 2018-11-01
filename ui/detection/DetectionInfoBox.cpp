@@ -63,9 +63,9 @@ void DetectionInfoBox::initializeComponent()
     grid->Add(_mouse_x, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Mouse Y :")));
     grid->Add(_mouse_y, 0, wxLEFT, 5);
-    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Zoom :")));
+    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Zoom :")), wxALIGN_CENTER_VERTICAL);
     grid->Add(_size_box, 0, wxLEFT | wxEXPAND, 5);
-    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Scale :")));
+    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Scale :")), wxALIGN_CENTER_VERTICAL);
     grid->Add(_image_scale_box, 0, wxLEFT | wxEXPAND, 5);
 
     SetSizer(grid);

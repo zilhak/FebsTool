@@ -57,6 +57,9 @@ public:
     void convertImage(std::vector<wxImage> & input, std::vector<wxBitmap> & output);
 
 public:
+    int getImageRectIndex(wxPoint const & pos);
+
+public:
     bool teardown();
 };
 

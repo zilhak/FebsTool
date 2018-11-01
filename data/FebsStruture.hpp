@@ -67,7 +67,7 @@ struct ConfigData {
     wxString default_class = "NULL";
     std::vector<Name> class_list;
 
-    std::map<int, Action> key_map;
+    std::map<int, int> key_map;
 
     int zoom_interval = 10;
     int zoom_min = 20;

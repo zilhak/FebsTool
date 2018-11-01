@@ -140,6 +140,7 @@ void DetectionFrame::onSettingButton(wxCommandEvent & event)
     std::shared_ptr<SettingFrame> setting(new SettingFrame(this, wxID_ANY, ObjectType::DETECTION));
 
     setting->ShowModal();
+    setting->save();
 
     applySetting();
 }
@@ -175,6 +176,65 @@ void DetectionFrame::applySetting()
     _image_panel->Refresh();
 }
 
+// Code List
+//  0 ~ 9 : class change
+// 10 ~ 19: move to folder
+// 20  : confirm box
+// 30  : next object
+// 31  : previous object
+// 32  : delete object
+// 50  : nextfile
+// 51  : prevfile
+// 100 : deletefile
+// 101 : cropfile
+// 110 : crosshair on/off
+// 111 : object name on/off
+// 112 : box on/off
+
+
+int DetectionFrame::getAction(int keycode)
+{
+    auto code = _key_map.find(keycode);
+
+    if (code != _key_map.end()) {
+        return code->second;
+    }
+
+    switch (keycode) {
+        case 13 : return 101;// 'enter', crop image
+        case 69 : return 20; // 'e', confirm box
+
+        case 96 : return 30; // '`', next object;
+        case 9  : return 31; //'tab', prev object;
+        case 84 : return 32; // 't', delete object
+
+        case 81 : return 51; // 'q', previous image
+        case 82 : return 50; // 'r', next image
+        //case ?? : return 100// delete file!!
+
+        case 49 : return 0;  // '1', class change
+        case 50 : return 1;  // '2', class change
+        case 51 : return 2;  // '3', class change
+        case 52 : return 3;  // '4', class change
+        case 53 : return 4;  // '5', class change
+        case 54 : return 5;  // '6', class change
+        case 55 : return 6;  // '7', class change
+        case 56 : return 7;  // '8', class change
+        case 57 : return 8;  // '9', class change
+        case 48 : return 9;  // '0', class change
+
+        case 90 : return 10; // 'z', image move to folder
+        case 88 : return 11; // 'x', image move to folder
+        case 67 : return 12; // 'c', image move to folder
+        case 86 : return 13; // 'v', image move to folder
+
+        case 72 : return 110;// 'h', crosshair on/off
+        case 78 : return 111;// 'n', class name on/off
+        case 66 : return 112;// 'b', box on/off
+        default : return -1;
+    }
+}
+
 void DetectionFrame::onSelectFile(wxListEvent & event)
 {
     setImagePanel();
@@ -184,56 +244,46 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 {
     std::cout << "Inserted keycode : "<< event.GetKeyCode() << std::endl;
     if (_image_panel->isLoaded()) {
-        if (event.GetKeyCode() == 69) { // 'e'
-            _image_panel->setType(_toolbar->getType());
-            _image_panel->setDiff(_toolbar->getDifficult());
-            _image_panel->setDepth(_infobox->getImageScale());
-            if (_image_panel->saveTempDetection()) {
-                _file_list->xmlCheck();
-            }
-        } else if (event.GetKeyCode() == 81) { //'q'
-            prev();
-        } else if (event.GetKeyCode() == 87) { //'w'
-
-        } else if (event.GetKeyCode() == 83) { //'s'
-
-        } else if (event.GetKeyCode() == 65) { //'a'
-
-        } else if (event.GetKeyCode() == 68) { //'d'
-
-        } else if (event.GetKeyCode() == 82) { //'r'
-            next();
-        } else if (event.GetKeyCode() == 84) { //'t
-            _image_panel->deleteObject();
-        } else if (event.GetKeyCode() == 13) { //'enter'
-            _image_panel->saveCropImage();
-        } else if (event.GetKeyCode() == 49) { //'1'
-            _toolbar->setType(0);
-        } else if (event.GetKeyCode() == 50) { //'2'
-            _toolbar->setType(1);
-        } else if (event.GetKeyCode() == 51) { //'3'
-            _toolbar->setType(2);
-        } else if (event.GetKeyCode() == 66) { //'b'
-            _image_panel->showObjects();
-        } else if (event.GetKeyCode() == 78) { //'n'
-            _image_panel->showObjectName();
-        } else if (event.GetKeyCode() == 72) { //'h'
-            _image_panel->showCrossHair();
-        } else if (event.GetKeyCode() == 90) { //'z'
-            if (_folder_name_list.size() > 0) { moveFile(_folder_name_list[0]); }
-        } else if (event.GetKeyCode() == 88) { //'x'
-            if (_folder_name_list.size() > 1) { moveFile(_folder_name_list[1]); }
-        } else if (event.GetKeyCode() == 67) { //'c'
-            if (_folder_name_list.size() > 2) { moveFile(_folder_name_list[2]); }
-        } else if (event.GetKeyCode() == 86) { //'v'
-            if (_folder_name_list.size() > 3) { moveFile(_folder_name_list[3]); }
-        } else if (event.GetKeyCode() == WXK_TAB) {
-            _image_panel->nextObject();
-        } else if (event.GetKeyCode() == 96) { // '`'
-            _image_panel->previousObject();
+        int action_code = getAction(event.GetKeyCode());
+        switch (action_code) {
+            case 20 : // confirm box
+                _image_panel->setType(_toolbar->getType());
+                _image_panel->setDiff(_toolbar->getDifficult());
+                _image_panel->setDepth(_infobox->getImageScale());
+                if (_image_panel->saveTempDetection()) {
+                    _file_list->xmlCheck();
+                }
+                break;
+            case 30: // select next object
+                _image_panel->nextObject(); break;
+            case 31: // select previous object
+                _image_panel->previousObject(); break;
+            case 32: // delete selected object
+                _image_panel->deleteObject(); break;
+            case 50 : // next image
+                next(); break;
+            case 51 : // previous image
+                prev(); break;
+            case 100 : // delete file
+                break;
+            case 101 : // save croped image
+                _image_panel->saveCropImage(); break;
+            case 110 : // crosshair on/off
+                _image_panel->showCrossHair(); break;
+            case 111 : // classname on/off
+                _image_panel->showObjectName(); break;
+            case 112 : // box on/off
+                _image_panel->showObjects(); break;
+            case 0 : case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: // set class name
+                _toolbar->setType(action_code); break;
+            case 10: case 11: case 12: case 13: case 14: case 15: case 16: case 17: case 18: case 19: // move file
+                if (_folder_name_list.size() > action_code - 10) { moveFile(_folder_name_list[action_code - 10]); }
+                break;
+            default:
+                return;
         }
+        SetTitle(_file_list->getHighlightedItem());
     }
-    SetTitle(_file_list->getHighlightedItem());
 }
 
 void DetectionFrame::onMouseEvent(wxMouseEvent & event)
@@ -330,8 +380,8 @@ void DetectionFrame::moveFile(wxString const &folder_name)
         wxRenameFile(file.GetPath(wxPATH_GET_SEPARATOR) + file.GetName() + ".xml",
                 path + "/" + file.GetName() + duplicate_number + ".xml", true);
     }
-    _infobox->setImageIndex();
 
     _file_list->deleteFile(file.GetFullName());
+    _infobox->decreaseFolderSize();
     setImagePanel();
 }

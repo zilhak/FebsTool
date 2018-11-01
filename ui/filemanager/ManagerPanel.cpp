@@ -4,6 +4,7 @@
 
 BEGIN_EVENT_TABLE(ManagerPanel, wxPanel)
     EVT_PAINT(ManagerPanel::onPaint)
+    EVT_MOUSE_EVENTS(ManagerPanel::onMouse)
 END_EVENT_TABLE()
 
 ManagerPanel::ManagerPanel(wxWindow * parent, wxWindowID id) : wxPanel(parent, id)
@@ -68,16 +69,20 @@ void ManagerPanel::setImages(std::vector<wxString> const & file_list)
         num = max_size;
     }
 
+    util::startCheckTime();
     for (int i = 0; i < num; ++i) {
-        wxImage(_path + "/" + file_list[i]);
         _image_vector.emplace_back(wxImage(_path + "/" + file_list[i]));
     }
-
+    util::endCheckTime(true);
     _resized_bitmap_vector.clear();
 
     for (auto const & image : _image_vector) {
-        _resized_bitmap_vector.emplace_back(wxBitmap(image.Scale(_width, _height, wxIMAGE_QUALITY_BOX_AVERAGE)));
+        const wxImage img = image.Scale(_width, _height, wxIMAGE_QUALITY_BOX_AVERAGE);
+        wxBitmap bitmap = wxBitmap(img);
+        _resized_bitmap_vector.emplace_back(bitmap);
     }
+
+    Refresh();
 }
 
 void ManagerPanel::setGrid(int row, int col)
@@ -96,6 +101,16 @@ void ManagerPanel::setGrid(int row, int col)
                                                   (_height + _space_y) * i + _space_y, _width, _height));
         }
     }
+}
+
+int ManagerPanel::getImageRectIndex(wxPoint const & pos)
+{
+    for (int i = 0; i < _image_pos_vector.size(); ++i) {
+        if (_image_pos_vector[i].Contains(pos)) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 bool ManagerPanel::teardown()

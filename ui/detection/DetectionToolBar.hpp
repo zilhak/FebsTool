@@ -22,6 +22,7 @@ private:
 public:
     wxString getType();
     int getDifficult();
+    int getTypeSize() const { return _type_box->GetCount(); }
 
 public:
     void setType(wxString type);

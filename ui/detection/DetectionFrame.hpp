@@ -42,6 +42,7 @@ private:
     wxString _current_file;
     std::set<wxString> _image_extension;
     std::vector<wxString> _folder_name_list;
+    std::map<int, int> _key_map;
 
 private:
     int _previous_mouse_x;
@@ -82,6 +83,9 @@ private:
 private:
     void setImagePanel();
     void applySetting();
+
+private:
+    int getAction(int key);
 
 private:
     void moveFile(wxString const & folder_name);

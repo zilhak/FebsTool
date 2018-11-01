@@ -666,18 +666,18 @@ wxPoint ImagePanel::virtualLocationAdjust(int x, int y)
 
 wxPoint ImagePanel::actualLocationAdjust(int x, int y)
 {
-    if (x < 0) {
-        x = 0;
+    if (x < _current_view.x) {
+        x = _current_view.x;
     }
-    else if (x > _image_width) {
-        x = _image_width;
+    else if (x > _current_view.GetRight()) {
+        x = _current_view.GetRight();
     }
 
-    if (y < 0) {
-        y = 0;
+    if (y < _current_view.y) {
+        y = _current_view.y;
     }
-    else if (y > _image_height) {
-        y = _image_height;
+    else if (y > _current_view.GetBottom()) {
+        y = _current_view.GetBottom();
     }
     return wxPoint(x, y);
 }

@@ -48,6 +48,11 @@ void SettingFrame::initializePanel(wxBoxSizer * h_sizer)
     _target_panel->Layout();
 }
 
+void SettingFrame::save()
+{
+    _list_manager->saveConfig();
+}
+
 void SettingFrame::onSelect(wxTreeEvent & event)
 {
     _list_manager->open(_list_manager->GetItemText(event.GetItem()));

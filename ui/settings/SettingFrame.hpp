@@ -24,6 +24,9 @@ private:
     void initializePanel(wxBoxSizer * h_sizer);
     void initializeTree(wxBoxSizer * h_sizer);
 
+public:
+    void save();
+
 private:
     void onSelect(wxTreeEvent & event);
 };
