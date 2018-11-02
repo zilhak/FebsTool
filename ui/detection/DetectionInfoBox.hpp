@@ -22,6 +22,7 @@ private:
     wxStaticText * _image_size;
     wxStaticText * _mouse_x;
     wxStaticText * _mouse_y;
+    wxStaticText * _object_size;
     wxComboBox * _size_box;
     wxComboBox * _image_scale_box;
 
@@ -48,6 +49,7 @@ public:
     void setImageName(wxString const & name);
     void setImageSize(wxString const & size);
     void setMouseInfo(wxPoint const & point);
+    void setObjectInfo(wxRect const & rect);
 
 public:
     void decreaseFolderSize();

@@ -30,7 +30,7 @@ void DetectionInfoBox::initializeSetting()
 
 void DetectionInfoBox::initializeComponent()
 {
-    wxFlexGridSizer * grid = new wxFlexGridSizer(9,2,3,3);
+    wxFlexGridSizer * grid = new wxFlexGridSizer(10,2,3,3);
 
     grid->AddGrowableCol(0);
     grid->AddGrowableCol(1);
@@ -42,6 +42,7 @@ void DetectionInfoBox::initializeComponent()
     _image_size = new wxStaticText(this, wxID_ANY, "-----");
     _mouse_x = new wxStaticText(this, wxID_ANY, "-----");
     _mouse_y = new wxStaticText(this, wxID_ANY, "-----");
+    _object_size = new wxStaticText(this, wxID_ANY, "0 x 0 x 0 x 0");
     _size_box = new wxComboBox(this, ID::ZOOM_BOX, wxT("100%"));
     _image_scale_box = new wxComboBox(this, wxID_ANY, wxT("3"));
 
@@ -63,6 +64,8 @@ void DetectionInfoBox::initializeComponent()
     grid->Add(_mouse_x, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Mouse Y :")));
     grid->Add(_mouse_y, 0, wxLEFT, 5);
+    grid->Add(new wxStaticText(this, wxID_ANY, wxT("Object :")));
+    grid->Add(_object_size, 0, wxLEFT, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Zoom :")), wxALIGN_CENTER_VERTICAL);
     grid->Add(_size_box, 0, wxLEFT | wxEXPAND, 5);
     grid->Add(new wxStaticText(this, wxID_ANY, wxT("Scale :")), wxALIGN_CENTER_VERTICAL);
@@ -116,6 +119,11 @@ void DetectionInfoBox::setMouseInfo(wxPoint const & point)
 {
     _mouse_x->SetLabel(std::to_string(point.x));
     _mouse_y->SetLabel(std::to_string(point.y));
+}
+
+void DetectionInfoBox::setObjectInfo(wxRect const & rect)
+{
+    _object_size->SetLabel(wxString::Format("%d x %d x %d x %d", rect.x, rect.y, rect.width, rect.height));
 }
 
 void DetectionInfoBox::decreaseFolderSize()

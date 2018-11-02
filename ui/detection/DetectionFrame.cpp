@@ -2,6 +2,7 @@
 #include <ui/detection/DetectionFrame.hpp>
 #include <data/ThemeData.hpp>
 #include <iostream>
+#include <opencv/cv.hpp>
 
 wxBEGIN_EVENT_TABLE(DetectionFrame, wxDialog)
     EVT_BUTTON(ButtonID::OPEN, DetectionFrame::onOpenButton)
@@ -15,6 +16,8 @@ wxEND_EVENT_TABLE()
 DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 {
     initialize();
+    cv::Mat mat;
+    std::cout << "test : " << mat.elemSize() << std::endl;
 }
 
 DetectionFrame::~DetectionFrame()
@@ -283,6 +286,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
                 return;
         }
         SetTitle(_file_list->getHighlightedItem());
+        _infobox->setObjectInfo(_image_panel->getSelectedDetection());
     }
 }
 
@@ -319,6 +323,7 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
         new_object.difficult = _toolbar->getDifficult();
 
         _image_panel->startAddTempDetection(new_object);
+        _infobox->setObjectInfo(_image_panel->getSelectedDetection());
     } else if (event.LeftUp()) {
         _image_panel->endAddTempDetection();
     } else if (event.RightDown()) {
@@ -329,6 +334,8 @@ void DetectionFrame::onMouseEvent(wxMouseEvent & event)
                                _previous_mouse_y - mouse_y);
         _previous_mouse_x = mouse_x;
         _previous_mouse_y = mouse_y;
+    } else if (event.LeftIsDown()) {
+        _infobox->setObjectInfo(_image_panel->getSelectedDetection());
     }
 
     _image_panel->Refresh();

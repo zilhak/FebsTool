@@ -95,6 +95,7 @@ public:
     int getImageHeight() const {return _image_height;}
     wxPoint getActualMouse() const { return _actual_mouse_pos; }
     wxRect getView() const { return _current_view; }
+    wxRect getSelectedDetection();
 
 public:
     void addObject(Object const & obj);

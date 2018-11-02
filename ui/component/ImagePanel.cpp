@@ -30,12 +30,10 @@ void ImagePanel::setSize(int scale)
 {
     _zoom_setting = static_cast<double>(scale) / 100;
 
-    _background_bitmap = wxBitmap(_original_image.Scale(static_cast<int>(static_cast<double>(_image_width) * _zoom_setting),
-        static_cast<int>(static_cast<double>(_image_height) * _zoom_setting),
-        wxIMAGE_QUALITY_HIGH));
+    _bitmap_width = static_cast<int>(static_cast<double>(_image_width) * _zoom_setting);
+    _bitmap_height = static_cast<int>(static_cast<double>(_image_height) * _zoom_setting);
 
-    _bitmap_width = _background_bitmap.GetWidth();
-    _bitmap_height = _background_bitmap.GetHeight();
+    _background_bitmap = wxBitmap(_original_image.Scale(_bitmap_width, _bitmap_height, wxIMAGE_QUALITY_HIGH));
 
     setView(_current_view.x, _current_view.y);
 }
@@ -108,6 +106,19 @@ void ImagePanel::setView(int x, int y)
     Refresh();
 }
 
+wxRect ImagePanel::getSelectedDetection()
+{
+    if (_status == STATUS::DRAWING_NEW_OBJECT) {
+        return wxRect(_temp_obj.point_list[0], convertToActualLocation(_virtual_mouse_pos, true));
+    } else if (_status == STATUS::EDIT_OBJECT) {
+        return wxRect(_temp_obj.point_list[0], _temp_obj.point_list[1]);
+    } else if (_status == STATUS::IDLE && _selected_obj >= _obj_vector.size()) {
+        return wxRect(0, 0, 0, 0);
+    } else if (_status == STATUS::IDLE && _selected_obj < _obj_vector.size()) {
+        return wxRect(_obj_vector[_selected_obj].point_list[0], _obj_vector[_selected_obj].point_list[1]);
+    }
+}
+
 void ImagePanel::moveView(int x, int y)
 {
     int move_x;
@@ -163,8 +174,7 @@ void ImagePanel::onPaint(wxPaintEvent & event)
     if (!_screen.IsOk()) {
         return;
     }
-    wxPaintDC dc(this);
-    wxBufferedDC bg(&dc);
+    wxAutoBufferedPaintDC bg(this);
     bg.Clear();
     drawBackGround(bg);
     drawObject(bg);

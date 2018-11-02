@@ -68,8 +68,8 @@ void NameBoxSetting::initializeGrid(wxSizer * v_sizer)
     }
 
     _item_grid->SetColSize(GRID_COL_TYPE, 300);
-    _item_grid->SetColSize(GRID_COL_COLOUR, 140);
-    _item_grid->SetColSize(GRID_COL_DELETE, 40);
+    _item_grid->SetColSize(GRID_COL_COLOUR, 100);
+    _item_grid->SetColSize(GRID_COL_DELETE, 42);
 
     v_sizer->Add(_item_grid, 1, wxEXPAND | wxTOP | wxBOTTOM, 10);
 }
