@@ -12,6 +12,7 @@
 #include <set>
 #include <vector>
 #include <algorithm>
+#include <deque>
 
 
 class DetectionFrame : public wxDialog
@@ -43,8 +44,10 @@ private:
     std::set<wxString> _image_extension;
     std::vector<wxString> _folder_name_list;
     std::map<int, int> _key_map;
+    std::deque<std::pair<wxString, wxString>> _undo_map;
 
 private:
+    bool _system_key_down = false;
     int _previous_mouse_x;
     int _previous_mouse_y;
 
@@ -62,9 +65,9 @@ private:
     void initialize();
     void initializeStyle();
     void initializeSetting();
-    void initializeToolBar(wxBoxSizer * sizer);
+    void initializeToolBar(wxBoxSizer * v_sizer);
     void initializeLeftMenu(wxBoxSizer * h_sizer);
-    void initializeImageViewer(wxBoxSizer * h_sizer);
+    void initializeImageViewer(wxBoxSizer * sizer);
 
 private: // menu event.
     void onZoomBox(wxCommandEvent &event);
@@ -89,5 +92,6 @@ private:
 
 private:
     void moveFile(wxString const & folder_name);
+    void undo();
 };
 

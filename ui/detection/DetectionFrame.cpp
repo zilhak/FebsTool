@@ -193,6 +193,7 @@ void DetectionFrame::applySetting()
 // 110 : crosshair on/off
 // 111 : object name on/off
 // 112 : box on/off
+// 200 : undo
 
 
 int DetectionFrame::getAction(int keycode)
@@ -234,6 +235,8 @@ int DetectionFrame::getAction(int keycode)
         case 72 : return 110;// 'h', crosshair on/off
         case 78 : return 111;// 'n', class name on/off
         case 66 : return 112;// 'b', box on/off
+
+        case 85 : return 200;// 'u', undo
         default : return -1;
     }
 }
@@ -277,8 +280,11 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
                 _image_panel->showObjectName(); break;
             case 112 : // box on/off
                 _image_panel->showObjects(); break;
+            case 200 : // undo
+
             case 0 : case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: // set class name
-                _toolbar->setType(action_code); break;
+                _toolbar->setType(action_code);
+                break;
             case 10: case 11: case 12: case 13: case 14: case 15: case 16: case 17: case 18: case 19: // move file
                 if (_folder_name_list.size() > action_code - 10) { moveFile(_folder_name_list[action_code - 10]); }
                 break;

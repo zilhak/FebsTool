@@ -161,7 +161,7 @@ bool ImagePanel::save()
 {
     if (_background_bitmap.IsOk()) {
         saveToXml(_obj_vector, _image_file, ImageInfo(_image_height, _image_width, _image_depth));
-        _selected_obj = _obj_vector.size();
+        _selected_obj = static_cast<int>(_obj_vector.size());
         Refresh();
         return true;
     } else {
@@ -489,9 +489,8 @@ bool ImagePanel::saveTempDetection()
         }
         _obj_vector.emplace_back(_temp_obj);
         _temp_obj.point_list.clear();
-    } else if (_temp_obj.type == ObjectType::DETECTION && _status == STATUS::IDLE) {
-       _selected_obj = _obj_vector.size();
-        return false;
+    } else if (_selected_obj < _obj_vector.size() && _status == STATUS::IDLE) {
+        _temp_obj.point_list.clear();
     } else {
         return false;
     }
