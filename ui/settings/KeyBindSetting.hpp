@@ -2,19 +2,27 @@
 #ifndef FEPSTOOL_KEYBINDSETTING_HPP
 #define FEPSTOOL_KEYBINDSETTING_HPP
 
+#include <wx/wx.h>
+#include <data/FebsStruture.hpp>
 
-class KeyBindSetting
+
+class KeyBindSetting : public wxPanel
 {
-
+private:
+    enum BUTTON_ID {
+        DEFAULT,
+        CANCEL
+    };
 
 public:
-    KeyBindSetting();
+    KeyBindSetting(wxWindow * parent, ConfigData & data);
     ~KeyBindSetting();
 
 public:
     void initialize();
-    void initializeComponent();
-    void initializeButtons();
+    void initializeComponent(wxSizer * sizer);
+    void initializeMessage(wxSizer * sizer);
+    void initializeButtons(wxSizer * sizer);
     void initializeData();
 };
 

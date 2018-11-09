@@ -8,6 +8,7 @@
 #include <ui/detection/DetectionInfoBox.hpp>
 #include <ui/detection/DetectionToolBar.hpp>
 #include <ui/settings/SettingFrame.hpp>
+#include <data/KeyboardInputManager.hpp>
 
 #include <set>
 #include <vector>
@@ -27,15 +28,7 @@ public:
     };
     enum ID {
         COMBO_SIZE,
-        COMBO_TYPE,
-        COMBO_SCALE,
-        COMBO_DIFFICULT,
         IMAGE_VIEWER,
-        FILE_EXPLORER
-    };
-    enum STATUS {
-        IDLE,
-
     };
 
 private:
@@ -43,11 +36,9 @@ private:
     wxString _current_file;
     std::set<wxString> _image_extension;
     std::vector<wxString> _folder_name_list;
-    std::map<int, int> _key_map;
     std::deque<std::pair<wxString, wxString>> _undo_map;
 
 private:
-    bool _system_key_down = false;
     int _previous_mouse_x;
     int _previous_mouse_y;
 
@@ -56,6 +47,7 @@ private:
     DetectionToolBar * _toolbar;
     DetectionInfoBox * _infobox;
     ImagePanel * _image_panel;
+    KeyboardInputManager _input_manager;
 
 public:
     DetectionFrame(wxString const & title);
