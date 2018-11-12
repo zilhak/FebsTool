@@ -5,6 +5,7 @@
 #include "SettingPanelManager.hpp"
 #include "NameBoxSetting.hpp"
 #include "GeneralSetting.hpp"
+#include "KeyBindSetting.hpp"
 
 BEGIN_EVENT_TABLE(SettingPanelManager, wxTreeCtrl)
 END_EVENT_TABLE()
@@ -30,6 +31,7 @@ void SettingPanelManager::initializeManager(wxPanel * target_panel, wxSizer * ta
 
     addToList(Panel(new GeneralSetting(target_panel, _config)), wxT("General Setting"), root);
     addToList(Panel(new NameBoxSetting(target_panel, _config)), wxT("Object Color Setting"), root);
+    addToList(Panel(new KeyBindSetting(target_panel, _config)), wxT("Key Bind Setting"), root);
 
     for (auto pair : _map) {
         target_sizer->Add(pair.second.get(), 1, wxEXPAND);

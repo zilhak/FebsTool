@@ -29,7 +29,7 @@ void KeyBindSetting::initializeComponent(wxSizer * sizer)
     wxScrolledWindow * component_panel = new wxScrolledWindow(this, wxID_ANY);
     wxFlexGridSizer * grid_sizer = new wxFlexGridSizer(3, 10, 10);
 
-
+    grid_sizer->Add(new wxStaticText(component_panel, wxID_ANY, wxT("test")));
 
     component_panel->SetSizer(grid_sizer);
 
@@ -38,7 +38,7 @@ void KeyBindSetting::initializeComponent(wxSizer * sizer)
 
 void KeyBindSetting::initializeMessage(wxSizer * sizer)
 {
-    sizer->Add(new wxStaticText(this, wxID_ANY, wxT("변경을 원하는 단축키를 클릭해주세요")), 0, wxALIGN_CENTER);
+    sizer->Add(new wxStaticText(this, wxID_ANY, wxT("Click!!")), 0, wxALIGN_CENTER);
 }
 
 void KeyBindSetting::initializeButtons(wxSizer * sizer)
@@ -52,7 +52,9 @@ void KeyBindSetting::initializeButtons(wxSizer * sizer)
     buttons_sizer->Add(default_button, 0);
     buttons_sizer->Add(cancel_button, 0, wxLEFT, 10);
 
-    sizer->Add(buttons_panel, 0, wxEXPAND);
+    buttons_panel->SetSizer(buttons_sizer);
+
+    sizer->Add(buttons_panel, 0, wxALIGN_RIGHT);
 }
 
 void KeyBindSetting::initializeData()

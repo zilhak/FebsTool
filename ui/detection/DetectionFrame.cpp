@@ -17,7 +17,6 @@ DetectionFrame::DetectionFrame(const wxString & title) : wxDialog(NULL, wxID_ANY
 {
     initialize();
     cv::Mat mat;
-    std::cout << "test : " << mat.elemSize() << std::endl;
 }
 
 DetectionFrame::~DetectionFrame()

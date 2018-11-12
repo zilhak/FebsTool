@@ -4,7 +4,7 @@
 
 #include "KeyboardInputManager.hpp"
 
-KeyboardInputManager::KeyboardInputManager(ObjectType type, std::string const & file_name)
+KeyboardInputManager::KeyboardInputManager(ObjectType type, std::string const & file_name) : _type(type)
 {
     load(type);
 }
@@ -38,7 +38,7 @@ void KeyboardInputManager::load(ObjectType type)
 int KeyboardInputManager::getCode(int keycode)
 {
     auto code = _key_map.find(keycode);
-    std::cout << "haha" << std::endl;
+    std::cout << code->first << " " << code->second << std::endl;
     if (code != _key_map.end()) {
         return code->second;
     }
@@ -80,6 +80,7 @@ int KeyboardInputManager::getCode(int keycode)
             default : return -1;
         }
     } else if (_type == ObjectType::SEGMENTATION) {
-
+        return -1;
     }
+    return -1;
 }
