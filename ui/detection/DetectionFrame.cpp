@@ -244,7 +244,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 {
     std::cout << event.GetKeyCode() << std::endl;
     if (_image_viewer->isReady()) {
-        if (event.GetKeyCode() == 69) { // 'e'
+        if (event.GetKeyCode() == /*69*/WXK_NUMPAD0) { // 'e'
             _image_viewer->setType(_type_combobox->GetValue());
             if (_image_viewer->save()) {
                 _file_list_viewer->xmlCheck(_current_file);
@@ -261,7 +261,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 
         } else if (event.GetKeyCode() == /*82*/WXK_RIGHT) { //'r'
             nextFile();
-        } else if (event.GetKeyCode() == 84) { //'t
+        } else if (event.GetKeyCode() == /*84*/WXK_NUMPAD2) { //'t
             _image_viewer->deleteObject();
         } else if (event.GetKeyCode() == 13) { //'enter'
             _image_viewer->saveCropImage();
@@ -292,7 +292,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == /*WXK_PAGEUP*/WXK_F1) { //'pageup'
+        } else if (event.GetKeyCode() == /*WXK_PAGEUP*/WXK_END) { //'end'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp1";
 
@@ -313,7 +313,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == /*WXK_PAGEDOWN*/WXK_F2) { //'delete'
+        } else if (event.GetKeyCode() == WXK_PAGEDOWN) { //'pagedown'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp2";
 
@@ -334,11 +334,11 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == WXK_TAB) {
+        } else if (event.GetKeyCode() == WXK_NUMPAD1) {
             _image_viewer->previousObject();
         } else if (event.GetKeyCode() == WXK_SHIFT) {
             _image_viewer->hideBox(true);
-        } else if (event.GetKeyCode() == WXK_ALT) {
+        } else if (event.GetKeyCode() == WXK_CONTROL) {
             _image_viewer->hideName(true);
         }
     }
