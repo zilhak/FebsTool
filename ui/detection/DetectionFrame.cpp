@@ -249,7 +249,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             if (_image_viewer->save()) {
                 _file_list_viewer->xmlCheck(_current_file);
             }
-        } else if (event.GetKeyCode() == 81) { //'q'
+        } else if (event.GetKeyCode() == /*81*/WXK_LEFT) { //'q'
             prevFile();
         } else if (event.GetKeyCode() == 87) { //'w'
 
@@ -259,7 +259,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
 
         } else if (event.GetKeyCode() == 68) { //'d'
 
-        } else if (event.GetKeyCode() == 82) { //'r'
+        } else if (event.GetKeyCode() == /*82*/WXK_RIGHT) { //'r'
             nextFile();
         } else if (event.GetKeyCode() == 84) { //'t
             _image_viewer->deleteObject();
@@ -292,7 +292,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == WXK_PAGEUP) { //'pageup'
+        } else if (event.GetKeyCode() == /*WXK_PAGEUP*/WXK_F1) { //'pageup'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp1";
 
@@ -313,7 +313,7 @@ void DetectionFrame::onKeyboardEvent(wxKeyEvent & event)
             }
             makeFileList(file.GetPath());
             refresh();
-        } else if (event.GetKeyCode() == WXK_PAGEDOWN) { //'delete'
+        } else if (event.GetKeyCode() == /*WXK_PAGEDOWN*/WXK_F2) { //'delete'
             wxFileName file(_dir->GetName() + "/" + _current_file);
             wxString trashbin_path = file.GetPath(wxPATH_GET_SEPARATOR) + "temp2";
 

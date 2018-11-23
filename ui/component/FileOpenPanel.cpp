@@ -2,7 +2,7 @@
 // Created by bogonets on 2018. 4. 12..
 //
 
-#include <wx-3.1/wx/filename.h>
+#include <wx/filename.h>
 #include <ui/component/FileOpenPanel.hpp>
 
 BEGIN_EVENT_TABLE(FileOpenPanel, wxPanel)
